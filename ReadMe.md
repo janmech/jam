@@ -11,5 +11,14 @@ The project was born out of curiosity, wanting to learn how to write Max externa
 The jam package is created with the [Min-DevKit](http://cycling74.github.io/min-devkit/) of Cycling'74 and publisched under The MIT Lisense.
 
 
+## Installing
+Download the [latests release](https://github.com/janmech/jam/releases/) unzip and copy the folder to the Max packages folder.
+
+## System Requirements:
+Max: 8.0 or higher
+
+MacOS: 10.15 or higher 
+
+Windows: unsupported 
 
  
