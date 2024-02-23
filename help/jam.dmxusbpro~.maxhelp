@@ -709,7 +709,7 @@
 , 							{
 								"box" : 								{
 									"id" : "obj-8",
-									"items" : [ "(Select Interface)", ",", "(URT2)", ",", "(BLTH)", ",", "(URT1)", ",", "(Bluetooth-Incoming-Port)", ",", "usbserial-EN173013" ],
+									"items" : [ "(Select Interface)", ",", "(BLTH)", ",", "(URT2)", ",", "(URT1)", ",", "(Bluetooth-Incoming-Port)" ],
 									"maxclass" : "umenu",
 									"numinlets" : 1,
 									"numoutlets" : 3,
@@ -734,7 +734,7 @@
 , 							{
 								"box" : 								{
 									"border" : 0,
-									"filename" : "Macintosh HD:/Users/janmech/Documents/Max 8/Packages/jam/javascript/jam.helpdetails.js",
+									"filename" : "jam.helpdetails.js",
 									"id" : "obj-2",
 									"ignoreclick" : 1,
 									"jsarguments" : [ "jam.dmxusbpro~" ],

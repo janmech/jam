@@ -134,7 +134,7 @@
 , 			{
 				"box" : 				{
 					"border" : 0,
-					"filename" : "Macintosh HD:/Users/janmech/Documents/Max 8/Packages/jam/javascript/jam.helpdetails.js",
+					"filename" : "jam.helpdetails.js",
 					"id" : "obj-1",
 					"ignoreclick" : 1,
 					"jsarguments" : [ "jam.dmxusbpro~" ],
@@ -152,7 +152,7 @@
 , 			{
 				"box" : 				{
 					"border" : 0,
-					"filename" : "Macintosh HD:/Users/janmech/Documents/Max 8/Packages/jam/javascript/jam.helpdetails.js",
+					"filename" : "jam.helpdetails.js",
 					"id" : "obj-30",
 					"ignoreclick" : 1,
 					"jsarguments" : [ "jam.dmxusbpro" ],
