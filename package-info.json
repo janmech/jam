@@ -1,0 +1,20 @@
+{
+	"author" : "Jan Mech",
+	"description" : "Objects to control with ENTTECT DMX USB Pro interface",
+	"homepatcher" : "jam_overview.maxpat",
+	"max_version_min" : "8.0", "max_version_max" : "none",
+	"name" : "jam",
+	"os" : {
+		"macintosh" : {
+			"platform" : [ "x64", "aarch64" ],
+			"min_version" : "10.15"
+		}
+	},
+	"package_extra" : {
+		"reverse_domain" : "net.janmech",
+		"copyright" : "Copyright (c) 2024 Jan Mech - The MIT Lisence"
+	},
+	"tags" : [ ],
+	"version" : "1.0-beta",
+	"website" : "https://janmech.net"
+}

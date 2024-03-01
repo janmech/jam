@@ -709,7 +709,7 @@
 , 							{
 								"box" : 								{
 									"id" : "obj-8",
-									"items" : [ "(Select Interface)", ",", "(BLTH)", ",", "(URT2)", ",", "(URT1)", ",", "(Bluetooth-Incoming-Port)" ],
+									"items" : [ "(Select Interface)", ",", "URT1", ",", "BLTH", ",", "URT2", ",", "Bluetooth-Incoming-Port" ],
 									"maxclass" : "umenu",
 									"numinlets" : 1,
 									"numoutlets" : 3,
