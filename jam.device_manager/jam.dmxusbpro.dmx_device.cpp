@@ -282,7 +282,7 @@ int  Connector::connectionState(std::string port_name) {
         || options_stored.c_ispeed !=options_device.c_ispeed
         || options_stored.c_ospeed !=options_device.c_ospeed
         ) {
-            return ConnectionState::MODOFIED;
+            return ConnectionState::MODIFIED;
     }
 
     return ConnectionState::OK;

@@ -58,7 +58,7 @@ class Connector {
         enum ConnectionState {
             OK,
             MISSING,
-            MODOFIED
+            MODIFIED
         };
 
         Connector(const Connector&) = delete;
