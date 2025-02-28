@@ -29,6 +29,21 @@
 
 	<methodlist>
 
+		<method name='openfile'>
+			<digest>open an ILDA file </digest>
+			<description>open an ILDA file </description>
+		</method>
+
+		<method name='test'>
+			<digest>foooo </digest>
+			<description>foooo </description>
+		</method>
+
+		<method name='menu'>
+			<digest>Get list of connected devices and build menu from it</digest>
+			<description>Get list of connected devices and build menu from it. </description>
+		</method>
+
 		<method name='version'>
 			<digest>dev test message </digest>
 			<description>dev test message </description>

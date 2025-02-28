@@ -539,53 +539,53 @@ class dmxusbpro : public object<dmxusbpro>
                 std::this_thread::sleep_for(s_chrono::milliseconds(10));
 
                 this->_receive_thread = std::thread([this]()
-            {
-                atoms msg_to_console;
+                    {
+                        atoms msg_to_console;
 
-                if (verbose) {
-                    msg_to_console.push_back(TO_MAX_CONSOLE);
-                    msg_to_console.push_back("starting receive thread");
-                    _enque_msg_to_max(msg_to_console);
-                    deliverer_to_max.delay(0);
-                }
+                        if (verbose) {
+                            msg_to_console.push_back(TO_MAX_CONSOLE);
+                            msg_to_console.push_back("starting receive thread");
+                            _enque_msg_to_max(msg_to_console);
+                            deliverer_to_max.delay(0);
+                        }
 
-                while(_io_threads_continue) {
-                    _receiveThreadTask();
-                }
+                        while(_io_threads_continue) {
+                            _receiveThreadTask();
+                        }
 
-                if (verbose) {
-                    msg_to_console.clear();
-                    msg_to_console.push_back(TO_MAX_CONSOLE);
-                    msg_to_console.push_back("stopping receive thread");
-                    _enque_msg_to_max(msg_to_console);
-                    deliverer_to_max.delay(0);
-                }
-            });
+                        if (verbose) {
+                            msg_to_console.clear();
+                            msg_to_console.push_back(TO_MAX_CONSOLE);
+                            msg_to_console.push_back("stopping receive thread");
+                            _enque_msg_to_max(msg_to_console);
+                            deliverer_to_max.delay(0);
+                        }
+                    });
                 this->_receive_thread.detach();
 
                 this->_send_thread = std::thread([this]()
-            {
-                atoms msg_to_console;
+                    {
+                        atoms msg_to_console;
 
-                if (verbose) {
-                    msg_to_console.push_back(TO_MAX_CONSOLE);
-                    msg_to_console.push_back("starting send thread");
-                    _enque_msg_to_max(msg_to_console);
-                    deliverer_to_max.delay(0);
-                }
+                        if (verbose) {
+                            msg_to_console.push_back(TO_MAX_CONSOLE);
+                            msg_to_console.push_back("starting send thread");
+                            _enque_msg_to_max(msg_to_console);
+                            deliverer_to_max.delay(0);
+                        }
 
-                while(_io_threads_continue) {
-                    _sendThreadTask();
-                }
+                        while(_io_threads_continue) {
+                            _sendThreadTask();
+                        }
 
-                if (verbose) {
-                    msg_to_console.clear();
-                    msg_to_console.push_back(TO_MAX_CONSOLE);
-                    msg_to_console.push_back("stopping send thread");
-                    _enque_msg_to_max(msg_to_console);
-                    deliverer_to_max.delay(0);
-                }
-            });
+                        if (verbose) {
+                            msg_to_console.clear();
+                            msg_to_console.push_back(TO_MAX_CONSOLE);
+                            msg_to_console.push_back("stopping send thread");
+                            _enque_msg_to_max(msg_to_console);
+                            deliverer_to_max.delay(0);
+                        }
+                    });
                 this->_send_thread.detach();
                 return {};
             }

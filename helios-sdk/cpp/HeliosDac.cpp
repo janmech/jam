@@ -271,7 +271,7 @@ int HeliosDac::_OpenIdnDevices()
 
 void HeliosDac::_SortDeviceList()
 {
-	int listSize = deviceList.size();
+	int listSize = (int)deviceList.size();
 	for (int i = 0; i < listSize - 1; i++) // Bubble sort
 	{
 		for (int j = 0; j < listSize - i - 1; j++)

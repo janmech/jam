@@ -5,7 +5,6 @@ std::vector<std::string> & Connector::getDevicePaths() {
     return this->m_device_paths;
 }
 
-
 std::vector<std::string> Connector::getDeviceNames(bool verbose, bool reload) {
 
     std::vector<std::string> device_names;
