@@ -28,14 +28,32 @@ namespace s_chrono = std::chrono;
 class helios : public object<helios>
 {
     
+private:
+    dict _d_file_info{symbol(true)};
+    dict _d_file_info_header{symbol(true)};
+    
 protected:
     HeliosDac _helios_dac;
-    jam::IldaFileProcessor _fileProcessor;
+    jam::ilda::IldaFileProcessor _fileProcessor;
+    
+    void _fileToDict(std::string file_name) {
+        this->_d_file_info["file_name"] = file_name;
+        this->_d_file_info_header["format_code"] = this->_fileProcessor.getFileHeader().formatCode;
+        this->_d_file_info_header["frame_name"] = this->_fileProcessor.getFileHeader().frameName;
+        this->_d_file_info_header["company_name"] = this->_fileProcessor.getFileHeader().companyName;
+        this->_d_file_info_header["record_count"] = this->_fileProcessor.getFileHeader().recordCount;
+        this->_d_file_info_header["frame_number"] = this->_fileProcessor.getFileHeader().frameNumber;
+        this->_d_file_info_header["frames_in_sequence"] = this->_fileProcessor.getFileHeader().framesInSequence;
+        this->_d_file_info_header["is_color_pallet"] = this->_fileProcessor.getFileHeader().isColorPallet;
+    }
     
     
 public:
     
-    helios(const atoms& args = {}) {}
+    helios(const atoms& args = {}) {
+        _d_file_info["file_name"] = "";
+        _d_file_info["header"] = _d_file_info_header;
+    }
     
     ~helios() {
         this->_helios_dac.CloseDevices();
@@ -51,7 +69,8 @@ public:
     
     inlet<> input_1    { this, "(anything) Control Messages", "anything" };
     outlet<> output_1   { this, "(list) DMX Output <startcode> <channel> <value>", "list" };
-    outlet<> output_2   { this, "file opration success/failure notification", "list" };
+    outlet<> output_2   { this, "Dictionary with loaded file information", "dictionary" };
+    outlet<> output_3   { this, "file opration success/failure notification", "list" };
     
     message<threadsafe::yes> version {
         this, "version",
@@ -190,7 +209,7 @@ public:
                     file_message.push_back("import");
                     file_message.push_back(filename);
                     file_message.push_back(0);
-                    output_2.send(file_message);
+                    output_3.send(file_message);
                     return {};
                 }
             } else {
@@ -200,7 +219,7 @@ public:
                     file_message.push_back("import");
                     file_message.push_back(filename);
                     file_message.push_back(0);
-                    output_2.send(file_message);
+                    output_3.send(file_message);
                     return {};
                 }
                 strcpy(filename, user_filename.c_str());
@@ -210,7 +229,7 @@ public:
                     file_message.push_back("import");
                     file_message.push_back(filename);
                     file_message.push_back(0);
-                    output_2.send(file_message);
+                    output_3.send(file_message);
                     return {};
                 }
             }
@@ -221,7 +240,7 @@ public:
                 file_message.push_back("import");
                 file_message.push_back(filename);
                 file_message.push_back(0);
-                output_2.send(file_message);
+                output_3.send(file_message);
                 return {};
             }
             std::vector<char> ilda_file_bytes;
@@ -244,17 +263,17 @@ public:
                 file_message.push_back("import");
                 file_message.push_back(filename);
                 file_message.push_back(0);
-                output_2.send(file_message);
+                output_3.send(file_message);
             }
-            
+            this->_fileToDict(std::string(filename));
             file_message.push_back("import");
             file_message.push_back(filename);
             file_message.push_back(1);
-            output_2.send(file_message);
+            output_3.send(file_message);
             file_message.clear();
             file_message.push_back("bytes");
             file_message.push_back(ilda_file_bytes.size());
-            output_2.send(file_message);
+            output_3.send(file_message);
             return {};
             
         }
@@ -265,42 +284,8 @@ public:
         MIN_FUNCTION {
             if(!this->_fileProcessor.fileLoaded()) {
                 cwarn << "No file loaded." << endl;
-                return {};
             }
-            
-            jam::ilda_header_t header = this->_fileProcessor.getFileHeader();
-            /*
-             typedef struct header {
-                 uint8_t formatCode = 0;
-                 std::string frameName = "";
-                 std::string companyName = "";
-                 std::uint16_t recordCount = 0;
-                 std::uint16_t frameNumber = 0;
-                 std::uint16_t framesInSequence = 0;
-                 bool isColorPallet = false;
-                 
-             } ilda_header_t;
-             */
-            std::uint8_t formatCode = header.formatCode;
-            std::string frameName = header.frameName;
-            std::string companyName = header.companyName;
-            std::uint16_t recordCount = header.recordCount;
-            std::uint16_t frameNumber = header.frameNumber;
-            std::uint16_t framesInSequence = header.framesInSequence;
-            bool isColorPallet = header.isColorPallet;
-            
-            cout << "File header:" << endl;
-            cout << "    Format Code:" << (int)formatCode << endl;
-            cout << "    Frame Name:" << frameName << endl;
-            cout << "    Company Name:" << companyName << endl;
-            cout << "    Number of Records:" << recordCount << endl;
-            cout << "    Frame Number:" << frameNumber << endl;
-            cout << "    Frames in Sequence:" << framesInSequence << endl;
-            cout << "    Is Color Pallet File:" << isColorPallet << endl;
-            
-            
-            
-            
+            output_2("dictionary", _d_file_info.name());
             return {};
         }
     };

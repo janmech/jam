@@ -6,8 +6,9 @@
     //
 
 #include "ilda_file_processor.hpp"
-namespace jam {
+namespace jam::ilda {
     
+    /* public functions */
     bool IldaFileProcessor::setAndParseIldaFile(std::vector<char>ilda_file) {
         this->_ilda_file = ilda_file;
         if(!this->_parseHeader()) {
@@ -20,13 +21,13 @@ namespace jam {
     
     void IldaFileProcessor::clearFileData() {
         this->_ilda_file.clear();
-        this->_header.companyName="";
-        this->_header.formatCode = 0;
-        this->_header.framesInSequence = 0;
-        this->_header.frameNumber = 0;
-        this->_header.recordCount = 0;
-        this->_header.framesInSequence = 0;
-        this->_header.isColorPallet = false;
+        this->_file_header.companyName="";
+        this->_file_header.formatCode = 0;
+        this->_file_header.framesInSequence = 0;
+        this->_file_header.frameNumber = 0;
+        this->_file_header.recordCount = 0;
+        this->_file_header.framesInSequence = 0;
+        this->_file_header.isColorPallet = false;
         this->_fileLoaded = false;
     }
     
@@ -34,11 +35,11 @@ namespace jam {
         return this->_fileLoaded;
     }
     
-    ilda_header_t &IldaFileProcessor::getFileHeader() {
-        return this->_header;
+    section_header_t &IldaFileProcessor::getFileHeader() {
+        return this->_file_header;
     }
     
-        // Protected functions
+    /* protected functions */
     bool IldaFileProcessor::_parseHeader() {
             // Some basic header evaluation
         if (this->_ilda_file.size() < 32) {
@@ -86,17 +87,17 @@ namespace jam {
         this->_readHeaderSection(frames_in_sequence, FILE_HEADER_FRAMES_IN_SEQUENCE_START, FILE_HEADER_FRAMES_IN_SEQUENCE_END);
         
         
-        this->_header.formatCode = format_code;
-        this->_header.frameName = std::string(frame_name);
-        this->_header.companyName = std::string(company_name);
-        this->_header.recordCount = this->_parseUint16(record_count, sizeof(record_count));
-        this->_header.frameNumber = this->_parseUint16(frame_number, sizeof(frame_number));
-        this->_header.framesInSequence = this->_parseUint16(frames_in_sequence, sizeof(frames_in_sequence));
-        this->_header.isColorPallet = (this->_header.framesInSequence == 0);
+        this->_file_header.formatCode = format_code;
+        this->_file_header.frameName = std::string(frame_name);
+        this->_file_header.companyName = std::string(company_name);
+        this->_file_header.recordCount = this->_parseUint16(record_count, sizeof(record_count));
+        this->_file_header.frameNumber = this->_parseUint16(frame_number, sizeof(frame_number));
+        this->_file_header.framesInSequence = this->_parseUint16(frames_in_sequence, sizeof(frames_in_sequence));
+        this->_file_header.isColorPallet = (this->_file_header.framesInSequence == 0);
         
             // finally validate if record count is in bounds for color pallet
-        if(this->_header.isColorPallet) {
-            if(this->_header.recordCount < 2 || this->_header.recordCount > 256) {
+        if(this->_file_header.isColorPallet) {
+            if(this->_file_header.recordCount < 2 || this->_file_header.recordCount > 256) {
                 return false;
             }
         }

@@ -10,8 +10,10 @@
 
 #include <vector>
 #include <cstddef>
+#include "ilda_header.hpp"
+#include "ilda_data_record.hpp"
 
-namespace jam {
+namespace jam::ilda {
     
 #define FILE_HEADER_SIZE 32
     
@@ -42,16 +44,20 @@ namespace jam {
 #define FILE_HEADER_PROJECTOR_NUMBER_START 30
 #define FILE_HEADER_PROJECTOR_NUMBER_END 30
     
-    typedef struct header {
+    typedef struct Header_Struct {
         uint8_t formatCode = 0;
         std::string frameName = "";
         std::string companyName = "";
-        std::uint16_t recordCount = 0;
-        std::uint16_t frameNumber = 0;
-        std::uint16_t framesInSequence = 0;
+        uint16_t recordCount = 0;
+        uint16_t frameNumber = 0;
+        uint16_t framesInSequence = 0;
+        uint8_t projectorNumber = 0;
+        
         bool isColorPallet = false;
         
-    } ilda_header_t;
+    } section_header_t;
+    
+    
     
     class IldaFileProcessor {
     public:
@@ -63,15 +69,15 @@ namespace jam {
         bool setAndParseIldaFile(std::vector<char>ilda_file);
         void clearFileData();
         bool fileLoaded();
-        ilda_header_t &getFileHeader();
-        
-        
+        section_header_t &getFileHeader();
         
         
     protected:
+        
         bool _fileLoaded = false;
-        ilda_header_t _header;
+        section_header_t _file_header;
         std::vector<char> _ilda_file;
+        
         void _readHeaderSection(char* buffer, uint8_t start, uint8_t end);
         std::uint16_t _parseUint16(char* bytes, std::size_t byte_count);
         bool _parseHeader();
