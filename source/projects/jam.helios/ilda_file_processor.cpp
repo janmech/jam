@@ -6,108 +6,159 @@
     //
 
 #include "ilda_file_processor.hpp"
-namespace jam::ilda {
+namespace jam::helios {
     
     /* public functions */
-    bool IldaFileProcessor::setAndParseIldaFile(std::vector<char>ilda_file) {
+    void IldaFileProcessor::setFileData(std::vector<char>ilda_file) {
         this->_ilda_file = ilda_file;
-        if(!this->_parseHeader()) {
-            this->clearFileData();
-            return false;
-        }
         this->_fileLoaded = true;
-        return true;
     }
     
     void IldaFileProcessor::clearFileData() {
         this->_ilda_file.clear();
-        this->_file_header.companyName="";
-        this->_file_header.formatCode = 0;
-        this->_file_header.framesInSequence = 0;
-        this->_file_header.frameNumber = 0;
-        this->_file_header.recordCount = 0;
-        this->_file_header.framesInSequence = 0;
-        this->_file_header.isColorPallet = false;
         this->_fileLoaded = false;
+    }
+    
+    ParseResult IldaFileProcessor::parseFileData() {
+        ParseResult parse_result = ParseResult::SUCCESS;
+        this->_ilda_sections.clear();
+        if(!this->fileLoaded()) {
+            return ParseResult::NODATA;
+        }
+        if(this->_ilda_file.size() < FILE_HEADER_SIZE) { // We need at least one complete header
+            return ParseResult::PARSEERROR;
+        }
+        size_t byte_index = 0;
+        while(true) {
+            // TODO: Continue here. header parsing not yet working
+            IldaSection section;
+            ParseResult result = this->_extractSection(section, &byte_index);
+            this->_ilda_sections.push_back(section);
+            if(result != ParseResult::SUCCESS) {
+                if(result == ParseResult::END_OF_FILE) {
+                    parse_result = ParseResult::SUCCESS;
+                    break;
+                } else {
+                    parse_result = result;
+                    break;
+                }
+               
+            }
+        }
+        
+        return parse_result;
     }
     
     bool IldaFileProcessor::fileLoaded() {
         return this->_fileLoaded;
     }
     
-    section_header_t &IldaFileProcessor::getFileHeader() {
-        return this->_file_header;
-    }
-    
     /* protected functions */
-    bool IldaFileProcessor::_parseHeader() {
-            // Some basic header evaluation
-        if (this->_ilda_file.size() < 32) {
-            return false;
+    ParseResult IldaFileProcessor::_extractSection(IldaSection &section, size_t *byte_index) {
+        IldaHeader section_header;
+        section.setHeader(section_header);
+            // check start tag
+        size_t header_index_start = *byte_index + FILE_HEADER_ILDA_TAG_START;
+        char ilda_tag_buffer[FILE_HEADER_ILDA_TAG_LENGTH + 1] = {0};
+        this->_readHeaderSection(
+                                 ilda_tag_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_ILDA_TAG_LENGTH
+                                 );
+        std::string start_tag(ilda_tag_buffer);
+        if(start_tag != "ILDA") {
+            return ParseResult::PARSEERROR;
         }
         
-            // Check the start tag
-        char start_tag[5] = {0};
-        this->_readHeaderSection(start_tag, FILE_HEADER_ILDA_TAG_START, FILE_HEADER_ILDA_TAG_END);
-        std::string start_tag_string(start_tag);
-        if(start_tag_string != "ILDA") {
-            return false;
-        }
-        
-            // Read the header information
-        char format_code;
-        this->_readHeaderSection(&format_code, FILE_HEADER_FORMAT_CODE_START, FILE_HEADER_FORMAT_CODE_END);
+            // read format code
+        char format_code_buffer[FILE_HEADER_FORMAT_CODE_LENGTH] = {0};
+        header_index_start = *byte_index + FILE_HEADER_FORMAT_CODE_START;
+        this->_readHeaderSection(
+                                 format_code_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_FORMAT_CODE_LENGTH
+                                 );
+        int format_code = (int)format_code_buffer[0];
         if(format_code > 5 || format_code == 3) {
-            return false;
+            return ParseResult::PARSEERROR;
         }
+        section_header.setFormatCode(static_cast<RecordFormat>(format_code));
         
-        char frame_name[10] = {0};
-        this->_readHeaderSection(frame_name, FILE_HEADER_FRAME_NAME_START, FILE_HEADER_FRAME_NAME_END);
+            // read frame name
+        char frame_name_buffer[FILE_HEADER_FRAME_NAME_LENGTH + 1] = {0};
+        header_index_start = *byte_index + FILE_HEADER_FRAME_NAME_START;
+        this->_readHeaderSection(
+                                 frame_name_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_FRAME_NAME_LENGTH
+                                 );
+        section_header.setFrameName(std::string(frame_name_buffer));
         
-        char company_name[10] = {0};
-        this->_readHeaderSection(company_name, FILE_HEADER_COMPANY_NAME_START, FILE_HEADER_COMPANY_NAME_END);
+            // read company name
+        char company_name_buffer[FILE_HEADER_COMPANY_NAME_LENGTH + 1] {0};
+        header_index_start = *byte_index + FILE_HEADER_COMPANY_NAME_START;
+        this->_readHeaderSection(
+                                 company_name_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_COMPANY_NAME_LENGTH
+                                 );
+        section_header.setCompanyName(std::string(company_name_buffer));
         
-            // For color palettes, the number of records SHALL be between 2 and 256. A color pallet is indicateb by frames in sequence == 0
-        char record_count[2] = {};
-        this->_readHeaderSection(record_count, FILE_HEADER_NUMBER_OF_RECODRS_START, FILE_HEADER_NUMBER_OF_RECODRS_END);
-            // If the number of records is 0, then this is to be taken as the end of file header and no more data will follow this header.
-        if(this->_parseUint16(record_count, sizeof(record_count)) == 0) {
-            return false;
-        }
+            // read number of records
+        char num_records_buffer[FILE_HEADER_NUMBER_OF_RECODRS_LENGTH] = {0};
+        header_index_start = *byte_index + FILE_HEADER_NUMBER_OF_RECODRS_START;
+        this->_readHeaderSection(
+                                 num_records_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_NUMBER_OF_RECODRS_LENGTH
+                                 );
+        uint16_t num_record = this->_parseUint16(num_records_buffer, sizeof(num_records_buffer));
+        section_header.setRecordCount((size_t)num_record);
         
-            // If the frame is part of a group such as an animation sequence, this represents the frame number. Counting begins with frame 0. Range is 0 – 65534. TODO: Is this correct or a type in the specs? (0xFFFF == 65535)
-        char frame_number[2] = {0};
-        this->_readHeaderSection(frame_number, FILE_HEADER_FRAME_NUMBER_START, FILE_HEADER_FRAME_NUMBER_END);
-        if(this->_parseUint16(frame_number, sizeof(frame_number)) > 65534) {
-            return false;
-        }
+            // read frame number
+        char frame_number_buffer[FILE_HEADER_FRAME_NUMBER_LENGTH] = {0};
+        header_index_start = *byte_index + FILE_HEADER_FRAME_NUMBER_START;
+        this->_readHeaderSection(
+                                 frame_number_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_FRAME_NUMBER_LENGTH
+                                 );
         
-            // Total frames in this group or sequence. Range is 1 – 65535. For color palettes this SHALL be 0.
-        char frames_in_sequence[2] = {0};
-        this->_readHeaderSection(frames_in_sequence, FILE_HEADER_FRAMES_IN_SEQUENCE_START, FILE_HEADER_FRAMES_IN_SEQUENCE_END);
+        uint16_t frame_number = this->_parseUint16(frame_number_buffer, sizeof(frame_number_buffer));
+        section_header.setFrameNumber((size_t)frame_number);
         
+            // read frames in sequence
+        char frames_in_seq_buffer[FILE_HEADER_FRAMES_IN_SEQUENCE_LENGTH] = {};
+        header_index_start = *byte_index + FILE_HEADER_FRAMES_IN_SEQUENCE_START;
+        this->_readHeaderSection(
+                                 frames_in_seq_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_FRAMES_IN_SEQUENCE_LENGTH
+                                 );
+        uint16_t frames_in_sequence = this->_parseUint16(frames_in_seq_buffer, sizeof(frames_in_seq_buffer));
+        section_header.setFramesInSequence((size_t) frames_in_sequence);
         
-        this->_file_header.formatCode = format_code;
-        this->_file_header.frameName = std::string(frame_name);
-        this->_file_header.companyName = std::string(company_name);
-        this->_file_header.recordCount = this->_parseUint16(record_count, sizeof(record_count));
-        this->_file_header.frameNumber = this->_parseUint16(frame_number, sizeof(frame_number));
-        this->_file_header.framesInSequence = this->_parseUint16(frames_in_sequence, sizeof(frames_in_sequence));
-        this->_file_header.isColorPallet = (this->_file_header.framesInSequence == 0);
+            // read projector number
+        char projector_number_buffer[1] = {0};
+        header_index_start = *byte_index + FILE_HEADER_PROJECTOR_NUMBER_START;
+        this->_readHeaderSection(
+                                 projector_number_buffer,
+                                 (uint8_t)header_index_start,
+                                 (uint8_t)FILE_HEADER_PROJECTOR_NUMBER_LENGTH
+                                 );
+        section_header.setProjectorNumber((size_t) projector_number_buffer[0]);
         
-            // finally validate if record count is in bounds for color pallet
-        if(this->_file_header.isColorPallet) {
-            if(this->_file_header.recordCount < 2 || this->_file_header.recordCount > 256) {
-                return false;
-            }
-        }
+        size_t data_records_byte_size = section_header.getRecordCount() * this->_getRecordByteSize(section_header.getFormatCode());
         
-        return true;
-    }
+        *byte_index = *byte_index + FILE_HEADER_SIZE + data_records_byte_size;
+        
+        return (*byte_index >= this->_ilda_file.size()) ? ParseResult::END_OF_FILE : ParseResult::SUCCESS;
+    };
     
-    void IldaFileProcessor::_readHeaderSection(char* buffer, uint8_t start, uint8_t end) {
+    void IldaFileProcessor::_readHeaderSection(char* buffer, size_t start, size_t byte_count) {
         uint8_t buffer_index = 0;
-        for(size_t i = start; i <= end; i++) {
+        size_t end = start + byte_count;
+        for(size_t i = start; i < end; i++) {
             buffer[buffer_index] = this->_ilda_file[i];
             buffer_index++;
         }
@@ -120,13 +171,32 @@ namespace jam::ilda {
                 parsedInt = 0;
                 break;
             case 1:
-                parsedInt = (std::uint16_t)bytes[0];
+                parsedInt = (uint16_t)bytes[0];
                 break;
             default:
-                parsedInt = (((std::uint16_t)bytes[0]) << 8) | (uint16_t)bytes[1];
+                uint8_t most_sig = bytes[0];
+                uint8_t least_sig = bytes[1];
+                parsedInt = ((uint16_t)most_sig) << 8 | (uint16_t)least_sig;
                 break;
         }
         
         return parsedInt;
+    }
+    
+    size_t IldaFileProcessor::_getRecordByteSize(RecordFormat format) {
+        switch (format) {
+            case RecordFormat::FORMAT_2:
+                return 3;
+            case RecordFormat::FORMAT_1:
+                return 6;
+            case RecordFormat::FORMAT_0 :
+            case RecordFormat::FORMAT_5 :
+                return 8;
+            case RecordFormat::FORMAT_4:
+                return 10;
+            default:
+                return 0;
+                
+        }
     }
 };

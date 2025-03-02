@@ -30,21 +30,13 @@ class helios : public object<helios>
     
 private:
     dict _d_file_info{symbol(true)};
-    dict _d_file_info_header{symbol(true)};
     
 protected:
     HeliosDac _helios_dac;
-    jam::ilda::IldaFileProcessor _fileProcessor;
+    jam::helios::IldaFileProcessor _fileProcessor;
     
     void _fileToDict(std::string file_name) {
         this->_d_file_info["file_name"] = file_name;
-        this->_d_file_info_header["format_code"] = this->_fileProcessor.getFileHeader().formatCode;
-        this->_d_file_info_header["frame_name"] = this->_fileProcessor.getFileHeader().frameName;
-        this->_d_file_info_header["company_name"] = this->_fileProcessor.getFileHeader().companyName;
-        this->_d_file_info_header["record_count"] = this->_fileProcessor.getFileHeader().recordCount;
-        this->_d_file_info_header["frame_number"] = this->_fileProcessor.getFileHeader().frameNumber;
-        this->_d_file_info_header["frames_in_sequence"] = this->_fileProcessor.getFileHeader().framesInSequence;
-        this->_d_file_info_header["is_color_pallet"] = this->_fileProcessor.getFileHeader().isColorPallet;
     }
     
     
@@ -52,7 +44,6 @@ public:
     
     helios(const atoms& args = {}) {
         _d_file_info["file_name"] = "";
-        _d_file_info["header"] = _d_file_info_header;
     }
     
     ~helios() {
@@ -212,7 +203,8 @@ public:
                     output_3.send(file_message);
                     return {};
                 }
-            } else {
+            }
+            else {
                 std::string user_filename = args[0];
                 if(user_filename.size() > c74::max::MAX_PATH_CHARS - 1) {
                     cerr << "file name too long" << endl;
@@ -235,6 +227,7 @@ public:
             }
             
             open_result = c74::max::path_opensysfile( filename, path, &ilda_file_handle,c74::max::READ_PERM);
+            
             if(open_result != 0) {
                 cerr << "Couldn't open file" << endl;
                 file_message.push_back("import");
@@ -243,6 +236,7 @@ public:
                 output_3.send(file_message);
                 return {};
             }
+            
             std::vector<char> ilda_file_bytes;
             char file_buffer[HELIOS_FILE_CHUNK];
             c74::max::t_ptr_size chunk_size = HELIOS_FILE_CHUNK;
@@ -258,22 +252,22 @@ public:
               
             }
             // Set, parse and validate file date
-            if(!this->_fileProcessor.setAndParseIldaFile(ilda_file_bytes)) {
-                cerr << "Error parsing file data" << endl;
-                file_message.push_back("import");
-                file_message.push_back(filename);
-                file_message.push_back(0);
-                output_3.send(file_message);
+            this->_fileProcessor.setFileData(ilda_file_bytes);
+            jam::helios::ParseResult result = this->_fileProcessor.parseFileData();
+            int success = 1;
+            if(result != jam::helios::ParseResult::SUCCESS) {
+                success = 0;
             }
+            
             this->_fileToDict(std::string(filename));
             file_message.push_back("import");
             file_message.push_back(filename);
-            file_message.push_back(1);
+            file_message.push_back(success);
             output_3.send(file_message);
-            file_message.clear();
-            file_message.push_back("bytes");
-            file_message.push_back(ilda_file_bytes.size());
-            output_3.send(file_message);
+//            file_message.clear();
+//            file_message.push_back("bytes");
+//            file_message.push_back(ilda_file_bytes.size());
+//            output_3.send(file_message);
             return {};
             
         }

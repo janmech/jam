@@ -13,32 +13,13 @@
 #include <string>
 #include "ilda_definitions.hpp"
 
-namespace jam::ilda {
+namespace jam::helios {
     
-//#define HEADER_MAX_STRING_LENGTH 8
-//#define HEADER_MAX_RECORD_COUNT 65535
-//#define HEADER_MAX_FRAME_NUMBER 65535
-//#define HEADER_MAX_FRAMES_IN_SEQUENCE 65535
-//#define HEADER_MAX_PROJECTER_NUMBER 65535
-    
-//    enum RecordFormat {
-//        FORMAT_0 = 0, // 3D Coordinates with Indexed Color
-//        INDEXED_3D = 0,
-//        FORMAT_1 = 1, // 2D Coordinates with Indexed Color
-//        INDEXED_2D = 1,
-//        FORMAT_2 = 2, // Color Palette
-//        COLOR_PALLET = 2,
-//        FORMAT_4 = 4, // 3D Coordinates with True Color
-//        TRUE_COLOR_3D = 4,
-//        FORMAT_5 = 5, // 2D Coordinates with True Color
-//        TRUE_COLOR_2D = 5
-//    };
-//    
-    class Header {
+    class IldaHeader {
     public:
-        Header(){};
+        IldaHeader(){};
         
-        Header(
+        IldaHeader(
                RecordFormat format_code, std::string frame_name = "", std::string company_name = "",
                size_t record_count = 0, size_t frame_number = 0, size_t frames_in_sequence = 0,
                size_t projector_number = 0, bool is_color_pallet = false
@@ -56,7 +37,7 @@ namespace jam::ilda {
             
         };
         
-        ~Header(){};
+        ~IldaHeader(){};
         
         
         RecordFormat getFormatCode();
