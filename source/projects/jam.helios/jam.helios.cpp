@@ -30,6 +30,7 @@ class helios : public object<helios>
     
 private:
     dict _d_file_info{symbol(true)};
+    dict _d_file_sections{symbol(true)};
     
 protected:
     HeliosDac _helios_dac;
@@ -37,6 +38,18 @@ protected:
     
     void _fileToDict(std::string file_name) {
         this->_d_file_info["file_name"] = file_name;
+        _d_file_sections.clear();
+        int i = 0;
+        for(jam::helios::IldaSection s : this->_fileProcessor.getSections()) {
+            dict section{symbol(true)};
+            section["format"] = s.getHeader().getFormat();
+            section["frame_name"] = s.getHeader().getFrameName();
+            section["company_name"] = s.getHeader().getCompanyName();
+            section["frame_number"] = (int)s.getHeader().getFrameNumber();
+            section["frames_in_sequence"] = (int)s.getHeader().getFramesInSequence();
+            _d_file_sections[i] = section;
+            i++;
+        }
     }
     
     
@@ -44,6 +57,8 @@ public:
     
     helios(const atoms& args = {}) {
         _d_file_info["file_name"] = "";
+        _d_file_info["sections"] = _d_file_sections;
+        
     }
     
     ~helios() {
@@ -86,7 +101,6 @@ public:
     message<threadsafe::no> test {
         this, "test", "foooo",
         MIN_FUNCTION {
-            
             // Assemble test frames
             // This is a simple line moving upward in a loop, but for real graphics you should optimize the point stream for laser scanners by
             // interpolating long vectors including blanked sections, adding points at sharp corners, etc.
@@ -264,10 +278,6 @@ public:
             file_message.push_back(filename);
             file_message.push_back(success);
             output_3.send(file_message);
-//            file_message.clear();
-//            file_message.push_back("bytes");
-//            file_message.push_back(ilda_file_bytes.size());
-//            output_3.send(file_message);
             return {};
             
         }

@@ -12,6 +12,31 @@ namespace jam::helios{
     RecordFormat IldaHeader::getFormatCode() {
         return this->format_code;
     };
+    
+    std::string IldaHeader::getFormat() {
+        std::string format = "";
+        switch (this->getFormatCode()) {
+            case RecordFormat::FORMAT_0 :
+                format = "3D Coordinates with Indexed Color";
+                break;
+            case RecordFormat::FORMAT_1 :
+                format = "2D Coordinates with Indexed Color";
+                break;
+            case RecordFormat::FORMAT_2:
+                format = "Color Palette";
+                break;
+            case RecordFormat::FORMAT_4:
+                format = "3D Coordinates with True Color";
+                break;
+            case RecordFormat::FORMAT_5:
+                format = "2D Coordinates with True Colorr";
+                break;
+            default:
+                format = "Not recognized";
+                break;
+        }
+        return format;
+    };
     void IldaHeader::setFormatCode(RecordFormat format) {
         this->format_code = format;
     };

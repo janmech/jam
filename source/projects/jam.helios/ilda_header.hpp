@@ -41,7 +41,9 @@ namespace jam::helios {
         
         
         RecordFormat getFormatCode();
+        std::string getFormat();
         void setFormatCode(RecordFormat format);
+        
         
         std::string getFrameName();
         void setFrameName(std::string frame_name);

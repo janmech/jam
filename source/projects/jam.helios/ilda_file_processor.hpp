@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <cstddef>
+#include <memory>
 #include "ilda_definitions.hpp"
 #include "ilda_header.hpp"
 #include "ilda_data_record.hpp"
@@ -27,6 +28,7 @@ namespace jam::helios {
         void clearFileData();
         ParseResult parseFileData();
         bool fileLoaded();
+        std::vector<IldaSection> getSections();
         
         
     protected:
