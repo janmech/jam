@@ -30,7 +30,7 @@ namespace jam::helios{
     void IldaDataRecord::setColorIndex(uint8_t color_index) {
         this->color_index = color_index;
     };
-    uint8_t IldaDataRecord::getColorIndex(uint8_t color_index) {
+    uint8_t IldaDataRecord::getColorIndex() {
         return this->color_index;
     };
     void IldaDataRecord::setRed(uint8_t red) {

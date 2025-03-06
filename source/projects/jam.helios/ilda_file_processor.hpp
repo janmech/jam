@@ -37,9 +37,16 @@ namespace jam::helios {
         std::vector<char> _ilda_file;
         std::vector<IldaSection> _ilda_sections;
         
-        void _readHeaderSection(char* buffer, size_t start, size_t byte_count);
+        void _getFileBytes(char* buffer, size_t start, size_t byte_count);
         std::uint16_t _parseUint16(char* bytes, std::size_t byte_count);
+        int _parseTwosComplement(char most_significant, char least_significant); // value = (highbyte << 8) + lowbyte
         ParseResult _extractSection(IldaSection &section, size_t *byte_index);
+        ParseResult _parseSectionHeader(IldaHeader &section_header, size_t *byte_index);
+        ParseResult _parseDataRecordFormat_0(IldaDataRecord &data_record, char* buffer);
+        ParseResult _parseDataRecordFormat_1(IldaDataRecord &data_record, char* buffer);
+        ParseResult _parseDataRecordFormat_2(IldaDataRecord &data_record, char* buffer);
+        ParseResult _parseDataRecordFormat_4(IldaDataRecord &data_record, char* buffer);
+        ParseResult _parseDataRecordFormat_5(IldaDataRecord &data_record, char* buffer);
         size_t _getRecordByteSize(RecordFormat format);
         
     };

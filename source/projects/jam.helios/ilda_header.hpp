@@ -28,7 +28,7 @@ namespace jam::helios {
             this->setFormatCode(format_code);
             this->setFrameName(frame_name);
             this->setCompanyName(company_name);
-            this->setRecordCount(record_count);
+            this->setDataRecordCount(record_count);
             this->setFrameNumber(frame_number);
             this->setFramesInSequence(frames_in_sequence);
             this->setProjectorNumber(projector_number);
@@ -51,8 +51,8 @@ namespace jam::helios {
         std::string getCompanyName();
         void setCompanyName(std::string company_name);
         
-        size_t getRecordCount();
-        void setRecordCount(size_t record_count);
+        size_t getDataRecordCount();
+        void setDataRecordCount(size_t record_count);
         
         size_t getFrameNumber();
         void setFrameNumber(size_t frame_number);
@@ -68,10 +68,10 @@ namespace jam::helios {
         
         
     protected:
-        RecordFormat format_code = RecordFormat::INDEXED_3D ;
+        RecordFormat format_code = RecordFormat::FORMAT_0 ;
         std::string frame_name = "";
         std::string company_name = "";
-        size_t record_count = 0;
+        size_t data_record_count = 0;
         size_t frame_number = 0;
         size_t frames_in_sequence = 0;
         size_t projector_number = 0;

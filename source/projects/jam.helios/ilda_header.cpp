@@ -59,13 +59,13 @@ namespace jam::helios{
         this->company_name = company_name;
     };
     
-    size_t IldaHeader::getRecordCount() {
-        return this->record_count;
+    size_t IldaHeader::getDataRecordCount() {
+        return this->data_record_count;
     };
     
-    void IldaHeader::setRecordCount(size_t record_count) {
+    void IldaHeader::setDataRecordCount(size_t record_count) {
         record_count = (record_count> HEADER_MAX_RECORD_COUNT) ? HEADER_MAX_RECORD_COUNT : record_count;
-        this->record_count = record_count;
+        this->data_record_count = record_count;
     };
     
     size_t IldaHeader::getFrameNumber() {

@@ -30,7 +30,7 @@ namespace jam::helios {
     
     bool IldaSection::getNext(IldaDataRecord* data_record) {
         if(this->_data_records.size() > this->_iteratorIndex) {
-            data_record = &this->_data_records[this->_iteratorIndex];
+            *data_record = this->_data_records[this->_iteratorIndex];
             this->_iteratorIndex++;
             return true;
         }

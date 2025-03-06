@@ -104,7 +104,7 @@ namespace jam::helios {
         void setPosZ(int pos_z);
         int getPosZ();
         void setColorIndex(uint8_t color_index);
-        uint8_t getColorIndex(uint8_t color_index);
+        uint8_t getColorIndex();
         void setRed(uint8_t red);
         uint8_t getRed();
         void setGreen(uint8_t green);
