@@ -7,7 +7,7 @@
 
 #include "ilda_header.hpp"
 
-namespace jam::helios{
+namespace jam::ilda {
     
     RecordFormat IldaHeader::getFormatCode() {
         return this->format_code;
@@ -29,7 +29,7 @@ namespace jam::helios{
                 format = "3D Coordinates with True Color";
                 break;
             case RecordFormat::FORMAT_5:
-                format = "2D Coordinates with True Colorr";
+                format = "2D Coordinates with True Color";
                 break;
             default:
                 format = "Not recognized";
