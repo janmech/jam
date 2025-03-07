@@ -13,7 +13,6 @@
 #include "c74_min.h"
 #include "ilda_file_processor.hpp"
 
-#define OBJECT_VERSION "jam.helios v.0.0.0"
 #define HELIOS_FILE_CHUNK 1024
 
 
@@ -38,6 +37,7 @@ protected:
         for(jam::ilda::IldaFrame s : this->_fileProcessor.getFrames()) {
             dict frame{symbol(true)};
             frame["format"] = s.getHeader().getFormat();
+            frame["format_code"] = s.getHeader().getFormatCode();
             frame["frame_name"] = s.getHeader().getFrameName();
             frame["company_name"] = s.getHeader().getCompanyName();
             frame["frame_number"] = (int)s.getHeader().getFrameNumber();
@@ -54,6 +54,7 @@ protected:
         jam::ilda::IldaDataRecord data_record;
         jam::ilda::RecordFormat format_code = frame.getHeader().getFormatCode();
         this->_d_frame_data["format"] = frame.getHeader().getFormat();
+        this->_d_frame_data["format_code"] = format_code;
         this->_d_frame_data["frame_name"] = frame.getHeader().getFrameName();
         this->_d_frame_data["company_name"] = frame.getHeader().getCompanyName();
         this->_d_frame_data["frame_number"] = (int)frame.getHeader().getFrameNumber();

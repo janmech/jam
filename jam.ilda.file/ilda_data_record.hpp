@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <cstddef>
-#include "ilda_definitions.hpp"
+#include "../ilda_common/ilda_definitions.hpp"
 #include "ilda_header.hpp"
 
 namespace jam::ilda {

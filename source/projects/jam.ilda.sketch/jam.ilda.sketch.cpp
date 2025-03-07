@@ -13,6 +13,7 @@
 #include <thread>
 #include <string>
 #include "c74_min.h"
+#include  "../jam.ilda_common/ilda_definitions.hpp"
 
 #define OBJECT_VERSION "jam.helios v.0.0.0"
 #define HELIOS_FILE_CHUNK 1024
@@ -41,7 +42,7 @@ public:
     MIN_RELATED         { "jam.ilda.file"};
     
     inlet<> input_1    { this, "(anything) Control Messages", "anything" };
-    outlet<> output_1   { this, "(list) jit.gl.sketch draw commands", "list"  };
+    outlet<> output_1   { this, "jit.gl.sketch draw commands" };
     
     message<>bang  {
         this, "bang", "trigger output",
@@ -55,33 +56,93 @@ public:
     message<>dictionary {
         this, "dictionary", "ilda frame dictionary",
         MIN_FUNCTION {
-            cout << "ilda frame dictionary" << endl;
             dict frame_dict = {args[0]};
             int data_record_count = 0;
             try {
+                // reading data_record_cout
                 std::string count_string = atom(frame_dict.at("data_record_count"));
-                
                 data_record_count = std::atoi(count_string.c_str());
-        
-                cout << "data_records: " << data_record_count << endl;
             } catch(...) {
                 cerr << "error parsing frame dict." << endl;
                 return {};
             }
             
-            c74::min::symbol key {"data_records"};
-            auto data_records_dict_atom = c74::min::atom(frame_dict[key].begin());
-            
+            // getting dub dict data_recods
+            c74::min::symbol key_data_records {"data_records"};
+            auto data_records_dict_atom = c74::min::atom(frame_dict[key_data_records].begin());
                 // Create an unregistered subdict from the atom
             dict data_records_dict {data_records_dict_atom};
+
         
             try {
+                atom format_code = frame_dict.at("format_code");
+                int v_format_code = (int)format_code;
+                bool is_indexed_color = (
+                                         v_format_code == (int)jam::ilda::RecordFormat::FORMAT_0
+                                         || v_format_code ==  (int)jam::ilda::RecordFormat::FORMAT_1
+                                         );
+                
+                output_1("reset");
                 output_1("glcolor", 1., 1., 0., 1);
                 output_1("cmd_enable", "glcolor", 1);
+                output_1("gllinewidth", 2.);
                 
                 for(int i = 0; i < (int)data_record_count; i++) {
-                    auto data_record_dict = data_records_dict.at(symbol(i));
-                    // TODO: Continue here
+                    // geting sub dict data_record
+                    c74::min::symbol key_record_index {i};
+                    auto data_record_dict_atom = c74::min::atom(data_records_dict[key_record_index].begin());
+                    dict data_record_dict {data_record_dict_atom};
+                    try {
+                        std::vector<float> color_values = {1.,1.,1.};
+                        if(is_indexed_color) {
+                            atom a_color_index = data_record_dict.at("color_index");
+                            int v_color_idex = (int)a_color_index;
+                            color_values = this->_getFloatColorByIndex((uint8_t)v_color_idex);
+                        } else {
+                            atom a_red = data_record_dict.at("red");
+                            atom a_green = data_record_dict.at("green");
+                            atom a_blue = data_record_dict.at("blue");
+                            int v_red = a_red;
+                            int v_green = a_green;
+                            int v_blue = a_blue;
+                            color_values.clear();
+                            color_values.push_back((float) v_red / 255.);
+                            color_values.push_back((float) v_green / 255.);
+                            color_values.push_back((float) v_blue / 255.);
+                        }
+                        
+                        atom blanking = data_record_dict.at("blanking");
+                        bool value_blanking = (bool)blanking;
+                        atom a_pos_x = data_record_dict.at("pos_x");
+                        atom a_pos_y = data_record_dict.at("pos_y");
+                        std::string s_pos_x = a_pos_x;
+                        std::string s_pos_y = a_pos_y;
+                        int v_pos_x = std::atoi(s_pos_x.c_str());
+                        int v_pos_y = std::atoi(s_pos_y.c_str());
+                        
+                        if(value_blanking) {
+                            output_1(
+                                     "moveto",
+                                     this->_normalizePosition(v_pos_x),
+                                     this->_normalizePosition(v_pos_y),
+                                     0.
+                                     );
+                        } else {
+                            output_1("glcolor", color_values[0],color_values[1], color_values[2], 1);
+                            output_1(
+                                     "lineto",
+                                     this->_normalizePosition(v_pos_x),
+                                     this->_normalizePosition(v_pos_y),
+                                     0.
+                                     );
+                            
+                        }
+                        
+                    } catch(...) {
+                        cwarn << "skipped frame " << i << endl;
+                        continue;
+                    }
+                    
                 }
             } catch (std::runtime_error& e) {
                 cerr << "error parsing frame dict." << endl;
@@ -101,7 +162,7 @@ private:
         return color_vector;
     };
     
-    float _scalePosition(int pos) {
+    float _normalizePosition(int pos) {
         pos = (pos < -32768) ? -32768 : pos;
         pos = (pos > 32767) ? 32767 : pos;
         if (pos > 0) {
