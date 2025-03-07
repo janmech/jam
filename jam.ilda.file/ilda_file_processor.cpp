@@ -6,7 +6,7 @@
     //
 
 #include "ilda_file_processor.hpp"
-namespace jam::helios {
+namespace jam::ilda {
     
     /* public methods */
     void IldaFileProcessor::setFileData(std::vector<char>ilda_file) {
@@ -21,7 +21,7 @@ namespace jam::helios {
     
     ParseResult IldaFileProcessor::parseFileData() {
         ParseResult parse_result = ParseResult::SUCCESS;
-        this->_ilda_sections.clear();
+        this->_ilda_frames.clear();
         if(!this->fileLoaded()) {
             return ParseResult::NODATA;
         }
@@ -31,9 +31,9 @@ namespace jam::helios {
         }
         size_t byte_index = 0;
         while(true) {
-            IldaSection section;
-            ParseResult result = this->_extractSection(section, &byte_index);
-            this->_ilda_sections.push_back(std::move(section));
+            IldaFrame frame;
+            ParseResult result = this->_extractFrame(frame, &byte_index);
+            this->_ilda_frames.push_back(std::move(frame));
             if(result != ParseResult::SUCCESS) {
                 if(result == ParseResult::END_OF_FILE) {
                     parse_result = ParseResult::SUCCESS;
@@ -52,21 +52,21 @@ namespace jam::helios {
         return this->_fileLoaded;
     }
     
-    std::vector<IldaSection> IldaFileProcessor::getSections() {
-        return this->_ilda_sections;
+    std::vector<IldaFrame> IldaFileProcessor::getFrames() {
+        return this->_ilda_frames;
     }
     
     /* protected methods */
-    ParseResult IldaFileProcessor::_extractSection(IldaSection &section, size_t *byte_index) {
-        IldaHeader section_header;
-        ParseResult header_parse_result = this->_parseSectionHeader(section_header, byte_index);
+    ParseResult IldaFileProcessor::_extractFrame(IldaFrame &frame, size_t *byte_index) {
+        IldaHeader frame_header;
+        ParseResult header_parse_result = this->_parseFrameHeader(frame_header, byte_index);
         if(header_parse_result != ParseResult::SUCCESS) {
             this->clearFileData();
             return header_parse_result;
         }
-        size_t record_count = section_header.getDataRecordCount();
+        size_t record_count = frame_header.getDataRecordCount();
         for (size_t record_index = 0; record_index < record_count; record_index++) {
-            size_t record_byte_size = this->_getRecordByteSize(section_header.getFormatCode());
+            size_t record_byte_size = this->_getRecordByteSize(frame_header.getFormatCode());
             size_t record_start_index = *byte_index + FILE_HEADER_SIZE + (record_index * record_byte_size);
             char record_buffer[10] = {0};
             this->_getFileBytes(
@@ -76,7 +76,7 @@ namespace jam::helios {
                                 );
             ParseResult record_parse_result = ParseResult::SUCCESS;
             IldaDataRecord data_record;
-            switch (section_header.getFormatCode()) {
+            switch (frame_header.getFormatCode()) {
                 case RecordFormat::FORMAT_0 :
                     record_parse_result = this->_parseDataRecordFormat_0(data_record, record_buffer);
                     break;
@@ -98,19 +98,19 @@ namespace jam::helios {
             if(record_parse_result == ParseResult::ERROR) {
                 return record_parse_result;
             }
-            section.pushRecord(std::move(data_record));
+            frame.pushRecord(std::move(data_record));
         }
         
         
-        size_t data_records_byte_size = section_header.getDataRecordCount() * this->_getRecordByteSize(section_header.getFormatCode());
+        size_t data_records_byte_size = frame_header.getDataRecordCount() * this->_getRecordByteSize(frame_header.getFormatCode());
         
         *byte_index = *byte_index + FILE_HEADER_SIZE + data_records_byte_size;
-        section.setHeader(std::move(section_header));
+        frame.setHeader(std::move(frame_header));
         
         return (*byte_index >= this->_ilda_file.size()) ? ParseResult::END_OF_FILE : ParseResult::SUCCESS;
     };
     
-    ParseResult IldaFileProcessor::_parseSectionHeader(IldaHeader &section_header, size_t *byte_index) {
+    ParseResult IldaFileProcessor::_parseFrameHeader(IldaHeader &frame_header, size_t *byte_index) {
             // check start tag
         size_t header_start_index = *(byte_index) + FILE_HEADER_ILDA_TAG_START;
         char ilda_tag_buffer[FILE_HEADER_ILDA_TAG_LENGTH + 1] = {0};
@@ -136,7 +136,7 @@ namespace jam::helios {
         if(format_code > 5 || format_code == 3) {
             return ParseResult::ERROR;
         }
-        section_header.setFormatCode(static_cast<RecordFormat>(format_code));
+        frame_header.setFormatCode(static_cast<RecordFormat>(format_code));
         
             // read frame name
         char frame_name_buffer[FILE_HEADER_FRAME_NAME_LENGTH + 1] = {0};
@@ -146,7 +146,7 @@ namespace jam::helios {
                             header_start_index,
                             FILE_HEADER_FRAME_NAME_LENGTH
                             );
-        section_header.setFrameName(std::string(frame_name_buffer));
+        frame_header.setFrameName(std::string(frame_name_buffer));
         
             // read company name
         char company_name_buffer[FILE_HEADER_COMPANY_NAME_LENGTH + 1] {0};
@@ -156,7 +156,7 @@ namespace jam::helios {
                             header_start_index,
                             FILE_HEADER_COMPANY_NAME_LENGTH
                             );
-        section_header.setCompanyName(std::string(company_name_buffer));
+        frame_header.setCompanyName(std::string(company_name_buffer));
         
             // read number of records
         char num_records_buffer[FILE_HEADER_NUMBER_OF_RECODRS_LENGTH] = {0};
@@ -167,7 +167,7 @@ namespace jam::helios {
                             FILE_HEADER_NUMBER_OF_RECODRS_LENGTH
                             );
         uint16_t num_record = this->_parseUint16(num_records_buffer, sizeof(num_records_buffer));
-        section_header.setDataRecordCount((size_t)num_record);
+        frame_header.setDataRecordCount((size_t)num_record);
         
             // read frame number
         char frame_number_buffer[FILE_HEADER_FRAME_NUMBER_LENGTH] = {0};
@@ -179,7 +179,7 @@ namespace jam::helios {
                             );
         
         uint16_t frame_number = this->_parseUint16(frame_number_buffer, sizeof(frame_number_buffer));
-        section_header.setFrameNumber((size_t)frame_number);
+        frame_header.setFrameNumber((size_t)frame_number);
         
             // read frames in sequence
         char frames_in_seq_buffer[FILE_HEADER_FRAMES_IN_SEQUENCE_LENGTH] = {};
@@ -190,7 +190,7 @@ namespace jam::helios {
                             FILE_HEADER_FRAMES_IN_SEQUENCE_LENGTH
                             );
         uint16_t frames_in_sequence = this->_parseUint16(frames_in_seq_buffer, sizeof(frames_in_seq_buffer));
-        section_header.setFramesInSequence((size_t) frames_in_sequence);
+        frame_header.setFramesInSequence((size_t) frames_in_sequence);
         
             // read projector number
         char projector_number_buffer[1] = {0};
@@ -200,7 +200,7 @@ namespace jam::helios {
                             header_start_index,
                             FILE_HEADER_PROJECTOR_NUMBER_LENGTH
                             );
-        section_header.setProjectorNumber((size_t) projector_number_buffer[0]);
+        frame_header.setProjectorNumber((size_t) projector_number_buffer[0]);
         return ParseResult::SUCCESS;
     };
     

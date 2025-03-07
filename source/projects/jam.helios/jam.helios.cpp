@@ -66,15 +66,15 @@ public:
             if (inlet == 1) {
                 dict ilda_file = {args[0]};
                     // Turn the atom_reference from mindict["innerdict"] into an atom
-                c74::min::symbol key {"sections"};
-                auto section_dict_atom = c74::min::atom(ilda_file[key].begin());
+                c74::min::symbol key {"frames"};
+                auto frames_dict_atom = c74::min::atom(ilda_file[key].begin());
                 
                     // Create an unregistered subdict from the atom
-                dict sections_dict {section_dict_atom};
+                dict framess_dict {frames_dict_atom};
                 int i = 0;
                 try {
                     while(true) {
-                        auto section_dict = sections_dict.at(symbol(i));
+                        auto frame_dict = framess_dict.at(symbol(i));
                         i++;
                         if(1 > 1024) {
                             break;
@@ -87,15 +87,6 @@ public:
                 
                 
                 bool test = true;
-    
-                    // Generate a unique name (you could also name it yourself if you want)
-                    //                    auto sym = c74::min::symbol(true);
-                    //                    subdict.register_as(sym);
-                    //                c74::min::atom_reference sections = ilda_file["sections"];
-                    //                for(auto section = sections.begin(); section < sections.end();section++ ) {
-                    //                    c74::min::atom foo = *section;
-                    //                    auto bar = (int)foo;
-                    //                }
                 
             }
             return {};

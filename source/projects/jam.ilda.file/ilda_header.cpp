@@ -7,7 +7,7 @@
 
 #include "ilda_header.hpp"
 
-namespace jam::helios{
+namespace jam::ilda {
     
     RecordFormat IldaHeader::getFormatCode() {
         return this->format_code;

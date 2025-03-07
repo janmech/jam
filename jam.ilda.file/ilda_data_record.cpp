@@ -7,7 +7,7 @@
 
 #include "ilda_data_record.hpp"
 
-namespace jam::helios{
+namespace jam::ilda{
     
     void IldaDataRecord::setPosX(int pos_x) {
         this->pos_x = this->_clipPositionValue(pos_x);
@@ -73,7 +73,7 @@ namespace jam::helios{
         // Private functions
     int IldaDataRecord::_clipPositionValue(int pos) {
         pos = (pos < -32768) ? -32768 : pos;
-        pos = (pos > 32768) ? 32768 : pos;
+        pos = (pos > 32767) ? 32767 : pos;
         return pos;
     };
 };

@@ -14,7 +14,7 @@
 #include "ilda_definitions.hpp"
 #include "ilda_header.hpp"
 #include "ilda_data_record.hpp"
-#include "ilda_section.hpp"
+#include "ilda_frame.hpp"
 
 namespace jam::ilda {
     class IldaFileProcessor {
@@ -28,20 +28,20 @@ namespace jam::ilda {
         void clearFileData();
         ParseResult parseFileData();
         bool fileLoaded();
-        std::vector<IldaSection> getSections();
+        std::vector<IldaFrame> getFrames();
         
         
     protected:
         
         bool _fileLoaded = false;
         std::vector<char> _ilda_file;
-        std::vector<IldaSection> _ilda_sections;
+        std::vector<IldaFrame> _ilda_frames;
         
         void _getFileBytes(char* buffer, size_t start, size_t byte_count);
         std::uint16_t _parseUint16(char* bytes, std::size_t byte_count);
         int _parseTwosComplement(char most_significant, char least_significant); // value = (highbyte << 8) + lowbyte
-        ParseResult _extractSection(IldaSection &section, size_t *byte_index);
-        ParseResult _parseSectionHeader(IldaHeader &section_header, size_t *byte_index);
+        ParseResult _extractFrame(IldaFrame &frame, size_t *byte_index);
+        ParseResult _parseFrameHeader(IldaHeader &frame_header, size_t *byte_index);
         ParseResult _parseDataRecordFormat_0(IldaDataRecord &data_record, char* buffer);
         ParseResult _parseDataRecordFormat_1(IldaDataRecord &data_record, char* buffer);
         ParseResult _parseDataRecordFormat_2(IldaDataRecord &data_record, char* buffer);

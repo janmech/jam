@@ -8,7 +8,7 @@
 #ifndef ilda_definitions_h
 #define ilda_definitions_h
 
-namespace jam::helios {
+namespace jam::ilda {
     
 #define HEADER_MAX_STRING_LENGTH 8
 #define HEADER_MAX_RECORD_COUNT 65535

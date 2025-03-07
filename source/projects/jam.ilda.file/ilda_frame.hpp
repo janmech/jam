@@ -1,12 +1,12 @@
     //
-    //  ilds_section.hpp
+    //  ilds_frame.hpp
     //  jam.helios
     //
     //  Created by Jan Mech on 2/3/25.
     //
 
-#ifndef ilds_section_hpp
-#define ilds_section_hpp
+#ifndef ilda_frame_hpp
+#define ilda_frame_hpp
 
 #include <stdio.h>
 #include <vector>
@@ -15,10 +15,10 @@
 #include "ilda_data_record.hpp"
 
 namespace jam::ilda {
-    class IldaSection {
+    class IldaFrame {
     public:
-        IldaSection(){};
-        ~IldaSection(){};
+        IldaFrame(){};
+        ~IldaFrame(){};
         
         void setHeader(IldaHeader header);
         IldaHeader& getHeader();
@@ -40,4 +40,4 @@ namespace jam::ilda {
     };
 };
 
-#endif /* ilds_section_hpp */
+#endif /* ilda_frame_hpp */

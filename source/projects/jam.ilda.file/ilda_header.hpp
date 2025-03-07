@@ -13,7 +13,7 @@
 #include <string>
 #include "ilda_definitions.hpp"
 
-namespace jam::helios {
+namespace jam::ilda {
     
     class IldaHeader {
     public:

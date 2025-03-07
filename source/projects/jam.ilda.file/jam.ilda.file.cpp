@@ -20,12 +20,12 @@
 using namespace c74::min;
 namespace s_chrono = std::chrono;
 
-class helios : public object<helios>
+class ildafile : public object<ildafile>
 {
     
 private:
     dict _d_file_info{symbol(true)};
-    dict _d_file_sections{symbol(true)};
+    dict _d_file_frames{symbol(true)};
     dict _d_frame_data{symbol(true)};
     
 protected:
@@ -33,36 +33,36 @@ protected:
     
     void _fileToDict(std::string file_name) {
         this->_d_file_info["file_name"] = file_name;
-        _d_file_sections.clear();
+        _d_file_frames.clear();
         int i = 0;
-        for(jam::ilda::IldaSection s : this->_fileProcessor.getSections()) {
-            dict section{symbol(true)};
-            section["format"] = s.getHeader().getFormat();
-            section["frame_name"] = s.getHeader().getFrameName();
-            section["company_name"] = s.getHeader().getCompanyName();
-            section["frame_number"] = (int)s.getHeader().getFrameNumber();
-            section["frames_in_sequence"] = (int)s.getHeader().getFramesInSequence();
-            section["data_record_count"] = (int)s.getHeader().getDataRecordCount();
-            _d_file_sections[i] = section;
+        for(jam::ilda::IldaFrame s : this->_fileProcessor.getFrames()) {
+            dict frame{symbol(true)};
+            frame["format"] = s.getHeader().getFormat();
+            frame["frame_name"] = s.getHeader().getFrameName();
+            frame["company_name"] = s.getHeader().getCompanyName();
+            frame["frame_number"] = (int)s.getHeader().getFrameNumber();
+            frame["frames_in_sequence"] = (int)s.getHeader().getFramesInSequence();
+            frame["data_record_count"] = (int)s.getHeader().getDataRecordCount();
+            _d_file_frames[i] = frame;
             i++;
         }
     }
     
-    void _sectionToDict(jam::ilda::IldaSection section) {
+    void _frameToDict(jam::ilda::IldaFrame frame) {
         this->_d_frame_data.clear();
-        section.reset();
+        frame.reset();
         jam::ilda::IldaDataRecord data_record;
-        jam::ilda::RecordFormat format_code = section.getHeader().getFormatCode();
-        this->_d_frame_data["format"] = section.getHeader().getFormat();
-        this->_d_frame_data["frame_name"] = section.getHeader().getFrameName();
-        this->_d_frame_data["company_name"] = section.getHeader().getCompanyName();
-        this->_d_frame_data["frame_number"] = (int)section.getHeader().getFrameNumber();
-        this->_d_frame_data["frames_in_sequence"] = (int)section.getHeader().getFramesInSequence();
-        this->_d_frame_data["data_record_count"] = (int)section.getHeader().getDataRecordCount();
+        jam::ilda::RecordFormat format_code = frame.getHeader().getFormatCode();
+        this->_d_frame_data["format"] = frame.getHeader().getFormat();
+        this->_d_frame_data["frame_name"] = frame.getHeader().getFrameName();
+        this->_d_frame_data["company_name"] = frame.getHeader().getCompanyName();
+        this->_d_frame_data["frame_number"] = (int)frame.getHeader().getFrameNumber();
+        this->_d_frame_data["frames_in_sequence"] = (int)frame.getHeader().getFramesInSequence();
+        this->_d_frame_data["data_record_count"] = (int)frame.getHeader().getDataRecordCount();
         dict d_data_records{symbol(true)};
         this->_d_frame_data["data_records"] = d_data_records;
         int record_index = 0;
-        while (section.getNext(&data_record)) {
+        while (frame.getNext(&data_record)) {
             dict d_data_record{symbol(true)};
             if(format_code != jam::ilda::RecordFormat::FORMAT_2) {
                 d_data_record["pos_x"] = (int)data_record.getPosX();
@@ -93,13 +93,13 @@ protected:
     
 public:
     
-    helios(const atoms& args = {}) {
+    ildafile(const atoms& args = {}) {
         _d_file_info["file_name"] = "";
-        _d_file_info["sections"] = _d_file_sections;
+        _d_file_info["frames"] = _d_file_frames;
         
     }
     
-    ~helios() {
+    ~ildafile() {
 
     }
     
@@ -109,11 +109,11 @@ public:
     
     MIN_TAGS            { "utilities" };
     MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.dmxusbpro~, jam.dmxusbpro, serial"};
+    MIN_RELATED         { "jam.helios"};
     
     inlet<> input_1    { this, "(anything) Control Messages", "anything" };
-    outlet<> output_1   { this, "(dictionary) framedata", "dictionary" };
-    outlet<> output_2   { this, "(dictionary) fileinfo", "dictionary"  };
+    outlet<> output_1   { this, "(dictionary) fileinfo", "dictionary"  };
+    outlet<> output_2   { this, "(dictionary) framedata", "dictionary" };
     outlet<> output_3   { this, "file opration success/failure notification", "list" };
     
     
@@ -213,22 +213,22 @@ public:
             if(!this->_fileProcessor.fileLoaded()) {
                 cwarn << "No file loaded." << endl;
             }
-            output_2("dictionary", _d_file_info.name());
+            output_1("dictionary", _d_file_info.name());
             return {};
         }
     };
     
-    message<threadsafe::no>getframedata {
-        this, "getframedata", "Get information about the loaded ILDA file.",
+    message<threadsafe::yes>getframe {
+        this, "getframe", "Get information about the loaded ILDA file.",
         MIN_FUNCTION {
             if(!this->_fileProcessor.fileLoaded()) {
                 cwarn << "No file loaded." << endl;
             }
             if (args.size() > 1) {
-                cwarn << "extra argument for message 'getframedata'" << endl;
+                cwarn << "extra argument for message 'getframe'" << endl;
             }
             if (args.size() == 0) {
-                cerr << "missing argument for message 'getframedata'" << endl;
+                cerr << "missing argument for message 'getframe'" << endl;
                 return {};
             }
             if (args[0].a_type == c74::max::A_SYM) {
@@ -237,13 +237,13 @@ public:
             int frame_index = args[0];
             
             frame_index = frame_index < 0 ? 0 : frame_index;
-            auto sections = this->_fileProcessor.getSections();
+            auto frames = this->_fileProcessor.getFrames();
             
-            for (size_t i = 0; i < sections.size(); i++) {
-                jam::ilda::IldaSection section = sections[i];
-                if(section.getHeader().getFrameNumber() == (size_t)frame_index) {
-                    this->_sectionToDict(section);
-                    output_1("dictionary", _d_frame_data.name());
+            for (size_t i = 0; i < frames.size(); i++) {
+                jam::ilda::IldaFrame frame = frames[i];
+                if(frame.getHeader().getFrameNumber() == (size_t)frame_index) {
+                    this->_frameToDict(frame);
+                    output_2("dictionary", _d_frame_data.name());
                 }
             }
             
@@ -254,4 +254,4 @@ public:
 };
 
 
-MIN_EXTERNAL(helios);
+MIN_EXTERNAL(ildafile);

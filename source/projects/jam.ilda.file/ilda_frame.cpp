@@ -1,25 +1,25 @@
     //
-    //  ilds_section.cpp
+    //  ilda_frame.cpp
     //  jam.helios
     //
     //  Created by Jan Mech on 2/3/25.
     //
 
-#include "ilda_section.hpp"
+#include "ilda_frame.hpp"
 
-namespace jam::helios {
-    void IldaSection::setHeader(IldaHeader header) {
+namespace jam::ilda {
+    void IldaFrame::setHeader(IldaHeader header) {
         this->_header = header;
     };
-    IldaHeader& IldaSection::getHeader() {
+    IldaHeader& IldaFrame::getHeader() {
         return this->_header;
     };
     
-    void IldaSection::pushRecord(IldaDataRecord data_record) {
+    void IldaFrame::pushRecord(IldaDataRecord data_record) {
         this->_data_records.push_back(data_record);
     };
     
-    bool IldaSection::get(IldaDataRecord* data_record, size_t index) {
+    bool IldaFrame::get(IldaDataRecord* data_record, size_t index) {
         if(this->_data_records.size() > index) {
             data_record = &this->_data_records[index];
             return true;
@@ -28,7 +28,7 @@ namespace jam::helios {
         
     };
     
-    bool IldaSection::getNext(IldaDataRecord* data_record) {
+    bool IldaFrame::getNext(IldaDataRecord* data_record) {
         if(this->_data_records.size() > this->_iteratorIndex) {
             *data_record = this->_data_records[this->_iteratorIndex];
             this->_iteratorIndex++;
@@ -37,7 +37,7 @@ namespace jam::helios {
         return false;
     };
     
-    void IldaSection::IldaSection::reset() {
+    void IldaFrame::IldaFrame::reset() {
         this->_iteratorIndex = 0;
     };
 };
