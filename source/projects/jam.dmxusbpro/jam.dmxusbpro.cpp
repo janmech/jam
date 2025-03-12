@@ -29,7 +29,7 @@ class dmxusbpro : public object<dmxusbpro>
         std::thread _receive_thread;
         std::thread _send_thread;
         std::mutex _open_device_lock;
-        std::mutex _enque_msg_lock;
+        std::mutex _enqueue_msg_lock;
         std::queue<std::vector<unsigned char> > _messages_to_device_queue;
         std::string _open_device_name = "";
         fifo<atoms> _to_max_queue { 1000 };
@@ -38,18 +38,18 @@ class dmxusbpro : public object<dmxusbpro>
         unsigned char _serial_in_buffer[SERIAL_IN_BUFF_SIZE];
         dict _connections { symbol("__jamproconnections__") }; // Workaround until I find a way to make the device manager global
 
-        void _enque_msg_to_max(const atoms &msg_to_max) {
-            _enque_msg_lock.lock();
+        void _enqueue_msg_to_max(const atoms &msg_to_max) {
+            _enqueue_msg_lock.lock();
             this->_to_max_queue.try_enqueue(msg_to_max);
-            _enque_msg_lock.unlock();
+            _enqueue_msg_lock.unlock();
         }
 
         bool _dequeue_msg_to_max(atoms &msg_data) {
-            _enque_msg_lock.lock();
+            _enqueue_msg_lock.lock();
 
             bool result = this->_to_max_queue.try_dequeue(msg_data);
 
-            _enque_msg_lock.unlock();
+            _enqueue_msg_lock.unlock();
             return result;
         }
 
@@ -93,7 +93,7 @@ class dmxusbpro : public object<dmxusbpro>
 
             connection_state.push_back(TO_OUTLET_2);
             connection_state.push_back(0);
-            _enque_msg_to_max(connection_state);
+            _enqueue_msg_to_max(connection_state);
             deliverer_to_max.delay(0);
         }
 
@@ -124,7 +124,7 @@ class dmxusbpro : public object<dmxusbpro>
                         to_max.clear();
                         to_max.push_back(TO_OUTLET_DUMPOUT);
                         to_max.push_back("Error writing bytes");
-                        _enque_msg_to_max(to_max);
+                        _enqueue_msg_to_max(to_max);
                         deliverer_to_max.delay(0);
                     }
                 } else {
@@ -231,28 +231,28 @@ class dmxusbpro : public object<dmxusbpro>
                     response_message.push_back(TO_OUTLET_DUMPOUT);
                     response_message.push_back("firmware");
                     response_message.push_back(std::string(firmware_version));
-                    _enque_msg_to_max(response_message);
+                    _enqueue_msg_to_max(response_message);
                     deliverer_to_max.delay(0);
 
                     response_message.clear();
                     response_message.push_back(TO_OUTLET_DUMPOUT);
                     response_message.push_back("breaktime");
                     response_message.push_back(breaktime_val);
-                    _enque_msg_to_max(response_message);
+                    _enqueue_msg_to_max(response_message);
                     deliverer_to_max.delay(0);
 
                     response_message.clear();
                     response_message.push_back(TO_OUTLET_DUMPOUT);
                     response_message.push_back("mabtime");
                     response_message.push_back(mabtime_val);
-                    _enque_msg_to_max(response_message);
+                    _enqueue_msg_to_max(response_message);
                     deliverer_to_max.delay(0);
 
                     response_message.clear();
                     response_message.push_back(TO_OUTLET_DUMPOUT);
                     response_message.push_back("refresh");
                     response_message.push_back(refresh_val);
-                    _enque_msg_to_max(response_message);
+                    _enqueue_msg_to_max(response_message);
                     deliverer_to_max.delay(0);
                     return;
 
@@ -264,7 +264,7 @@ class dmxusbpro : public object<dmxusbpro>
                     response_message.push_back(TO_OUTLET_DUMPOUT);
                     response_message.push_back("serialnumber");
                     response_message.push_back(serial_number_string);
-                    _enque_msg_to_max(response_message);
+                    _enqueue_msg_to_max(response_message);
                     deliverer_to_max.delay(0);
                     return;
 
@@ -298,7 +298,7 @@ class dmxusbpro : public object<dmxusbpro>
 
                         if(current_dmx_package != last_dmx_package || out_mode == "always") {
                             last_dmx_package = current_dmx_package;
-                            _enque_msg_to_max(response_message);
+                            _enqueue_msg_to_max(response_message);
                             deliverer_to_max.delay(0);
                         }
                     }
@@ -532,7 +532,7 @@ class dmxusbpro : public object<dmxusbpro>
                 atoms       connection_state;
                 connection_state.push_back(TO_OUTLET_2);
                 connection_state.push_back(1);
-                _enque_msg_to_max(connection_state);
+                _enqueue_msg_to_max(connection_state);
                 deliverer_to_max.delay(0);
 
                 this->_io_threads_continue = true;
@@ -545,7 +545,7 @@ class dmxusbpro : public object<dmxusbpro>
                         if (verbose) {
                             msg_to_console.push_back(TO_MAX_CONSOLE);
                             msg_to_console.push_back("starting receive thread");
-                            _enque_msg_to_max(msg_to_console);
+                            _enqueue_msg_to_max(msg_to_console);
                             deliverer_to_max.delay(0);
                         }
 
@@ -557,7 +557,7 @@ class dmxusbpro : public object<dmxusbpro>
                             msg_to_console.clear();
                             msg_to_console.push_back(TO_MAX_CONSOLE);
                             msg_to_console.push_back("stopping receive thread");
-                            _enque_msg_to_max(msg_to_console);
+                            _enqueue_msg_to_max(msg_to_console);
                             deliverer_to_max.delay(0);
                         }
                     });
@@ -570,7 +570,7 @@ class dmxusbpro : public object<dmxusbpro>
                         if (verbose) {
                             msg_to_console.push_back(TO_MAX_CONSOLE);
                             msg_to_console.push_back("starting send thread");
-                            _enque_msg_to_max(msg_to_console);
+                            _enqueue_msg_to_max(msg_to_console);
                             deliverer_to_max.delay(0);
                         }
 
@@ -582,7 +582,7 @@ class dmxusbpro : public object<dmxusbpro>
                             msg_to_console.clear();
                             msg_to_console.push_back(TO_MAX_CONSOLE);
                             msg_to_console.push_back("stopping send thread");
-                            _enque_msg_to_max(msg_to_console);
+                            _enqueue_msg_to_max(msg_to_console);
                             deliverer_to_max.delay(0);
                         }
                     });
