@@ -16,7 +16,7 @@
 #include "c74_min.h"
 #include "helios-sdk/cpp/HeliosDac.h"
 #include "helios-sdk/cpp/libusb.h"
-#include "../jam.device_manager/jam.helios.device_manager.hpp"
+#include "jam.helios.device_manager.hpp"
 
 #define OBJECT_VERSION "jam.helios v.0.0.0"
 #define HELIOS_FILE_CHUNK 1024
@@ -32,7 +32,7 @@ protected:
     bool is_scanning = false;
     fifo<atoms> _to_max_queue { 1000 };
     std::mutex _enqueue_msg_lock;
-    jam::helios::HeliosDeviceManager & _deviceManager = jam::helios::HeliosDeviceManager::get();
+    jam::helios::DeviceManager & _deviceManager = jam::helios::DeviceManager::get();
     
     void _enqueue_msg_to_max(const atoms &msg_to_max) {
         _enqueue_msg_lock.lock();
@@ -53,11 +53,12 @@ protected:
 public:
     
     helios(const atoms& args = {}) {
-
+        this->_deviceManager.addObjInstance(this->maxobj());
     }
     
     ~helios() {
-        this->_helios_dac.CloseDevices();
+        this->_deviceManager.removeObjInstance(this->maxobj());
+//        this->_helios_dac.CloseDevices();
     }
     
     static constexpr const char* my_description {"foo"};
@@ -70,6 +71,7 @@ public:
     
     inlet<> input_1             { this, "(anything) Control Messages", "anything" };
     inlet<> input_2             { this, "(dictionary) ilda file dictionary" , "dictionary"};
+    outlet<> output_dev_menu    { this, "(anything) Connect to umenu", "message"};
     outlet<> output_dumpout     { this, "dumpout"};
     
     attribute<number> m_duration { this, "duration", 3000.0, description {"Duration of the process."} };
@@ -110,6 +112,18 @@ public:
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'menu'" << endl;
             }
+            std::vector<jam::helios::device_info_t> open_devices = this->_deviceManager.getOpenDevices();
+            output_dev_menu.send("clear");
+            atoms out_atoms;
+            out_atoms.push_back("append");
+            out_atoms.push_back("(Select Interface)");
+            output_dev_menu.send(out_atoms);
+            out_atoms.clear();
+            for(size_t i = 0; i < open_devices.size(); i++) {
+                out_atoms.push_back("append");
+                out_atoms.push_back(open_devices[i].name);
+                output_dev_menu.send(out_atoms);
+            }
             return {};
         }
     };
@@ -119,6 +133,10 @@ public:
         MIN_FUNCTION {
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'menu'" << endl;
+            }
+            if(this->_deviceManager.isScanning()) {
+                cwarn << "scan already in progress" << endl;
+                return {};
             }
             
             this->_device_scan_thread = std::thread([this]() {
@@ -132,20 +150,7 @@ public:
                 auto b = this->box();
                 number current_progress {-1.};
                 b("startprogress", &current_progress);
-                int numDevs = this->_helios_dac.OpenDevices();
-                if (numDevs <= 0) {
-                    cout << "No DACs found.\n"<< endl;
-                } else {
-                    cout << "Found" << numDevs << "DAC(s)" << endl;
-                    for (int j = 0; j < numDevs; j++)
-                        {
-                        char name[32];
-                        if (this->_helios_dac.GetName(j, name) == HELIOS_SUCCESS)
-                            cout << name << ": USB: " << this->_helios_dac.GetIsUsb(j) << "Firmware: " << this->_helios_dac.GetFirmwareVersion(j) << endl;
-                        else
-                            cout << "(unknown dac): USB: " << this->_helios_dac.GetIsUsb(j) << "Firmware: " << this->_helios_dac.GetFirmwareVersion(j) << endl;
-                        }
-                }
+                int numDevs = this->_deviceManager.deviceScan();
                 scan_result.clear();
                 scan_result.push_back(atom("devicescan"));
                 scan_result.push_back(atom(numDevs));
@@ -165,13 +170,15 @@ public:
     message<threadsafe::no> test {
         this, "test", "test function for dev stuff",
         MIN_FUNCTION {
-            int foo =  _deviceManager.test();
+           
                 // Assemble test frames
                 // This is a simple line moving upward in a loop, but for real graphics you should optimize the point stream for laser scanners by
                 // interpolating long vectors including blanked sections, adding points at sharp corners, etc.
             
+            cout << this->_deviceManager.deviceScan() << endl;
             cout << "TEST" << endl;
-            cout << foo << endl;
+            
+
        
             return {};
                 //            int numDevs = this->_helios_dac.OpenDevices();
