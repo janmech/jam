@@ -30,11 +30,12 @@ public:
     
     ildaframe(const atoms& args = {}) {
         if (args.size() > 1) {
+            cout << "TEST" << endl;
             cwarn << "Extra argumnt for oject jam.jit.gl.frame" << endl;
         }
         
-        // TODO: add attribute draw_to and set vale from argument
-    
+            // TODO: add attribute draw_to and set vale from argument
+        
         
         atom argu;
         this->_sketch_object = (c74::max::t_object*)c74::max::newinstance(symbol("jit.gl.sketch"), 0, &argu);
@@ -55,7 +56,8 @@ public:
     MIN_RELATED         { "jam.ilda.file"};
     
     inlet<> input_1    { this, "(anything) Control Messages", "anything" };
-    outlet<> output_1   { this, "jit.gl.sketch draw commands" };
+    outlet<> output_1   { this, "frame count" };
+    outlet<> output_2   { this, "current frame", "dictionary" };
     
     message<>bang  {
         this, "bang", "trigger output",
@@ -69,7 +71,7 @@ public:
         this, "drawto", "jitter context",
         MIN_FUNCTION {
             atom mess_arg =args[0];
-            typedmess(this->_sketch_object,symbol("drawto"),1,&mess_arg);
+                typedmess(this->_sketch_object,symbol("drawto"),1,&mess_arg);
             return {};
         }
     };
@@ -77,7 +79,16 @@ public:
     message<>reset {
         this, "reset", "reset",
         MIN_FUNCTION {
-            typedmess(this->_sketch_object,symbol("reset"),0,0L);
+                typedmess(this->_sketch_object,symbol("reset"),0,0L);
+            return {};
+        }
+    };
+    
+    message<> frame {
+        this, "frame", "render frame",
+        MIN_FUNCTION {
+            
+//            output_1("dictionary", this->_frames_dict.name());
             return {};
         }
     };
@@ -85,44 +96,48 @@ public:
     message<>dictionary {
         this, "dictionary", "ilda frame dictionary",
         MIN_FUNCTION {
+            dict incoming_dict = {args[0]};
+            this->_current_frame_dict.clear();
+            this->_current_frame_dict.copyunique(incoming_dict);
             
-            dict frame_dict = {args[0]};
             int data_record_count = 0;
             try {
                     // reading data_record_cout
-                std::string count_string = atom(frame_dict.at("data_record_count"));
+                std::string count_string = atom(this->_current_frame_dict.at("data_record_count"));
                 data_record_count = std::atoi(count_string.c_str());
-            } catch(...) {
-                cerr << "error parsing frame dict." << endl;
+            } catch(std::exception& ex) {
+                
+                cerr << "1. error parsing frame dict." << endl;
+                cerr << ex.what() << endl;
                 return {};
             }
             
-                // getting dub dict data_recods
+                // getting sub dict data_recods
             c74::min::symbol key_data_records {"data_records"};
-            auto data_records_dict_atom = c74::min::atom(frame_dict[key_data_records].begin());
+            auto data_records_dict_atom = c74::min::atom(this->_current_frame_dict[key_data_records].begin());
                 // Create an unregistered subdict from the atom
             dict data_records_dict {data_records_dict_atom};
             
             try {
-                atom format_code = frame_dict.at("format_code");
+                atom format_code = this->_current_frame_dict.at("format_code");
                 int v_format_code = (int)format_code;
                 bool is_indexed_color = (
                                          v_format_code == (int)jam::ilda::RecordFormat::FORMAT_0
                                          || v_format_code ==  (int)jam::ilda::RecordFormat::FORMAT_1
                                          );
-                typedmess(this->_sketch_object,symbol("reset"),0,0L);
+                    typedmess(this->_sketch_object,symbol("reset"),0,0L);
                 
                 atom args_color_values[3] = {atom(1.),atom(1.),atom(1.)};
                 atom args[5] = {atom(1), atom(1.), atom(0.), atom(0.), atom(0.) };
                 
-                typedmess(this->_sketch_object,symbol("glcolor"),4,args);
+                    typedmess(this->_sketch_object,symbol("glcolor"),4,args);
                 
                 args[0] = atom("glcolor");
                 args[1] = atom(1);
-                typedmess(this->_sketch_object,symbol("cmd_enable"),2,args);
+                    typedmess(this->_sketch_object,symbol("cmd_enable"),2,args);
                 
                 args[0] = atom(2.);
-                typedmess(this->_sketch_object,symbol("gllinewidth"),1,args);
+                    typedmess(this->_sketch_object,symbol("gllinewidth"),1,args);
                 
                 for(int i = 0; i < (int)data_record_count; i++) {
                         // geting sub dict data_record
@@ -164,11 +179,11 @@ public:
                         args[2] = atom(0); // For now we are ignoring z axis
                         
                         if(value_blanking) {
-                            typedmess(this->_sketch_object,symbol("moveto"),3,args);
+                                typedmess(this->_sketch_object,symbol("moveto"),3,args);
                             
                         } else {
-                            typedmess(this->_sketch_object,symbol("glcolor"),3,args_color_values);
-                            typedmess(this->_sketch_object,symbol("lineto"),3,args);
+                                typedmess(this->_sketch_object,symbol("glcolor"),3,args_color_values);
+                                typedmess(this->_sketch_object,symbol("lineto"),3,args);
                         }
                         
                     } catch(...) {
@@ -177,8 +192,9 @@ public:
                     }
                     
                 }
-            } catch (std::runtime_error& e) {
-                cerr << "error parsing frame dict." << endl;
+            } catch (std::exception& ex) {
+                cerr << "2. error parsing frame dict." << endl;
+                cerr << ex.what() << endl;
             }
             return {};
         }
@@ -187,9 +203,9 @@ public:
 private:
     
     c74::max::t_object *_sketch_object;
-    
-    
-    
+    dict _frames_dict{symbol(true)};
+    dict _current_frame_dict{symbol(true)};
+    long _frame_count = 0;
     float _normalizePosition(int pos) {
         pos = (pos < -32768) ? -32768 : pos;
         pos = (pos > 32767) ? 32767 : pos;
@@ -202,3 +218,26 @@ private:
 
 
 MIN_EXTERNAL(ildaframe);
+
+
+/*
+ long getentrycount() {
+ return (long)max::dictionary_getentrycount(m_instance);
+ }
+ 
+ std::vector<symbol> getkeys() {
+ std::vector<symbol>k;
+ max::t_symbol    **keys = NULL;
+ long        numkeys = 0;
+ long        i;
+ 
+ max::dictionary_getkeys(m_instance, &numkeys, &keys);
+ for(i=0; i<numkeys; i++){
+ k.push_back(symbol(keys[i]));
+ }
+ if(keys) {
+ max::dictionary_freekeys(m_instance, numkeys, keys);
+ }
+ return k;
+ }
+ */
