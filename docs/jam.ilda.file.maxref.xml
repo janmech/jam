@@ -29,11 +29,6 @@
 
 	<methodlist>
 
-		<method name='getframedata'>
-			<digest>Get information about the loaded ILDA file</digest>
-			<description>Get information about the loaded ILDA file. </description>
-		</method>
-
 		<method name='fileinfo'>
 			<digest>Get information about the loaded ILDA file</digest>
 			<description>Get information about the loaded ILDA file. </description>
@@ -57,9 +52,7 @@
 	<!--RELATED-->
 
 	<seealsolist>
-		<seealso name='jam.dmxusbpro~' />
-		<seealso name='jam.dmxusbpro' />
-		<seealso name='serial' />
+		<seealso name='jam.helios' />
 	</seealsolist>
 
 

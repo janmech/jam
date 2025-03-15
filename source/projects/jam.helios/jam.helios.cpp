@@ -321,6 +321,25 @@ public:
         }
     };
     
+    message <>set_test {
+        this, "set_test", "",
+        MIN_FUNCTION {
+            std::string foo = args[0];
+            this->_deviceManager.setTest(foo);
+            return {};
+        }
+        
+    };
+    
+    message <>get_test {
+        this, "get_test", "",
+        MIN_FUNCTION {
+            cout << this->_deviceManager.getTest()<< endl;
+            return {};
+        }
+        
+    };
+    
     timer<> deliverer_to_max {
         this, MIN_FUNCTION {
             queued_message_t queue_msg;

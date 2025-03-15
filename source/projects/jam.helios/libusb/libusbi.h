@@ -24,7 +24,7 @@
 #ifndef LIBUSBI_H
 #define LIBUSBI_H
 
-#include <config.h>
+#include "config.h"
 
 #include <assert.h>
 #include <inttypes.h>

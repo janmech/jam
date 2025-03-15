@@ -63,9 +63,17 @@ namespace jam::helios {
         DeviceState attachDeviceToInstance(std::string device_name, c74::max::t_object *intstance);
         bool detachDeviceFromInstance(c74::max::t_object *intstance);
         void setShutter( c74::max::t_object *intstance, bool state);
+        void setTest(std::string s) {
+            this->_test = s;
+        };
+        
+        std::string getTest() {
+            return this->_test;
+        }
         
         
     protected:
+        std::string _test = "";
         std::mutex _open_dev_lock;
         bool _is_scanning = false;
         HeliosDac _helios_dac;

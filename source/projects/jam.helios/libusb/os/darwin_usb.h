@@ -23,7 +23,7 @@
 
 #include <stdbool.h>
 
-#include "libusbi.h"
+#include "../libusbi.h"
 
 #include <IOKit/IOTypes.h>
 #include <IOKit/IOCFBundle.h>

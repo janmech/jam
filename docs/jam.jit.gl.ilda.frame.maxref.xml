@@ -44,6 +44,11 @@
 			<description>jitter context </description>
 		</method>
 
+		<method name='frame'>
+			<digest>render frame </digest>
+			<description>render frame </description>
+		</method>
+
 		<method name='bang'>
 			<digest>trigger output </digest>
 			<description>trigger output </description>

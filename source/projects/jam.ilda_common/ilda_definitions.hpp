@@ -59,7 +59,6 @@ namespace jam::ilda {
         ERROR = -2,
         END_OF_FILE = -3,
     };
-    
 };
 
 
