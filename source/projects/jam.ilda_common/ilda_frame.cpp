@@ -30,9 +30,13 @@ namespace jam::ilda {
     
     bool IldaFrame::getNext(IldaDataRecord* data_record) {
         if(this->_data_records.size() > this->_iteratorIndex) {
-            *data_record = this->_data_records[this->_iteratorIndex];
-            this->_iteratorIndex++;
-            return true;
+            try {
+                *data_record = this->_data_records.at(this->_iteratorIndex);
+                this->_iteratorIndex++;
+                return true;
+            } catch (const std::out_of_range& oor) {
+                return false;
+            }
         }
         return false;
     };

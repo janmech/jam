@@ -13,9 +13,9 @@ namespace jam::ilda {
          color_index = (color_index > 63) ? 63 : color_index;
         std::vector<float> color_vector;
         int offset = (int)color_index * 3;
-        color_vector.push_back((float)Colors::ilda_color_pallet[offset] / 255.);
-        color_vector.push_back((float)Colors::ilda_color_pallet[offset+1] / 255.);
-        color_vector.push_back((float)Colors::ilda_color_pallet[offset+2] / 255.);
+         color_vector.push_back((float)Colors::ilda_color_pallet_float[offset]);
+        color_vector.push_back((float)Colors::ilda_color_pallet_float[offset+1]);
+        color_vector.push_back((float)Colors::ilda_color_pallet_float[offset+2]);
         return color_vector;
     };
     

@@ -29,14 +29,14 @@
 
 	<methodlist>
 
-		<method name='fileinfo'>
-			<digest>Get information about the loaded ILDA file</digest>
-			<description>Get information about the loaded ILDA file. </description>
-		</method>
-
 		<method name='import'>
 			<digest>import an ILDA file </digest>
 			<description>import an ILDA file </description>
+		</method>
+
+		<method name='bang'>
+			<digest>Output the the reference to loaded ILDA file </digest>
+			<description>Output the the reference to loaded ILDA file </description>
 		</method>
 
 	</methodlist>
