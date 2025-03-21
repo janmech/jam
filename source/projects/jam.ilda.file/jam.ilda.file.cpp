@@ -119,8 +119,6 @@ public:
     
     ~ildafile() {}
     
-    static constexpr const char* my_description {"foo"};
-    
     MIN_DESCRIPTION     { "Connect to the Helios ILDA DAC" };
     
     MIN_TAGS            { "utilities" };
@@ -128,8 +126,8 @@ public:
     MIN_RELATED         { "jam.helios"};
     
     inlet<> input_1    { this, "(anything) Control Messages", "anything" };
-    outlet<> output_1   { this, "fileinfo"  };
-    outlet<> output_3   { this, "file opration success/failure notification", "list" };
+    outlet<> o_file_reference   { this, "ilda file reference"  };
+    outlet<> o_load_result   { this, "file opration success/failure notification", "list" };
     
     message<> bang {
         this, "bang", "Output the the reference to loaded ILDA file",
@@ -137,7 +135,7 @@ public:
             if(!this->_fileProcessor.fileLoaded()) {
                 cwarn << "No file loaded." << endl;
             }
-            output_1("ilda", this->_instance_id);
+            o_file_reference("ilda", this->_instance_id);
             return {};
         }
     };
@@ -173,7 +171,7 @@ public:
                     msg_atoms.push_back("import");
                     msg_atoms.push_back(filename);
                     msg_atoms.push_back(0);
-                    msg.set(&output_3, msg_atoms);
+                    msg.set(&o_load_result, msg_atoms);
                     msg.send(this);
                     this->_setParingState(false);
                     return{};
@@ -187,7 +185,7 @@ public:
                     msg_atoms.push_back("import");
                     msg_atoms.push_back(filename);
                     msg_atoms.push_back(0);
-                    msg.set(&output_3, msg_atoms);
+                    msg.set(&o_load_result, msg_atoms);
                     msg.send(this);
                     this->_setParingState(false);
                     return {};
@@ -202,7 +200,7 @@ public:
                     msg_atoms.push_back("import");
                     msg_atoms.push_back(filename);
                     msg_atoms.push_back(0);
-                    msg.set(&output_3, msg_atoms);
+                    msg.set(&o_load_result, msg_atoms);
                     msg.send(this);
                     this->_setParingState(false);
                     return {};
@@ -217,7 +215,7 @@ public:
                 msg_atoms.push_back("import");
                 msg_atoms.push_back(filename);
                 msg_atoms.push_back(0);
-                msg.set(&output_3, msg_atoms);
+                msg.set(&o_load_result, msg_atoms);
                 msg.send(this);
                 this->_setParingState(false);
                 return {};
@@ -257,11 +255,10 @@ public:
                     std::vector<jam::ilda::IldaFrame> frames =  this->_fileProcessor.getFrames();
                     this->_getStructPointer()->setInstanceFile(this->_instance_id, frames);
                     
-                    std::vector<jam::ilda::IldaFrame> foo = this->_getStructPointer()->getFrames(this->_instance_id);
                     msg_atoms.clear();
                     msg_atoms.push_back("ilda");
                     msg_atoms.push_back(this->_instance_id);
-                    msg.set(&output_1, msg_atoms);
+                    msg.set(&o_file_reference, msg_atoms);
                     msg.send(this);
                 }
                 
@@ -269,7 +266,7 @@ public:
                 msg_atoms.push_back("import");
                 msg_atoms.push_back(filename);
                 msg_atoms.push_back(success);
-                msg.set(&output_3, msg_atoms);
+                msg.set(&o_load_result, msg_atoms);
                 msg.send(this);
                 
                 b("stopprogress");
@@ -279,6 +276,21 @@ public:
             
             
             this->_device_scan_thread.detach();
+            return {};
+        }
+    };
+    
+    message<threadsafe::no> clear {
+        this, "clear", "Clear loaded file",
+        MIN_FUNCTION {
+            this->_fileProcessor.clearFileData();
+            atoms msg_atoms;
+            queued_message_t msg;
+            msg_atoms.clear();
+            msg_atoms.push_back("ilda");
+            msg_atoms.push_back(this->_instance_id);
+            msg.set(&o_file_reference, msg_atoms);
+            msg.send(this);
             return {};
         }
     };
