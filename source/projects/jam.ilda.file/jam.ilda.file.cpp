@@ -253,7 +253,7 @@ public:
                     this->_fileProcessor.clearFileData();
                 } else {
                     std::vector<jam::ilda::IldaFrame> frames =  this->_fileProcessor.getFrames();
-                    this->_getStructPointer()->setInstanceFile(this->_instance_id, frames);
+                    this->_getStructPointer()->setInstanceFile(this->_instance_id, frames, std::string(filename));
                     
                     msg_atoms.clear();
                     msg_atoms.push_back("ilda");

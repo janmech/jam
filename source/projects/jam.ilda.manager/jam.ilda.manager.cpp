@@ -30,7 +30,6 @@ void *jam_im_new(t_symbol *s, long argc, t_atom *argv)
 {
     static t_jam_im *x = NULL;
     if(x == NULL) {
-        post("new jam.ilda.manager");
         x = (t_jam_im *)object_alloc(s_jam_im_class);
     }
     return x;
