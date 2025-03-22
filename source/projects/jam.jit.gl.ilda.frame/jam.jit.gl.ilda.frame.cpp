@@ -29,7 +29,6 @@ using namespace c74::min;
 using fvec = std::vector<double>;
 using ivec = std::vector<int>;
 
-
 class ildaframe : public object<ildaframe>
 {
     
@@ -51,6 +50,9 @@ private:
         // We uase this flag to indicate whether the setter of blend/blend_mode attribute was called internally or not
         // To synchronize the displayed values they call each other and would end up in an infinite recursion otherwise
     bool _blend_setter_internal = false;
+    
+    dict d_outer{symbol(true)};
+    dict d_inner{symbol(true)};
     
     
     
@@ -117,6 +119,8 @@ protected:
     
     atom _blanking_color[4] = {atom(0.31),atom(0.31),atom(0.31), atom(0.7) };
     
+    atom _monochrome_color[4] = {atom(1.),atom(1.),atom(1.), atom(1.) };
+    
     int _line_width = 2;
     
     int _line_width_blanking = 1;
@@ -125,7 +129,15 @@ protected:
     
     bool _force_2d = false;
     
-    void _setCustomColorByIndex(uint8_t color_index, double r, double g, double b, double a) {
+    bool _use_custompallet = false;
+    
+    bool _override_opacity = false;
+    
+    double _opacity = false;
+    
+    bool _monochrome = false;
+    
+    void _setCustomColorByIndex(size_t color_index, double r, double g, double b, double a) {
         int offset = (int)color_index * 4;
         this->_custom_color_pallet[offset]   = r;
         this->_custom_color_pallet[offset+1] = g;
@@ -133,14 +145,19 @@ protected:
         this->_custom_color_pallet[offset+3] = a;
     };
     
-    fvec _getCustomColorByIndex(uint8_t color_index) {
+    fvec _getCustomColorByIndex(size_t color_index) {
         color_index = (color_index > 63) ? 63 : color_index;
         fvec color_vector;
-        int offset = (int)color_index * 4;
+        size_t offset = color_index * 4;
         color_vector.push_back(this->_custom_color_pallet[offset]);
         color_vector.push_back(this->_custom_color_pallet[offset+1]);
         color_vector.push_back(this->_custom_color_pallet[offset+2]);
-        color_vector.push_back(this->_custom_color_pallet[offset+3]);
+        if(!this->_override_opacity) {
+            color_vector.push_back(this->_custom_color_pallet[offset+3]);
+        } else {
+            color_vector.push_back(this->opacity);
+        }
+        
         return color_vector;
     };
     
@@ -254,7 +271,6 @@ protected:
         return "";
     }
     
-    
 public:
     
     ildaframe(const atoms& args = {}) {
@@ -272,34 +288,18 @@ public:
     
     
     MIN_DESCRIPTION     { "Render frames from an ILDA file to an Open GL context." };
-    
-    MIN_TAGS            { "utilities" };
+    MIN_TAGS            { "ILDA, laser tools, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file"};
     
     inlet<> input_1             { this, "(anything) Control Messages", "anything" };
+    inlet<> input_2             { this, "(dictionary) Set the custom color pallet", "dictionary" };
     
-    outlet<> output_loaded      { this, "Reference to loaded", "bang" };
-    outlet<> output_dumpout     { this, "dumpout" };
+    outlet<> outlet_dict      { this, "Dictionary describing custom color pallet", "dictionary" };
+    outlet<> output_dumpout     { this, "Framecount of currently loaded ILDA file." };
+
     
-    // TODO: Check all attributes for cases not enought arguments are probided.
-    
-    // Seting attributes without an argument can crash Max, wen a setter is c<alled. Workaround: define a message with the same same as sette
-    message<>linewidth_setter {
-        this, "linewidth",
-        MIN_FUNCTION {
-            if(args.size() < 1) {
-                cwarn << "missing argument for message linewidth." << endl;
-            } else {
-                this->linewidth.set(args);
-            }
-            return {};
-            
-        },
-        
-    };
-    
-    attribute<int, threadsafe::no, limit::clamp, allow_repetitions::no> linewidth {
+    attribute<int> linewidth {
         this, "linewidth", 2,
         setter { MIN_FUNCTION {
             atoms cleaned_args;
@@ -307,6 +307,10 @@ public:
             if (r == jam::too_long) {
                 cwarn << "missing argument for message linewidth. Assuming 1" << endl;
             }
+            int val = (int)cleaned_args[0];
+            val = (val < 1) ? 1 : val;
+            val = (val > 10) ? 10 : val;
+            cleaned_args[0] = atom(val);
             this->_line_width = cleaned_args[0];
             if(this->initialized()) {
                 this->bang();
@@ -315,53 +319,66 @@ public:
             return cleaned_args;
         }},
         title {"Line Width"},
-        description {"Line width for drawing regular segments"},
-        range {1, 10},
+        description {"Line width for drawing regular segments."},
         category {"Drawing"},
     };
     
-    attribute<int, threadsafe::no, limit::clamp, allow_repetitions::no> linewidth_blank {
-        this, "linewidth_blank", 1,
+    attribute<int> linewidth_blanking {
+        this, "linewidth_blanking", 1,
         setter { MIN_FUNCTION {
-            this->_line_width_blanking = args[0];
+            atoms cleaned_args;
+            jam::ArgVectSize r = jam::checkAndFillAttrArgs<int>(args, &cleaned_args, 1, 1);
+            if (r == jam::too_long) {
+                cwarn << "missing argument for message linewidth. Assuming 1" << endl;
+            }
+            int val = (int)cleaned_args[0];
+            val = (val < 1) ? 1 : val;
+            val = (val > 10) ? 10 : val;
+            cleaned_args[0] = atom(val);
+            this->_line_width_blanking = cleaned_args[0];
             if(this->initialized()) {
                 this->bang();
             }
-            return args;
+            
+            return cleaned_args;
         }},
         title {"Line Width Blanking"},
-        description {"Line width for drawing blanking segments"},
-        range {1, 10},
+        description {"Line width for drawing blanking segments."},
         category {"Drawing"}
     };
     
     attribute<bool> drawblanking {
         this, "drawblanking", false,
         title {"Draw Blanking"},
-        description {"Draw lines where the laser is blanked."},
         setter {
             MIN_FUNCTION {
-                this->_drawblanking = (bool)args[0];
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                this->_drawblanking = (bool)cleaned_args[0];
                 if(this->initialized()) {
                     this->bang();
                 }
-                return args;
+                return cleaned_args;
             }
         },
+        description {"Draw lines where the laser is blanked. (default=0)"},
         category {"Drawing"}
     };
     
     attribute<fvec> blankingcolor {
         this, "blankingcolor", { 0.31, 0.31, 0.31, 1.},
         setter { MIN_FUNCTION {
-            this->_blanking_color[0] = args[0];
-            this->_blanking_color[1] = args[1];
-            this->_blanking_color[2] = args[2];
-            this->_blanking_color[3] = args[3];
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(0,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            this->_blanking_color[0] = cleaned_args[0];
+            this->_blanking_color[1] = cleaned_args[1];
+            this->_blanking_color[2] = cleaned_args[2];
+            this->_blanking_color[3] = cleaned_args[3];
             if(this->initialized()) {
                 this->bang();
             }
-            return args;
+            return cleaned_args;
         }},
         title {"Blanking Color"},
         description {"If draw_blanking is enabled, the color blanked lines will be drawn."},
@@ -373,6 +390,59 @@ public:
         this, "custompallet", false,
         title {"Use Custom Color Pallet"},
         description {"Use custom color pallet for frames with indexed colors."},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                this->_use_custompallet = (bool)cleaned_args[0];
+                if(this->initialized()) {
+                    this->bang();
+                }
+                return cleaned_args;
+            }
+        },
+        category {"Custom Color Pallet"},
+        category {"Drawing"}
+    };
+    
+    attribute<bool> overrideopacity {
+        this, "overrideopacity", false,
+        title {"Override Opacity"},
+        description {"Override color opacity values when rendering a frame and use the value from the 'opacity' attribute instead.<br/><b>Note</b>: 'blend_enable' must be set to 1 for this to take effect."},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                this->_override_opacity = (bool)cleaned_args[0];
+                if(this->initialized()) {
+                    this->bang();
+                }
+                return cleaned_args;
+            }
+        },
+        category {"Custom Color Pallet"},
+        category {"Drawing"}
+    };
+    
+    attribute<double> opacity {
+        this, "opacity", 1.,
+        title {"Opacity"},
+        description {"Opacity value applied when 'overrideopacity' is set to 1."},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 1, 1.);
+                double opac_val = cleaned_args[0];
+                opac_val = opac_val > 1. ? 1. : opac_val;
+                opac_val = opac_val < 0. ? 0. : opac_val;
+                cleaned_args[0] = opac_val;
+                this->_opacity = cleaned_args[0];
+                if(this->initialized()) {
+                    this->bang();
+                }
+                return cleaned_args;
+            }
+        },
         category {"Custom Color Pallet"},
         category {"Drawing"}
     };
@@ -383,32 +453,65 @@ public:
         description {"Set to 1 the z-axis position is ignored, regardles of the specified format in a frame. This can help to remove distortions in some cases, when the file is not properly generated."},
         setter {
             MIN_FUNCTION {
-                this->_force_2d = (bool)args[0];
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                this->_force_2d = (bool)cleaned_args[0];
                 if(this->initialized()) {
                     this->bang();
                 }
-                return args;
+                return cleaned_args;
             }
         },
         category {"Drawing"}
     };
     
+    attribute<bool> monochrome {
+        this, "monochrome", false,
+        title {"Monochrome"},
+        description {"Igore color information and draw everything  in 'monochromecolor'."},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                this->_monochrome = (bool)cleaned_args[0];
+                if(this->initialized()) {
+                    this->bang();
+                }
+                return cleaned_args;
+            }
+        },
+        category {"Drawing"}
+    };
+    
+    attribute<fvec> monochromecolor {
+        this, "monochromecolor", { 1., 1., 1., 1.},
+        setter { MIN_FUNCTION {
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(0,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            this->_monochrome_color[0] = cleaned_args[0];
+            this->_monochrome_color[1] = cleaned_args[1];
+            this->_monochrome_color[2] = cleaned_args[2];
+            this->_monochrome_color[3] = cleaned_args[3];
+            if(this->initialized()) {
+                this->bang();
+            }
+            return cleaned_args;
+        }},
+        title {"Monochrome Color"},
+        description {"If 'monochrome' is enabled, the color everything will be drawn."},
+        style {c74::min::style::color},
+        category {"Drawing"}
+    };
+    
     attribute<fvec> sketch_anchor {
-        this, "anchor ", {0., 0., 0.},
+        this, "anchor", {0., 0., 0.},
         title {"Anchor"},
         description {"The anchor position in local space (default = 0. 0. 0.). Allows for offsetting the local 3D origin around which transforms are applied."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
-                for(size_t i = 0; i < args.size(); i++) {
-                    cleaned_args.push_back((float)args[i]);
-                    if (i == 2) {
-                        break;
-                    }
-                }
-                while(cleaned_args.size() < 3) {
-                    cleaned_args.push_back(0);
-                }
+                jam::checkAndFillAttrArgs<float>(args, &cleaned_args, 3, 0.);
                 atom sketch_atoms[3] = {cleaned_args[0], cleaned_args[1], cleaned_args[2]};
                 typedmess(this->_getSketchObject(),symbol("anchor"),3,sketch_atoms);
                 
@@ -421,14 +524,16 @@ public:
     };
     
     attribute<bool> sketch_antialias {
-        this, "antialias ", false,
+        this, "antialias", false,
         title {"Antialias"},
         description {"Antialiasing flag (default = 0) On some hardware, the blend_enable attribute must also be enabled for antialiasing to work."},
         setter {
             MIN_FUNCTION {
-                atom sketch_atoms[1] = {args[0]};
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                atom sketch_atoms[1] = {cleaned_args[0]};
                 typedmess(this->_getSketchObject(),symbol("antialias"),3,sketch_atoms);
-                return args;
+                return cleaned_args;
             }
             
         },
@@ -436,14 +541,16 @@ public:
     };
     
     attribute<bool> sketch_auto_material {
-        this, "auto_material ", true,
+        this, "auto_material", true,
         title {"Auto Material"},
-        description {"Antialiasing flag (default = 0) On some hardware, the blend_enable attribute must also be enabled for antialiasing to workAutomatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object, the diffuse and ambient material components for the object will be set to the object's color, and the specular and emissive lighting components are disabled."},
+        description {"Automatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object."},
         setter {
             MIN_FUNCTION {
-                atom sketch_atoms[1] = {args[0]};
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, true);
+                atom sketch_atoms[1] = {cleaned_args[0]};
                 typedmess(this->_getSketchObject(),symbol("auto_material"),3,sketch_atoms);
-                return args;
+                return cleaned_args;
             }
             
         },
@@ -451,14 +558,16 @@ public:
     };
     
     attribute<bool> sketch_automatic {
-        this, "automatic ", true,
+        this, "automatic", true,
         title {"Automatic"},
         description {"Automatic rendering flag (default = 1) When the flag is set, rendering occurs when the associated jit.gl.render object receives a bang message."},
         setter {
             MIN_FUNCTION {
-                atom sketch_atoms[1] = {args[0]};
-                typedmess(this->_getSketchObject(),symbol("automatic"),3,sketch_atoms);
-                return args;
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, true);
+                atom sketch_atoms[1] = {cleaned_args[0]};
+                typedmess(this->_getSketchObject(),symbol("automatic"),1,sketch_atoms);
+                return cleaned_args;
             }
             
         },
@@ -471,9 +580,11 @@ public:
         description {"x/y/z axis rendering off/on (default = 0)"},
         setter {
             MIN_FUNCTION {
-                atom sketch_atoms[1] = {args[0]};
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                atom sketch_atoms[1] = {cleaned_args[0]};
                 typedmess(this->_getSketchObject(),symbol("axes"),3,sketch_atoms);
-                return args;
+                return cleaned_args;
             }
             
         },
@@ -483,9 +594,11 @@ public:
     attribute<symbol> sketch_drawto {
         this, "drawto","",
         setter { MIN_FUNCTION {
-            atom mess_arg = args[0];
-            typedmess(this->_getSketchObject(),symbol("drawto"),1,&mess_arg);
-            return args;
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "");
+            atom sketch_atoms[1] = {cleaned_args[0]};
+            typedmess(this->_getSketchObject(),symbol("drawto"),1,sketch_atoms);
+            return cleaned_args;
         }},
         title {"Drawto"},
         description {"The named drawing context in which to draw (default = none) A named drawing context is a named instance of a jit.window, jit.pwindow, or jit.matrix object that has an instance of the jit.gl.render object associated with it."},
@@ -495,9 +608,11 @@ public:
     attribute<bool> sketch_blend_enable {
         this, "blend_enable", false,
         setter { MIN_FUNCTION {
-            atom mess_arg = args[0];
-            typedmess(this->_getSketchObject(),symbol("blend_enable"),1,&mess_arg);
-            return args;
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+            atom sketch_atoms[1] = {cleaned_args[0]};
+            typedmess(this->_getSketchObject(),symbol("blend_enable"),1,sketch_atoms);
+            return cleaned_args;
         }},
         title {"Blend Enable"},
         description {"Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects."},
@@ -507,9 +622,11 @@ public:
     attribute<fvec> sketch_position {
         this, "position", {0.0, 0.0, 0.0},
         setter { MIN_FUNCTION {
-            atom mess_args[3] = {args[0], args[1], args[2], };
-            typedmess(this->_getSketchObject(),symbol("position"),3,mess_args);
-            return args;
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<float>(args, &cleaned_args, 3, 0.);
+            atom sketch_atoms[3] = {args[0], args[1], args[2], };
+            typedmess(this->_getSketchObject(),symbol("position"),3,sketch_atoms);
+            return cleaned_args;
         }},
         title {"Position"},
         description {"The 3D origin in the form x y z (default = 0. 0. 0.)"},
@@ -519,9 +636,11 @@ public:
     attribute<fvec> sketch_scale {
         this, "scale", {1.0, 1.0, 1.0},
         setter { MIN_FUNCTION {
-            atom mess_args[3] = {args[0], args[1], args[2], };
-            typedmess(this->_getSketchObject(),symbol("scale"),3,mess_args);
-            return args;
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<float>(args, &cleaned_args, 3, 1.);
+            atom sketch_atoms[3] = {args[0], args[1], args[2], };
+            typedmess(this->_getSketchObject(),symbol("scale"),3,sketch_atoms);
+            return cleaned_args;
         }},
         title {"Scale"},
         description {"The 3D scaling factor in the form x y z (default = 1. 1. 1.)"},
@@ -529,11 +648,13 @@ public:
     };
     
     attribute<fvec> sketch_rotate {
-        this, "rotate", {1.0, 1.0, 1.0},
+        this, "rotate", {0., 0., 0., 1.},
         setter { MIN_FUNCTION {
-            atom mess_args[3] = {args[0], args[1], args[2], };
-            typedmess(this->_getSketchObject(),symbol("rotate"),3,mess_args);
-            return args;
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<float>(args, &cleaned_args, 4, 0.);
+            atom sketch_atoms[4] = {cleaned_args[0], cleaned_args[1], cleaned_args[2], cleaned_args[2]};
+            typedmess(this->_getSketchObject(),symbol("rotate"),4,sketch_atoms);
+            return cleaned_args;
         }},
         title {"Rotate"},
         description {"The angle of rotation and the xyz vector about which the rotation is performed in the form rotation-angle x y z (default = 0. 0. 0. 1.)"},
@@ -543,7 +664,9 @@ public:
     attribute<symbol> sketch_blend {
         this, "blend", "alphablend",
         setter { MIN_FUNCTION {
-            std::string blend_name = (std::string)args[0];
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "alphablend");
+            std::string blend_name = (std::string)cleaned_args[0];
             if(this->initialized()) {
                 if(this->_blend_setter_internal) {
                     this->_blend_setter_internal = false;
@@ -554,45 +677,23 @@ public:
                     }
                 }
             }
-            return args;
+            return cleaned_args;
         }},
         title {"Blend"},
-        description {"The named blending mode. The possible values are:<br />add = blend_mode 1 1<br/>multiply = blend_mode 2 1<br/>screen = blend_mode 4 1<br/>exclusion = blend_mode 4 5<br/>colorblend = blend_mode 3 4<br/>alphablend = blend_mode 6 7<br/>coloradd = blend_mode 3 1<br/>alphaadd = blend_mode 6 1<br />"},
+        description {"The named blending mode. The possible values are:<br/>add = blend_mode 1 1<br/>multiply = blend_mode 2 1<br/>screen = blend_mode 4 1<br/>exclusion = blend_mode 4 5<br/>colorblend = blend_mode 3 4<br/>alphablend = blend_mode 6 7<br/>coloradd = blend_mode 3 1<br/>alphaadd = blend_mode 6 1<br/>"},
         range {"add", "multiply", "screen", "exclusion", "colorblend", "colorblend", "alphablend", "coloradd", "coloradd", "alphaadd"},
         category {"OB3D"}
-    };
-    
-    
-    enum class cull_face_options : int {off, back, front, two_pass, enum_count};
-    enum_map cull_face_options_range = {"Off", "Back", "Front", "2Pass"};
-    attribute<cull_face_options> sketch_cull_face {
-        this, "cull_face", cull_face_options::off,cull_face_options_range,
-        title {"Cull Face"},
-        description {"Face culling mode (default = 0 (no culling))<br /> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces"},
-        setter { MIN_FUNCTION {
-            atom mess_args[1] = {args[0]};
-            typedmess(this->_getSketchObject(),symbol("cull_face"),1,mess_args);
-            return args;
-        }},
-        category {"OB3D"},
     };
     
     attribute<ivec> sketch_blend_mode {
         this, "blend_mode", {6, 7},
         title {"Blend Mode"},
-        description {" The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode. The supported modes are:<br />     0 = zero<br />     1 = one<br />     2 = destination color<br />     3 = source color<br />     4 = one minus destination color<br />     5 = one minus source color<br />     6 = source alpha<br />     7 = one minus source alpha<br />     8 = destination alpha<br />     9 = one minus destination alpha<br />     10 = source alpha saturate"},
-        range {0,10},
+        description {"The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode. The supported modes are:<br/>     0 = zero<br/>     1 = one<br/>     2 = destination color<br/>     3 = source color<br/>     4 = one minus destination color<br/>     5 = one minus source color<br/>     6 = source alpha<br/>     7 = one minus source alpha<br/>     8 = destination alpha<br/>     9 = one minus destination alpha<br/>     10 = source alpha saturate"},
         setter { MIN_FUNCTION {
+            
             atoms cleaned_args;
-            for(size_t i = 0; i < args.size(); i++) {
-                cleaned_args.push_back((int)args[i]);
-                if (i == 1) {
-                    break;
-                }
-            }
-            while(cleaned_args.size() < 2) {
-                cleaned_args.push_back(0);
-            }
+            jam::checkAndFillAttrArgs<int>(args, &cleaned_args, 2, 0);
+
             for(size_t i = 0; i < cleaned_args.size(); i++) {
                 cleaned_args[i] = ((int)cleaned_args[i] > 10) ? atom(10) : cleaned_args[i];
                 cleaned_args[i] = ((int)cleaned_args[i] < 0) ? atom(0) : cleaned_args[i];
@@ -615,11 +716,43 @@ public:
         category {"OB3D"},
     };
     
+    attribute<bool> sketch_lighting_enable {
+        this, "lighting_enable", false,
+        setter { MIN_FUNCTION {
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+            atom sketch_atoms[1] = {cleaned_args[0]};
+            typedmess(this->_getSketchObject(),symbol("lighting_enable"),1,sketch_atoms);
+            return cleaned_args;
+        }},
+        title {"Lightning Enable"},
+        description {"Lighting enabled flag (default = 0) When the flag is set, lighting is calculated."},
+        category {"OB3D"}
+    };
+    
+    
+    enum class cull_face_options : int {off, back, front, two_pass, enum_count};
+    enum_map cull_face_options_range = {"Off", "Back", "Front", "2Pass"};
+    
+    attribute<cull_face_options> sketch_cull_face {
+        this, "cull_face", cull_face_options::off,cull_face_options_range,
+        title {"Cull Face"},
+        description {"Face culling mode (default = 0 (no culling))<br/> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces"},
+        setter { MIN_FUNCTION {
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<cull_face_options>(args, &cleaned_args, 1, cull_face_options::off);
+            atom sketch_atoms[1] = {cleaned_args[0]};
+            typedmess(this->_getSketchObject(),symbol("cull_face"),1,sketch_atoms);
+            return cleaned_args;
+        }},
+        category {"OB3D"},
+    };
     
     attribute<fvec> customcolor_0 {
         this, "customcolor_0", { 1.0 , 0.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
+           
             jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
             this->_setCustomColorByIndex(0,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
             return cleaned_args;
@@ -1609,24 +1742,34 @@ public:
             while(frame.getNext(&data_record)) {
                 bool blanking = data_record.getBlanking();
                 
-                if(!blanking  || this->_drawblanking) {
-                    if(is_indexed_color) {
-                        volatile uint8_t color_index = data_record.getColorIndex();
-                        bool is_custom_pallet = (bool)custompallet;
-                        fvec color_values = (is_custom_pallet) ? this->_getCustomColorByIndex(color_index) : jam::ilda::Colors::getFloatColorByIndex(color_index);
-                        args_color_values[0] = atom(color_values[0]);
-                        args_color_values[1] = atom(color_values[1]);
-                        args_color_values[2] = atom(color_values[2]);
-                        args_color_values[3] = atom(color_values[3]);
+                if(!blanking  || this->_drawblanking) { // Do we need a color to draw?
+                    double opacity = this->_override_opacity ? this->_opacity : 1.;
+                    if(this->_monochrome) { // use monochrome color
+                        args_color_values[0] = this->_monochrome_color[0];
+                        args_color_values[1] = this->_monochrome_color[1];
+                        args_color_values[2] = this->_monochrome_color[2];
+                        args_color_values[3] = (this->_override_opacity) ? atom(this->_opacity) : this->_monochrome_color[3];
                     } else {
-                        uint8_t red = data_record.getRed();
-                        uint8_t green = data_record.getGreen();
-                        uint8_t blue = data_record.getBlue();
-                        args_color_values[0] = atom((float) red / 255.);
-                        args_color_values[1] = atom((float) green / 255.);
-                        args_color_values[2] = atom((float) blue / 255.);
-                        args_color_values[3] = atom(1.); // ILDA RGB Colors don't have alpha
+                        if(is_indexed_color) { // use indexed color
+                            size_t color_index = data_record.getColorIndex();
+                            fvec color_values = (this->_use_custompallet) ? this->_getCustomColorByIndex(color_index) : jam::ilda::Colors::getFloatColorByIndex(color_index, opacity);
+                            args_color_values[0] = atom(color_values[0]);
+                            args_color_values[1] = atom(color_values[1]);
+                            args_color_values[2] = atom(color_values[2]);
+                            
+                            args_color_values[3] = atom( this->_override_opacity ? this->_opacity : color_values[3]);
+                        } else { // use frame true color
+                            uint8_t red = data_record.getRed();
+                            uint8_t green = data_record.getGreen();
+                            uint8_t blue = data_record.getBlue();
+                            args_color_values[0] = atom((float) red / 255.);
+                            args_color_values[1] = atom((float) green / 255.);
+                            args_color_values[2] = atom((float) blue / 255.);
+                                // ILDA RGB Colors don't have alpha, so we set it 1. if not overridden
+                            args_color_values[3] = atom(opacity = this->_override_opacity ? this->_opacity : 1.);
+                        }
                     }
+                    
                     typedmess(this->_getSketchObject(),symbol("glcolor"),4,args_color_values);
                     
                     
@@ -1654,7 +1797,7 @@ public:
     };
     
     message<>ilda {
-        this, "ilda", "reference to am ILDA file loaded by jam.ilda.file",
+        this, "ilda", "Reference to am ILDA file loaded by jam.ilda.file",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message ilda" << endl;
@@ -1666,18 +1809,140 @@ public:
             std::string ilda_file_refence = args[0];
             std::vector<jam::ilda::IldaFrame> frames = this->_getStructPointer()->getFrames(ilda_file_refence);
             this->_frames = frames;
+        
+            return {};
+            
+        }
+    };
+    
+    message<> exportpallet {
+        this, "exportpallet", "Export the custom color pallet as dictionary",
+        MIN_FUNCTION {
+            
+            this->d_inner.clear();
+            this->d_outer.clear();
+            this->d_outer["colorpallet"] = d_inner;
+            c74::max::t_object* ro = (c74::max::t_object*)d_inner;
+            c74::max::t_dictionary* maxdict = (c74::max::t_dictionary*)ro;
+            for(size_t color_index = 0; color_index < 64; color_index++) {
+                fvec color = this->_getCustomColorByIndex(color_index);
+                atom color_atoms[4] = {color[0], color[1], color[2], color[3]};
+                std::ostringstream index_stream;
+                index_stream << color_index;
+                c74::max::dictionary_appendatoms(maxdict,symbol(index_stream.str()),4,color_atoms);
+            }
             
             queued_message_t msg;
             atoms msg_atoms;
-            msg_atoms.push_back("bang");
-            msg.set(&output_loaded,msg_atoms);
+            msg_atoms.push_back("dictionary");
+            msg_atoms.push_back(this->d_outer.name());
+            msg.set(&outlet_dict,msg_atoms);
             msg.send(this);
+            
             
             return {};
             
         }
     };
     
+    message<> resetpallet {
+        this, "resetpallet", "Reset the custom color pallet to the ILDA default pallet colors",
+        MIN_FUNCTION {
+            auto attrs = this->attributes();
+            atoms color_vals_atoms;
+            fvec color_values_vec;
+            
+            for(size_t color_index = 0; color_index < 64; color_index++) {
+                try {
+                    color_values_vec.clear();
+                    fvec color_values_vec = jam::ilda::Colors::getFloatColorByIndex(color_index);
+                    std::ostringstream index_stream;
+                    index_stream << color_index;
+                    std::string attr_name = "customcolor_" + index_stream.str();
+                    
+                    attribute_base * cust_color_attr = attrs.at(attr_name);
+                    color_vals_atoms.clear();
+                    for(size_t val_index = 0; val_index < 4; val_index++) {
+                        color_vals_atoms.push_back(color_values_vec[val_index]);
+                    }
+                    cust_color_attr->set(color_vals_atoms);
+                } catch (std::out_of_range) {
+                    continue;
+                }
+            }
+            
+            return {};
+            
+        }
+    };
+    
+    message<> dictionary {
+        this, "dictionary", "Use a dictionary to define the pattern of bangs produced.",
+        MIN_FUNCTION {
+            if(inlet != 1) {
+                return {};
+            }
+            c74::max::t_atom d_atom = args[0];
+            if(!c74::max::atomisdictionary(&d_atom)) {
+                return {};
+            }
+            dict d {args[0]};
+            
+            try {
+                d.at("colorpallet");
+            } catch (std::runtime_error) {
+                cerr << "dictionary not well formatted. Please refere to the documentaion." << endl;
+                return {};
+            }
+            
+                // Turn the atom_reference from d["colorpallet"] into an atom
+            c74::min::symbol key {"colorpallet"};
+            auto subdictatom = c74::min::atom(d[key].begin());
+            
+                // Create an unregistered subdict from the atom
+            dict color_vaules_dict {subdictatom};
+            
+                // Generate a unique name
+            auto sym = c74::min::symbol(true);
+            color_vaules_dict.register_as(sym);
+            atoms color_vals_atoms;
+            auto attrs = this->attributes();
+            for (size_t color_index = 0;  color_index < 64; color_index++) {
+                    // declaring output string stream
+                std::ostringstream str_stream;
+                str_stream << color_index;
+                std::string string_index = str_stream.str();
+                try {
+                    atom_reference color_values = color_vaules_dict.at(string_index);
+                    long cv_count =  color_values.size();
+                    if(cv_count < 4) {
+                        cwarn << "missing values as index: '" << color_index << "' expecting 4 floats" << endl;
+                        continue;;
+                    }
+                    fvec color_values_vec = static_cast<fvec>(color_values);
+                    std::ostringstream index_stream;
+                    index_stream << color_index;
+                    std::string attr_name = "customcolor_" + index_stream.str();
+                    try {
+                        attribute_base * cust_color_attr = attrs.at(attr_name);
+                        color_vals_atoms.clear();
+                        for(size_t val_index = 0; val_index < 4; val_index++) {
+                            color_vals_atoms.push_back(color_values_vec[val_index]);
+                        }
+                        cust_color_attr->set(color_vals_atoms);
+                    } catch (std::out_of_range) {
+                        continue;
+                    }
+                    
+                } catch (std::runtime_error) {
+                    continue;
+                }
+                
+            }
+            
+            return {};
+        }
+    };
     
         // Timer dedicated to deliver messages to object outlets
     timer<> deliverer_to_max {
