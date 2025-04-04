@@ -27,139 +27,117 @@ class helios : public object<helios>
 {
     
 protected:
-    
-    typedef struct QuededMessage {
-        outlet<>* out;
-        atoms msg_atoms;
-        void set(outlet<>* o, atoms ma) {
-            this->out = o;
-            this->setAtoms(ma);
-        }
-        void setAtoms(atoms ma) {
-            this->msg_atoms.clear();
-            this->msg_atoms = ma;
-        }
-        void send(helios* me) {
-            me->_enqueue_msg_to_max(*this);
-            me->deliverer_to_max.delay(0);
-        }
+    typedef struct QuededMessage
+    {
+    outlet<>* out;
+    atoms msg_atoms;
+    void set(outlet<>* o, atoms ma)
+    {
+    this->out = o;
+    this->setAtoms(ma);
+    }
+    void setAtoms(atoms ma)
+    {
+    this->msg_atoms.clear();
+    this->msg_atoms = ma;
+    }
+    void send(helios* me)
+    {
+    me->_enqueue_msg_to_max(*this);
+    me->deliverer_to_max.delay(0);
+    }
     } queued_message_t;
     
     std::thread _device_scan_thread;
-    fifo<queued_message_t> _to_max_queue_2 { 1000 };
+    fifo<queued_message_t> _to_max_queue_2{ 1000 };
     std::mutex _enqueue_msg_lock;
-    jam::helios::DeviceManager & _deviceManager = jam::helios::DeviceManager::get();
+    jam::helios::DeviceManager& _deviceManager = jam::helios::DeviceManager::get();
     
-    void _enqueue_msg_to_max(const queued_message_t &msg_to_max) {
-        _enqueue_msg_lock.lock();
-        this->_to_max_queue_2.try_enqueue(msg_to_max);
-        _enqueue_msg_lock.unlock();
+    void _enqueue_msg_to_max(const queued_message_t& msg_to_max)
+    {
+    _enqueue_msg_lock.lock();
+    this->_to_max_queue_2.try_enqueue(msg_to_max);
+    _enqueue_msg_lock.unlock();
     }
     
-    bool _dequeue_msg_to_max(queued_message_t &msg_data) {
-        _enqueue_msg_lock.lock();
-        bool result = this->_to_max_queue_2.try_dequeue(msg_data);
-        _enqueue_msg_lock.unlock();
-        return result;
+    bool _dequeue_msg_to_max(queued_message_t& msg_data)
+    {
+    _enqueue_msg_lock.lock();
+    bool result = this->_to_max_queue_2.try_dequeue(msg_data);
+    _enqueue_msg_lock.unlock();
+    return result;
     }
     
 public:
-    
-    helios(const atoms& args = {}) {
-        if(!dummy()) {
-            this->_deviceManager.addObjInstance(this->maxobj());
-        }
+    helios(const atoms& args = {})
+    {
+    if (!dummy()) {
+        this->_deviceManager.addObjInstance(this->maxobj());
+    }
     }
     
-    ~helios() {
-        if(!dummy()) {
-            this->_deviceManager.removeObjInstance(this->maxobj());
-        }
+    ~helios()
+    {
+    if (!dummy()) {
+        this->_deviceManager.removeObjInstance(this->maxobj());
+    }
     }
     
-    MIN_DESCRIPTION     { "Connect to a Helios ILDA DAC" };
-    MIN_TAGS            { "utilities" };
-    MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.dmxusbpro~, jam.dmxusbpro"};
+    MIN_DESCRIPTION{ "Connect to a Helios ILDA DAC" };
+    MIN_TAGS{ "utilities" };
+    MIN_AUTHOR{ "Jan Mech" };
+    MIN_RELATED{ "jam.dmxusbpro~, jam.dmxusbpro" };
     
-    inlet<> input_1             { this, "(anything) Control Messages", "anything" };
-    inlet<> input_2             { this, "(dictionary) ilda file dictionary" , "dictionary"};
-    outlet<> outlet_menu        { this, "(anything) Connect to umenu", "message"};
-    outlet<> outlet_connected   { this, "(int) State of Connection", "int" };
-    outlet<> outlet_dumpout     { this, "dumpout"};
+    inlet<> input_1{ this, "(anything) Control Messages", "anything" };
+    inlet<> input_2{ this, "(dictionary) ilda file dictionary", "dictionary" };
+    outlet<> outlet_menu{ this, "(anything) Connect to umenu", "message" };
+    outlet<> outlet_connected{ this, "(int) State of Connection", "int" };
+    outlet<> outlet_dumpout{ this, "dumpout" };
     
-    attribute<bool> notifyothers {
+    attribute<bool> notifyothers{
         this, "notifyothers", true,
-        title { "Notify others" },
-        description { "If set to 1 (default) other jam.helios object will be notified if an  device scan has been exectued. The new result will update all umenus connected to the leftmost outlet." }
+        title{ "Notify others" },
+        description{ "If set to 1 (default) other jam.helios object will be notified if an  device scan has been exectued. The new result will update all umenus connected to the leftmost outlet." }
     };
     
-    attribute<int, threadsafe::no, limit::clamp> samplerate {
-        this, "samplerate", 30000,
-        title {"Samplerate"},
-        description {"Points per second send to the laser projector.<br /><b>Note</b>:It is recommended to keep sampling rate at 30000 or below, as higher values can cause problems in certain devices like LaserCube Wifi"},
-        range {1000, 100000},
+    attribute<int, threadsafe::no, limit::clamp> samplerate{
+        this,
+        "samplerate",
+        30000,
+        title{ "Samplerate" },
+        description{ "Points per second send to the laser projector.<br /><b>Note</b>:It is recommended to keep sampling rate at 30000 or below, as higher values can cause problems in certain devices like LaserCube Wifi" },
+        range{ 1000, 100000 },
     };
     
-    attribute<bool> invert_x {
+    attribute<bool> invert_x{
         this, "invert_x", false,
-        title {"Invert X"},
-        description { "Invert the output of the X-axis (horizontally)" }
+        title{ "Invert X" },
+        description{ "Invert the output of the X-axis (horizontally)" }
     };
     
-    attribute<bool> invert_y {
+    attribute<bool> invert_y{
         this, "invert_y", false,
-        title {"Invert Y"},
-        description { "Invert the output of the Y-axis (vertically)" }
+        title{ "Invert Y" },
+        description{ "Invert the output of the Y-axis (vertically)" }
     };
     
-    message<> dictionary {
-        this, "dictionary", "Dictionary containing an ILDA file animation for sending to the DAC",
-        MIN_FUNCTION {
-            if (inlet == 1) {
-                dict ilda_file = {args[0]};
-                    // Turn the atom_reference from mindict["innerdict"] into an atom
-                c74::min::symbol key {"frames"};
-                auto frames_dict_atom = c74::min::atom(ilda_file[key].begin());
-                
-                    // Create an unregistered subdict from the atom
-                dict framess_dict {frames_dict_atom};
-                int i = 0;
-                try {
-                    while(true) {
-                        auto frame_dict = framess_dict.at(symbol(i));
-                        i++;
-                        if(1 > 1024) {
-                            break;
-                        }
-                    }
-                } catch (std::runtime_error& e) {
-                    cerr << "could not fetch key called 'pattern'" << endl;
-                }
-                
-            }
-            return {};
-        }
-    };
-    
-    message<> menu {
+    message<> menu{
         
         this, "menu", "Get list of connected devices and build menu from it.",
-        MIN_FUNCTION {
+        MIN_FUNCTION{
             this->close();
-            if(this->_deviceManager.getOpenDevices()->size() == 0) {
+            if (this->_deviceManager.getOpenDevices()->size() == 0) {
                 cwarn << "No devices registered. Try re-scanning." << endl;
             }
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'menu'" << endl;
             }
-            std::vector<jam::helios::device_info_t> *open_devices = this->_deviceManager.getOpenDevices();
+            std::vector<jam::helios::device_info_t>* open_devices = this->_deviceManager.getOpenDevices();
             atoms msg_atoms;
             msg_atoms.push_back("clear");
             queued_message_t msg;
             msg.set(&outlet_menu, msg_atoms);
             msg.send(this);
-            
             
             msg_atoms.clear();
             msg_atoms.push_back("append");
@@ -168,7 +146,7 @@ public:
             msg.send(this);
             
             msg_atoms.clear();
-            for(size_t i = 0; i < open_devices->size(); i++) {
+            for (size_t i = 0; i < open_devices->size(); i++) {
                 msg_atoms.push_back("append");
                 msg_atoms.push_back((*open_devices)[i].name);
                 msg.setAtoms(msg_atoms);
@@ -176,23 +154,24 @@ public:
             }
             return {};
         }
-    };
+    }
+    ;
     
-    message<> devicescan {
+    message<> devicescan{
         this, "devicescan", "Scan for connected Helios DACs.",
-        MIN_FUNCTION {
+        MIN_FUNCTION{
             this->close();
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'menu'" << endl;
             }
-            if(this->_deviceManager.isScanning()) {
+            if (this->_deviceManager.isScanning()) {
                 cwarn << "scan already in progress" << endl;
                 return {};
             }
             
             this->_device_scan_thread = std::thread([this]() {
                 auto b = this->box();
-                number current_progress {-1.};
+                number current_progress{ -1. };
                 b("startprogress", &current_progress);
                 int numDevs = this->_deviceManager.deviceScan();
                 atoms scan_result;
@@ -203,9 +182,10 @@ public:
                 msg.set(&outlet_dumpout, scan_result);
                 msg.send(this);
                 b("stopprogress");
-                if(notifyothers) {
+                if (notifyothers) {
                     this->_deviceManager.notifyInstances();
-                } else {
+                }
+                else {
                     menu();
                 }
             });
@@ -213,29 +193,33 @@ public:
             
             return {};
         }
-    };
+    }
+    ;
     
-    message<> deviceinfo {
+    message<> deviceinfo{
         this, "deviceinfo", "Print infomation about Helios DAC devices to the Max console.",
-        MIN_FUNCTION {
-            std::vector<jam::helios::device_info_t> *devs = this->_deviceManager.getOpenDevices();
-            if(devs->size() == 0) {
+        MIN_FUNCTION{
+            std::vector<jam::helios::device_info_t>* devs = this->_deviceManager.getOpenDevices();
+            if (devs->size() == 0) {
                 cwarn << "No devices registered. Try re-scanning." << endl;
             }
-            for(jam::helios::device_info_t info : *devs) {
+            for (jam::helios::device_info_t info : *devs) {
                 cout << "Device " << info.index + 1 << endl;
-                cout << "    Name: " << info.name << endl;;
-                cout << "    Type: " << this->_deviceManager.getTypeName(info.type) << endl;;
+                cout << "    Name: " << info.name << endl;
+                ;
+                cout << "    Type: " << this->_deviceManager.getTypeName(info.type) << endl;
+                ;
                 cout << "    Firmware: " << info.firmware << endl;
             }
             return {};
         }
-    };
+    }
+    ;
     
-    message<> open {
+    message<> open{
         this, "open", "Open connetion to a Helios DAC",
-        MIN_FUNCTION {
-            if (args.size() == 0) {
+        MIN_FUNCTION{
+            if (args.size() == 0){
                 cwarn << "missing argument for message open" << endl;
                 return {};
             }
@@ -246,12 +230,13 @@ public:
             std::string dev_name = "";
             int dev_index = 0;
             bool id_is_name = false;
-            if(device_id.a_type == c74::max::A_SYM) {
-                dev_name = (std::string) device_id;
+            if (device_id.a_type == c74::max::A_SYM) {
+                dev_name = (std::string)device_id;
                 id_is_name = true;
-            } else {
+            }
+            else {
                 dev_index = (int)device_id;
-                // Publicly displayed device indices start with 1, internal inidices with 0. We need to take that into account.
+                    // Publicly displayed device indices start with 1, internal inidices with 0. We need to take that into account.
                 if (dev_index < 1) {
                     cwarn << "device not found" << endl;
                     return {};
@@ -261,39 +246,42 @@ public:
             
             queued_message_t msg;
             atoms msg_atoms;
-            auto result = jam::helios::DeviceState::NOTFOUND ;
-           
-            if(id_is_name) {
+            auto result = jam::helios::DeviceState::NOTFOUND;
+            
+            if (id_is_name) {
                 result = this->_deviceManager.attachDeviceToInstance(dev_name, this->maxobj());
-            } else {
+            }
+            else {
                 result = this->_deviceManager.attachDeviceToInstance(dev_index, this->maxobj());
             }
             switch (result) {
                 case jam::helios::DeviceState::ATTACHED_ERROR_ALREADY_ATTACHED:
                     cwarn << "device already opened by other instance" << endl;
                     break;
-                case jam::helios::DeviceState::NOTFOUND :
+                case jam::helios::DeviceState::NOTFOUND:
                     cwarn << "device not found" << endl;
                     break;
-                case jam::helios::DeviceState::ATTACHED_SUCCESS :
+                case jam::helios::DeviceState::ATTACHED_SUCCESS:
                     break;
                 default:
                     cwarn << "error not opening device" << endl;
             }
-            if(result != jam::helios::DeviceState::ATTACHED_SUCCESS) {
+            if (result != jam::helios::DeviceState::ATTACHED_SUCCESS) {
                 msg_atoms.push_back(0);
-            } else {
+            }
+            else {
                 msg_atoms.push_back(1);
             }
             msg.set(&outlet_connected, msg_atoms);
             msg.send(this);
             return {};
         }
-    };
+    }
+    ;
     
-    message<> close {
+    message<> close{
         this, "close", "Close connetion to Helios DAC",
-        MIN_FUNCTION {
+        MIN_FUNCTION{
             this->_deviceManager.detachDeviceFromInstance(this->maxobj());
             queued_message_t msg;
             atoms msg_atoms;
@@ -302,46 +290,28 @@ public:
             msg.send(this);
             return {};
         }
-    };
+    }
+    ;
     
-    message<> shutter {
+    message<> shutter{
         this, "shutter", "Open/Close the shutter. <p><b>Argument:</b><br /> shutter_state [int]</p>",
-        MIN_FUNCTION {
-            if(args.size() < 1) {
+        MIN_FUNCTION{
+            if (args.size() < 1){
                 cwarn << "missing argument for message shutter" << endl;
                 return {};
             }
-            if(args.size() > 1) {
+            if (args.size() > 1) {
                 cwarn << "extra argument for message shutter" << endl;
             }
             int shutter_state_int = (int)args[0];
-            bool shutter_state = shutter_state_int =! 0;
+            bool shutter_state = shutter_state_int = !0;
             this->_deviceManager.setShutter(this->maxobj(), shutter_state);
             return {};
         }
     };
     
-    message <>set_test {
-        this, "set_test", "",
-        MIN_FUNCTION {
-            std::string foo = args[0];
-            this->_deviceManager.setTest(foo);
-            return {};
-        }
-        
-    };
-    
-    message <>get_test {
-        this, "get_test", "",
-        MIN_FUNCTION {
-            cout << this->_deviceManager.getTest()<< endl;
-            return {};
-        }
-        
-    };
-    
-    timer<> deliverer_to_max {
-        this, MIN_FUNCTION {
+    timer<> deliverer_to_max{
+        this, MIN_FUNCTION{
             queued_message_t queue_msg;
             
             while (_dequeue_msg_to_max(queue_msg)) {
@@ -350,8 +320,6 @@ public:
             return {};
         }
     };
-    
 };
-
 
 MIN_EXTERNAL(helios);

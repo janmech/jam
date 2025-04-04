@@ -1,0 +1,29 @@
+
+<svg height="100" width="100" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 0 L100 100" stroke="blue"/>
+  Sorry, your browser does not support inline SVG.
+</svg>
+
+* height and width need to be normalized
+* in this exapmle  0 0 is top left, 100 100 is bottom right
+
+starting with only supporting path:
+MptX ptY : loveto == blanking: two data point
+LptX ptY : lineto == drawing line: two data poin
+
+
+
+H = horizontal lineto (create a horizontal line)
+V = vertical lineto (create a vertical line)
+C = curveto (create a curve)
+S = smooth curveto (create a smooth curve)
+Q = quadratic Bézier curve (create a quadratic Bézier curve)
+T = smooth quadratic Bézier curveto (create a smooth quadratic Bézier curve)
+A = elliptical Arc (create a elliptical arc)
+Z = closepath (close the path)
+
+Note: All of the commands above can also be expressed in lower case. Upper case means absolutely positioned, lower case means relatively positioned.
+
+
+https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d
+
