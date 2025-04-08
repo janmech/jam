@@ -29,7 +29,7 @@ using namespace c74::min;
 using fvec = std::vector<double>;
 using ivec = std::vector<int>;
 
-class ildadict : public object<ildadict>
+class ildasvg : public object<ildasvg>
 {
     
 private:
@@ -53,7 +53,7 @@ protected:
             this->msg_atoms = ma;
         }
         
-        void send(ildadict* me) {
+        void send(ildasvg* me) {
             me->_enqueue_msg_to_max(*this);
             me->deliverer_to_max.delay(0);
         }
@@ -83,13 +83,9 @@ protected:
         return this->_manager_struct_ptr;
     }
     
-    std::vector<jam::ilda::IldaFrame> _frames;
-    
-    symbol loaded_dict_name = symbol("");
-    
 public:
     
-    ildadict(const atoms& args = {}) {
+    ildasvg(const atoms& args = {}) {
         if (args.size() > 0) {
             cwarn << "Extra argumnt for oject jam.jit.gl.dict" << endl;
         }
@@ -97,82 +93,22 @@ public:
         this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
     };
     
-    ~ildadict() {};
+    ~ildasvg() {};
     
-    dict d_ilda_file = dict(symbol(true));
-    
-    MIN_DESCRIPTION     { "Parse ILDA files to dictionary." };
+    MIN_DESCRIPTION     { "Parse SVG file to ILDA file format." };
     MIN_TAGS            { "ILDA, laser tools, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.frame"};
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
-    
-    outlet<> outlet_dict      { this, "ILDA file content as dictionary" };
+
     
     
     message<>bang  {
-        this, "bang", "Output dictionary",
+        this, "bang", "test",
         MIN_FUNCTION {
-            queued_message_t msg;
-            atoms msg_atoms;
-            msg_atoms.push_back("dictionary");
-            msg_atoms.push_back(this->loaded_dict_name );
-            
-            msg.set(&outlet_dict, msg_atoms);
-            msg.send(this);
+            cout << "Bandg Test" << endl;
             return {};
-        }
-    };
-    
-    message<>ilda {
-        this, "ilda", "Reference to am ILDA file loaded by jam.ilda.file",
-        MIN_FUNCTION {
-            if(args.size() < 1) {
-                cwarn << "missing argument for message ilda" << endl;
-                return {};
-            }
-            std::string ilda_file_refence = args[0];
-            std::vector<jam::ilda::IldaFrame> frames = this->_getStructPointer()->getFrames(ilda_file_refence);
-            this->_frames = frames;
-            
-            this->d_ilda_file = dict(symbol(true));
-            this->d_ilda_file.clear();
-            this->d_ilda_file["file_name"] = this->_getStructPointer()->getFileName(ilda_file_refence);
-            this->d_ilda_file["frame_count"] = (int)frames.size();
-            dict d_ilda_frames(symbol(true));
-            
-            for (size_t frame_index = 0; frame_index < frames.size(); frame_index++) {
-                dict d_ilda_frame(symbol(true));
-                jam::ilda::IldaFrame f = this->_frames[frame_index];
-                jam::ilda::IldaHeader h =  f.getHeader();
-            
-                d_ilda_frame["format_name"] = h.getFormat();
-                d_ilda_frame["format_code"] = (int)h.getFormatCode();
-                d_ilda_frame["company_name"] = h.getCompanyName();;
-                d_ilda_frame["frame_name"] = h.getFrameName();;
-                d_ilda_frame["frame_number"] = (int)h.getFrameNumber();
-                d_ilda_frame["frames_in_sequence"] = (int) h.getFramesInSequence();
-                d_ilda_frame["data_record_count"] = (int)h.getDataRecordCount();
-                f.reset();
-                
-                
-                std::ostringstream os;
-                os << frame_index;
-                d_ilda_frames[os.str()] = d_ilda_frame;
-            }
-            this->d_ilda_file["frames"] = d_ilda_frames;
-            this->loaded_dict_name = this->d_ilda_file.name();
-            queued_message_t msg;
-            atoms msg_atoms;
-            msg_atoms.push_back("dictionary");
-            msg_atoms.push_back(this->loaded_dict_name );
-            
-            msg.set(&outlet_dict, msg_atoms);
-            msg.send(this);
-           
-            return {};
-            
         }
     };
     
@@ -190,6 +126,6 @@ public:
 };
 
 
-MIN_EXTERNAL(ildadict);
+MIN_EXTERNAL(ildasvg);
 
 
