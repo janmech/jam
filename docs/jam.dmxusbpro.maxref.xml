@@ -76,14 +76,14 @@
 
 	<attributelist>
 
+		<attribute name='baudrate' get='1' set='1' type='long' size='1' >
+			<digest>Set the baud rate for communicating with the interface</digest>
+			<description>Set the baud rate for communicating with the interface. Default: 56700 </description>
+		</attribute>
+
 		<attribute name='keepsending' get='1' set='1' type='long' size='1' >
 			<digest>If set to 0 (default), the device will stop sending DMX data when the connection is closed</digest>
 			<description>If set to 0 (default), the device will stop sending DMX data when the connection is closed. If set to 1 the device will continue to send the last received DMX data after the connection has been closed. </description>
-		</attribute>
-
-		<attribute name='outmode' get='1' set='1' type='symbol' size='1' >
-			<digest>If set to 'onchange' (default) first outlet will only send out DMX data if values have changed</digest>
-			<description>If set to 'onchange' (default) first outlet will only send out DMX data if values have changed. <bvr />If set to 'always' every received DMX package will we sent out the first outlet. </description>
 		</attribute>
 
 		<attribute name='outformat' get='1' set='1' type='symbol' size='1' >
@@ -91,9 +91,9 @@
 			<description>DMX data format sent to first outlet. If set to 'list' (default) a list of pairs of <i>DMX Channel</i> and <i>DMX Value</i> will be send out. If set to 'raw' outputs the raw bytes of received DMX data:<br />First byte: Status code. Following Bytes: DMX values.<br /> </description>
 		</attribute>
 
-		<attribute name='baudrate' get='1' set='1' type='long' size='1' >
-			<digest>Set the baud rate for communicating with the interface</digest>
-			<description>Set the baud rate for communicating with the interface. Default: 56700 </description>
+		<attribute name='outmode' get='1' set='1' type='symbol' size='1' >
+			<digest>If set to 'onchange' (default) first outlet will only send out DMX data if values have changed</digest>
+			<description>If set to 'onchange' (default) first outlet will only send out DMX data if values have changed. <bvr />If set to 'always' every received DMX package will we sent out the first outlet. </description>
 		</attribute>
 
 		<attribute name='verbose' get='1' set='1' type='long' size='1' >

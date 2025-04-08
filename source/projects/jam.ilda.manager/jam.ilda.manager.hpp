@@ -54,6 +54,7 @@ typedef struct _jam_im
         for(int i = 0; i < _files.size(); i++) {
             if(_files[i]._owner_id == owner_id) {
                 _files[i]._frames.clear();
+                _files[i]._file_name = "";
                 break;
             }
         }

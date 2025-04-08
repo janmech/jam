@@ -78,379 +78,9 @@
 
 	<attributelist>
 
-		<attribute name='customcolor_62' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 62 </digest>
-			<description>Custom Color for color index 62 </description>
-		</attribute>
-
-		<attribute name='customcolor_59' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 59 </digest>
-			<description>Custom Color for color index 59 </description>
-		</attribute>
-
-		<attribute name='customcolor_57' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 57 </digest>
-			<description>Custom Color for color index 57 </description>
-		</attribute>
-
-		<attribute name='customcolor_55' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 55 </digest>
-			<description>Custom Color for color index 55 </description>
-		</attribute>
-
-		<attribute name='customcolor_54' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 54 </digest>
-			<description>Custom Color for color index 54 </description>
-		</attribute>
-
-		<attribute name='customcolor_61' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 64 </digest>
-			<description>Custom Color for color index 64 </description>
-		</attribute>
-
-		<attribute name='customcolor_52' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 52 </digest>
-			<description>Custom Color for color index 52 </description>
-		</attribute>
-
-		<attribute name='customcolor_49' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 49 </digest>
-			<description>Custom Color for color index 49 </description>
-		</attribute>
-
-		<attribute name='customcolor_47' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 47 </digest>
-			<description>Custom Color for color index 47 </description>
-		</attribute>
-
-		<attribute name='customcolor_46' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 46 </digest>
-			<description>Custom Color for color index 46 </description>
-		</attribute>
-
-		<attribute name='customcolor_45' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 45 </digest>
-			<description>Custom Color for color index 45 </description>
-		</attribute>
-
-		<attribute name='customcolor_44' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 44 </digest>
-			<description>Custom Color for color index 44 </description>
-		</attribute>
-
-		<attribute name='customcolor_43' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 43 </digest>
-			<description>Custom Color for color index 43 </description>
-		</attribute>
-
-		<attribute name='customcolor_51' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 54 </digest>
-			<description>Custom Color for color index 54 </description>
-		</attribute>
-
-		<attribute name='customcolor_42' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 42 </digest>
-			<description>Custom Color for color index 42 </description>
-		</attribute>
-
-		<attribute name='customcolor_41' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 34 </digest>
-			<description>Custom Color for color index 34 </description>
-		</attribute>
-
-		<attribute name='customcolor_37' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 37 </digest>
-			<description>Custom Color for color index 37 </description>
-		</attribute>
-
-		<attribute name='customcolor_33' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 33 </digest>
-			<description>Custom Color for color index 33 </description>
-		</attribute>
-
-		<attribute name='customcolor_32' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 32 </digest>
-			<description>Custom Color for color index 32 </description>
-		</attribute>
-
-		<attribute name='customcolor_58' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 45 </digest>
-			<description>Custom Color for color index 45 </description>
-		</attribute>
-
-		<attribute name='customcolor_53' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 53 </digest>
-			<description>Custom Color for color index 53 </description>
-		</attribute>
-
-		<attribute name='customcolor_31' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 31 </digest>
-			<description>Custom Color for color index 31 </description>
-		</attribute>
-
-		<attribute name='customcolor_40' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 40 </digest>
-			<description>Custom Color for color index 40 </description>
-		</attribute>
-
-		<attribute name='customcolor_29' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 29 </digest>
-			<description>Custom Color for color index 29 </description>
-		</attribute>
-
-		<attribute name='customcolor_28' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 28 </digest>
-			<description>Custom Color for color index 28 </description>
-		</attribute>
-
-		<attribute name='customcolor_56' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 56 </digest>
-			<description>Custom Color for color index 56 </description>
-		</attribute>
-
-		<attribute name='force_2d' get='1' set='1' type='long' size='1' >
-			<digest>Set to 1 the z-axis position is ignored, regardles of the specified format in a frame</digest>
-			<description>Set to 1 the z-axis position is ignored, regardles of the specified format in a frame. This can help to remove distortions in some cases, when the file is not properly generated. </description>
-		</attribute>
-
-		<attribute name='customcolor_21' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 21 </digest>
-			<description>Custom Color for color index 21 </description>
-		</attribute>
-
-		<attribute name='cull_face' get='1' set='1' type='long' size='1' >
-			<digest>Face culling mode (default = 0 (no culling))<br/> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces </digest>
-			<description>Face culling mode (default = 0 (no culling))<br/> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces </description>
-		</attribute>
-
-		<attribute name='customcolor_20' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 20 </digest>
-			<description>Custom Color for color index 20 </description>
-		</attribute>
-
-		<attribute name='customcolor_19' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 19 </digest>
-			<description>Custom Color for color index 19 </description>
-		</attribute>
-
-		<attribute name='customcolor_36' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 36 </digest>
-			<description>Custom Color for color index 36 </description>
-		</attribute>
-
-		<attribute name='customcolor_13' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 13 </digest>
-			<description>Custom Color for color index 13 </description>
-		</attribute>
-
-		<attribute name='customcolor_38' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 38 </digest>
-			<description>Custom Color for color index 38 </description>
-		</attribute>
-
-		<attribute name='customcolor_17' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 17 </digest>
-			<description>Custom Color for color index 17 </description>
-		</attribute>
-
-		<attribute name='drawto' get='1' set='1' type='symbol' size='1' >
-			<digest>The named drawing context in which to draw (default = none) A named drawing context is a named instance of a jit.window, jit.pwindow, or jit.matrix object that has an instance of the jit.gl.render object associated with it</digest>
-			<description>The named drawing context in which to draw (default = none) A named drawing context is a named instance of a jit.window, jit.pwindow, or jit.matrix object that has an instance of the jit.gl.render object associated with it. </description>
-		</attribute>
-
-		<attribute name='customcolor_12' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 12 </digest>
-			<description>Custom Color for color index 12 </description>
-		</attribute>
-
-		<attribute name='customcolor_11' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 11 </digest>
-			<description>Custom Color for color index 11 </description>
-		</attribute>
-
-		<attribute name='customcolor_30' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 30 </digest>
-			<description>Custom Color for color index 30 </description>
-		</attribute>
-
-		<attribute name='customcolor_1' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 1 </digest>
-			<description>Custom Color for color index 1 </description>
-		</attribute>
-
-		<attribute name='customcolor_24' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 24 </digest>
-			<description>Custom Color for color index 24 </description>
-		</attribute>
-
-		<attribute name='customcolor_26' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 26 </digest>
-			<description>Custom Color for color index 26 </description>
-		</attribute>
-
-		<attribute name='customcolor_9' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 9 </digest>
-			<description>Custom Color for color index 9 </description>
-		</attribute>
-
-		<attribute name='customcolor_50' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 50 </digest>
-			<description>Custom Color for color index 50 </description>
-		</attribute>
-
-		<attribute name='customcolor_10' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 10 </digest>
-			<description>Custom Color for color index 10 </description>
-		</attribute>
-
-		<attribute name='customcolor_7' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 7 </digest>
-			<description>Custom Color for color index 7 </description>
-		</attribute>
-
-		<attribute name='automatic' get='1' set='1' type='long' size='1' >
-			<digest>Automatic rendering flag (default = 1) When the flag is set, rendering occurs when the associated jit.gl.render object receives a bang message</digest>
-			<description>Automatic rendering flag (default = 1) When the flag is set, rendering occurs when the associated jit.gl.render object receives a bang message. </description>
-		</attribute>
-
-		<attribute name='customcolor_2' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 2 </digest>
-			<description>Custom Color for color index 2 </description>
-		</attribute>
-
-		<attribute name='customcolor_35' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 35 </digest>
-			<description>Custom Color for color index 35 </description>
-		</attribute>
-
-		<attribute name='customcolor_16' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 16 </digest>
-			<description>Custom Color for color index 16 </description>
-		</attribute>
-
-		<attribute name='customcolor_60' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 60 </digest>
-			<description>Custom Color for color index 60 </description>
-		</attribute>
-
-		<attribute name='custompallet' get='1' set='1' type='long' size='1' >
-			<digest>Use custom color pallet for frames with indexed colors</digest>
-			<description>Use custom color pallet for frames with indexed colors. </description>
-		</attribute>
-
-		<attribute name='customcolor_4' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 4 </digest>
-			<description>Custom Color for color index 4 </description>
-		</attribute>
-
-		<attribute name='scale' get='1' set='1' type='float64' size='1' >
-			<digest>The 3D scaling factor in the form x y z (default = 1</digest>
-			<description>The 3D scaling factor in the form x y z (default = 1. 1. 1.) </description>
-		</attribute>
-
-		<attribute name='rotate' get='1' set='1' type='float64' size='1' >
-			<digest>The angle of rotation and the xyz vector about which the rotation is performed in the form rotation-angle x y z (default = 0</digest>
-			<description>The angle of rotation and the xyz vector about which the rotation is performed in the form rotation-angle x y z (default = 0. 0. 0. 1.) </description>
-		</attribute>
-
-		<attribute name='customcolor_63' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 63 </digest>
-			<description>Custom Color for color index 63 </description>
-		</attribute>
-
-		<attribute name='axes' get='1' set='1' type='long' size='1' >
-			<digest>x/y/z axis rendering off/on (default = 0) </digest>
-			<description>x/y/z axis rendering off/on (default = 0) </description>
-		</attribute>
-
-		<attribute name='position' get='1' set='1' type='float64' size='1' >
-			<digest>The 3D origin in the form x y z (default = 0</digest>
-			<description>The 3D origin in the form x y z (default = 0. 0. 0.) </description>
-		</attribute>
-
-		<attribute name='customcolor_14' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 14 </digest>
-			<description>Custom Color for color index 14 </description>
-		</attribute>
-
-		<attribute name='customcolor_5' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 5 </digest>
-			<description>Custom Color for color index 5 </description>
-		</attribute>
-
-		<attribute name='blend_enable' get='1' set='1' type='long' size='1' >
-			<digest>Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects</digest>
-			<description>Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects. </description>
-		</attribute>
-
-		<attribute name='linewidth_blanking' get='1' set='1' type='long' size='1' >
-			<digest>Line width for drawing blanking segments</digest>
-			<description>Line width for drawing blanking segments. </description>
-		</attribute>
-
-		<attribute name='linewidth' get='1' set='1' type='long' size='1' >
-			<digest>Line width for drawing regular segments</digest>
-			<description>Line width for drawing regular segments. </description>
-		</attribute>
-
-		<attribute name='customcolor_6' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 6 </digest>
-			<description>Custom Color for color index 6 </description>
-		</attribute>
-
-		<attribute name='auto_material' get='1' set='1' type='long' size='1' >
-			<digest>Automatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object</digest>
-			<description>Automatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object. </description>
-		</attribute>
-
 		<attribute name='anchor' get='1' set='1' type='float64' size='1' >
 			<digest>The anchor position in local space (default = 0</digest>
 			<description>The anchor position in local space (default = 0. 0. 0.). Allows for offsetting the local 3D origin around which transforms are applied. </description>
-		</attribute>
-
-		<attribute name='customcolor_48' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 48 </digest>
-			<description>Custom Color for color index 48 </description>
-		</attribute>
-
-		<attribute name='customcolor_25' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 25 </digest>
-			<description>Custom Color for color index 25 </description>
-		</attribute>
-
-		<attribute name='customcolor_34' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 34 </digest>
-			<description>Custom Color for color index 34 </description>
-		</attribute>
-
-		<attribute name='blend_mode' get='1' set='1' type='float64' size='1' >
-			<digest>The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode</digest>
-			<description>The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode. The supported modes are:<br/>     0 = zero<br/>     1 = one<br/>     2 = destination color<br/>     3 = source color<br/>     4 = one minus destination color<br/>     5 = one minus source color<br/>     6 = source alpha<br/>     7 = one minus source alpha<br/>     8 = destination alpha<br/>     9 = one minus destination alpha<br/>     10 = source alpha saturate </description>
-		</attribute>
-
-		<attribute name='customcolor_8' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 8 </digest>
-			<description>Custom Color for color index 8 </description>
-		</attribute>
-
-		<attribute name='opacity' get='1' set='1' type='float64' size='1' >
-			<digest>Opacity value applied when 'overrideopacity' is set to 1</digest>
-			<description>Opacity value applied when 'overrideopacity' is set to 1. </description>
-		</attribute>
-
-		<attribute name='customcolor_23' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 23 </digest>
-			<description>Custom Color for color index 23 </description>
-		</attribute>
-
-		<attribute name='customcolor_18' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 18 </digest>
-			<description>Custom Color for color index 18 </description>
-		</attribute>
-
-		<attribute name='customcolor_15' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 15 </digest>
-			<description>Custom Color for color index 15 </description>
 		</attribute>
 
 		<attribute name='antialias' get='1' set='1' type='long' size='1' >
@@ -458,14 +88,19 @@
 			<description>Antialiasing flag (default = 0) On some hardware, the blend_enable attribute must also be enabled for antialiasing to work. </description>
 		</attribute>
 
-		<attribute name='overrideopacity' get='1' set='1' type='long' size='1' >
-			<digest>Override color opacity values when rendering a frame and use the value from the 'opacity' attribute instead.<br/><b>Note</b>: 'blend_enable' must be set to 1 for this to take effect</digest>
-			<description>Override color opacity values when rendering a frame and use the value from the 'opacity' attribute instead.<br/><b>Note</b>: 'blend_enable' must be set to 1 for this to take effect. </description>
+		<attribute name='auto_material' get='1' set='1' type='long' size='1' >
+			<digest>Automatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object</digest>
+			<description>Automatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object. </description>
 		</attribute>
 
-		<attribute name='blend' get='1' set='1' type='symbol' size='1' >
-			<digest>The named blending mode</digest>
-			<description>The named blending mode. The possible values are:<br/>add = blend_mode 1 1<br/>multiply = blend_mode 2 1<br/>screen = blend_mode 4 1<br/>exclusion = blend_mode 4 5<br/>colorblend = blend_mode 3 4<br/>alphablend = blend_mode 6 7<br/>coloradd = blend_mode 3 1<br/>alphaadd = blend_mode 6 1<br/> </description>
+		<attribute name='automatic' get='1' set='1' type='long' size='1' >
+			<digest>Automatic rendering flag (default = 1) When the flag is set, rendering occurs when the associated jit.gl.render object receives a bang message</digest>
+			<description>Automatic rendering flag (default = 1) When the flag is set, rendering occurs when the associated jit.gl.render object receives a bang message. </description>
+		</attribute>
+
+		<attribute name='axes' get='1' set='1' type='long' size='1' >
+			<digest>x/y/z axis rendering off/on (default = 0) </digest>
+			<description>x/y/z axis rendering off/on (default = 0) </description>
 		</attribute>
 
 		<attribute name='blankingcolor' get='1' set='1' type='float64' size='1' >
@@ -473,14 +108,24 @@
 			<description>If draw_blanking is enabled, the color blanked lines will be drawn. </description>
 		</attribute>
 
-		<attribute name='drawblanking' get='1' set='1' type='long' size='1' >
-			<digest>Draw lines where the laser is blanked</digest>
-			<description>Draw lines where the laser is blanked. (default=0) </description>
+		<attribute name='blend' get='1' set='1' type='symbol' size='1' >
+			<digest>The named blending mode</digest>
+			<description>The named blending mode. The possible values are:<br/>add = blend_mode 1 1<br/>multiply = blend_mode 2 1<br/>screen = blend_mode 4 1<br/>exclusion = blend_mode 4 5<br/>colorblend = blend_mode 3 4<br/>alphablend = blend_mode 6 7<br/>coloradd = blend_mode 3 1<br/>alphaadd = blend_mode 6 1<br/> </description>
 		</attribute>
 
-		<attribute name='customcolor_39' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 39 </digest>
-			<description>Custom Color for color index 39 </description>
+		<attribute name='blend_enable' get='1' set='1' type='long' size='1' >
+			<digest>Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects</digest>
+			<description>Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects. </description>
+		</attribute>
+
+		<attribute name='blend_mode' get='1' set='1' type='float64' size='1' >
+			<digest>The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode</digest>
+			<description>The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode. The supported modes are:<br/>     0 = zero<br/>     1 = one<br/>     2 = destination color<br/>     3 = source color<br/>     4 = one minus destination color<br/>     5 = one minus source color<br/>     6 = source alpha<br/>     7 = one minus source alpha<br/>     8 = destination alpha<br/>     9 = one minus destination alpha<br/>     10 = source alpha saturate </description>
+		</attribute>
+
+		<attribute name='cull_face' get='1' set='1' type='long' size='1' >
+			<digest>Face culling mode (default = 0 (no culling))<br/> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces </digest>
+			<description>Face culling mode (default = 0 (no culling))<br/> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces </description>
 		</attribute>
 
 		<attribute name='customcolor_0' get='1' set='1' type='float64' size='1' >
@@ -488,9 +133,74 @@
 			<description>Custom Color for color index 0 </description>
 		</attribute>
 
-		<attribute name='customcolor_27' get='1' set='1' type='float64' size='1' >
-			<digest>Custom Color for color index 27 </digest>
-			<description>Custom Color for color index 27 </description>
+		<attribute name='customcolor_1' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 1 </digest>
+			<description>Custom Color for color index 1 </description>
+		</attribute>
+
+		<attribute name='customcolor_10' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 10 </digest>
+			<description>Custom Color for color index 10 </description>
+		</attribute>
+
+		<attribute name='customcolor_11' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 11 </digest>
+			<description>Custom Color for color index 11 </description>
+		</attribute>
+
+		<attribute name='customcolor_12' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 12 </digest>
+			<description>Custom Color for color index 12 </description>
+		</attribute>
+
+		<attribute name='customcolor_13' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 13 </digest>
+			<description>Custom Color for color index 13 </description>
+		</attribute>
+
+		<attribute name='customcolor_14' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 14 </digest>
+			<description>Custom Color for color index 14 </description>
+		</attribute>
+
+		<attribute name='customcolor_15' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 15 </digest>
+			<description>Custom Color for color index 15 </description>
+		</attribute>
+
+		<attribute name='customcolor_16' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 16 </digest>
+			<description>Custom Color for color index 16 </description>
+		</attribute>
+
+		<attribute name='customcolor_17' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 17 </digest>
+			<description>Custom Color for color index 17 </description>
+		</attribute>
+
+		<attribute name='customcolor_18' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 18 </digest>
+			<description>Custom Color for color index 18 </description>
+		</attribute>
+
+		<attribute name='customcolor_19' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 19 </digest>
+			<description>Custom Color for color index 19 </description>
+		</attribute>
+
+		<attribute name='customcolor_2' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 2 </digest>
+			<description>Custom Color for color index 2 </description>
+		</attribute>
+
+		<attribute name='customcolor_20' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 20 </digest>
+			<description>Custom Color for color index 20 </description>
+		</attribute>
+
+		<attribute name='customcolor_21' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 21 </digest>
+			<description>Custom Color for color index 21 </description>
 		</attribute>
 
 		<attribute name='customcolor_22' get='1' set='1' type='float64' size='1' >
@@ -498,9 +208,314 @@
 			<description>Custom Color for color index 22 </description>
 		</attribute>
 
+		<attribute name='customcolor_23' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 23 </digest>
+			<description>Custom Color for color index 23 </description>
+		</attribute>
+
+		<attribute name='customcolor_24' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 24 </digest>
+			<description>Custom Color for color index 24 </description>
+		</attribute>
+
+		<attribute name='customcolor_25' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 25 </digest>
+			<description>Custom Color for color index 25 </description>
+		</attribute>
+
+		<attribute name='customcolor_26' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 26 </digest>
+			<description>Custom Color for color index 26 </description>
+		</attribute>
+
+		<attribute name='customcolor_27' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 27 </digest>
+			<description>Custom Color for color index 27 </description>
+		</attribute>
+
+		<attribute name='customcolor_28' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 28 </digest>
+			<description>Custom Color for color index 28 </description>
+		</attribute>
+
+		<attribute name='customcolor_29' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 29 </digest>
+			<description>Custom Color for color index 29 </description>
+		</attribute>
+
 		<attribute name='customcolor_3' get='1' set='1' type='float64' size='1' >
 			<digest>Custom Color for color index 3 </digest>
 			<description>Custom Color for color index 3 </description>
+		</attribute>
+
+		<attribute name='customcolor_30' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 30 </digest>
+			<description>Custom Color for color index 30 </description>
+		</attribute>
+
+		<attribute name='customcolor_31' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 31 </digest>
+			<description>Custom Color for color index 31 </description>
+		</attribute>
+
+		<attribute name='customcolor_32' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 32 </digest>
+			<description>Custom Color for color index 32 </description>
+		</attribute>
+
+		<attribute name='customcolor_33' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 33 </digest>
+			<description>Custom Color for color index 33 </description>
+		</attribute>
+
+		<attribute name='customcolor_34' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 34 </digest>
+			<description>Custom Color for color index 34 </description>
+		</attribute>
+
+		<attribute name='customcolor_35' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 35 </digest>
+			<description>Custom Color for color index 35 </description>
+		</attribute>
+
+		<attribute name='customcolor_36' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 36 </digest>
+			<description>Custom Color for color index 36 </description>
+		</attribute>
+
+		<attribute name='customcolor_37' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 37 </digest>
+			<description>Custom Color for color index 37 </description>
+		</attribute>
+
+		<attribute name='customcolor_38' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 38 </digest>
+			<description>Custom Color for color index 38 </description>
+		</attribute>
+
+		<attribute name='customcolor_39' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 39 </digest>
+			<description>Custom Color for color index 39 </description>
+		</attribute>
+
+		<attribute name='customcolor_4' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 4 </digest>
+			<description>Custom Color for color index 4 </description>
+		</attribute>
+
+		<attribute name='customcolor_40' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 40 </digest>
+			<description>Custom Color for color index 40 </description>
+		</attribute>
+
+		<attribute name='customcolor_41' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 34 </digest>
+			<description>Custom Color for color index 34 </description>
+		</attribute>
+
+		<attribute name='customcolor_42' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 42 </digest>
+			<description>Custom Color for color index 42 </description>
+		</attribute>
+
+		<attribute name='customcolor_43' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 43 </digest>
+			<description>Custom Color for color index 43 </description>
+		</attribute>
+
+		<attribute name='customcolor_44' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 44 </digest>
+			<description>Custom Color for color index 44 </description>
+		</attribute>
+
+		<attribute name='customcolor_45' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 45 </digest>
+			<description>Custom Color for color index 45 </description>
+		</attribute>
+
+		<attribute name='customcolor_46' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 46 </digest>
+			<description>Custom Color for color index 46 </description>
+		</attribute>
+
+		<attribute name='customcolor_47' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 47 </digest>
+			<description>Custom Color for color index 47 </description>
+		</attribute>
+
+		<attribute name='customcolor_48' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 48 </digest>
+			<description>Custom Color for color index 48 </description>
+		</attribute>
+
+		<attribute name='customcolor_49' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 49 </digest>
+			<description>Custom Color for color index 49 </description>
+		</attribute>
+
+		<attribute name='customcolor_5' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 5 </digest>
+			<description>Custom Color for color index 5 </description>
+		</attribute>
+
+		<attribute name='customcolor_50' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 50 </digest>
+			<description>Custom Color for color index 50 </description>
+		</attribute>
+
+		<attribute name='customcolor_51' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 54 </digest>
+			<description>Custom Color for color index 54 </description>
+		</attribute>
+
+		<attribute name='customcolor_52' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 52 </digest>
+			<description>Custom Color for color index 52 </description>
+		</attribute>
+
+		<attribute name='customcolor_53' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 53 </digest>
+			<description>Custom Color for color index 53 </description>
+		</attribute>
+
+		<attribute name='customcolor_54' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 54 </digest>
+			<description>Custom Color for color index 54 </description>
+		</attribute>
+
+		<attribute name='customcolor_55' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 55 </digest>
+			<description>Custom Color for color index 55 </description>
+		</attribute>
+
+		<attribute name='customcolor_56' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 56 </digest>
+			<description>Custom Color for color index 56 </description>
+		</attribute>
+
+		<attribute name='customcolor_57' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 57 </digest>
+			<description>Custom Color for color index 57 </description>
+		</attribute>
+
+		<attribute name='customcolor_58' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 45 </digest>
+			<description>Custom Color for color index 45 </description>
+		</attribute>
+
+		<attribute name='customcolor_59' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 59 </digest>
+			<description>Custom Color for color index 59 </description>
+		</attribute>
+
+		<attribute name='customcolor_6' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 6 </digest>
+			<description>Custom Color for color index 6 </description>
+		</attribute>
+
+		<attribute name='customcolor_60' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 60 </digest>
+			<description>Custom Color for color index 60 </description>
+		</attribute>
+
+		<attribute name='customcolor_61' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 64 </digest>
+			<description>Custom Color for color index 64 </description>
+		</attribute>
+
+		<attribute name='customcolor_62' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 62 </digest>
+			<description>Custom Color for color index 62 </description>
+		</attribute>
+
+		<attribute name='customcolor_63' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 63 </digest>
+			<description>Custom Color for color index 63 </description>
+		</attribute>
+
+		<attribute name='customcolor_7' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 7 </digest>
+			<description>Custom Color for color index 7 </description>
+		</attribute>
+
+		<attribute name='customcolor_8' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 8 </digest>
+			<description>Custom Color for color index 8 </description>
+		</attribute>
+
+		<attribute name='customcolor_9' get='1' set='1' type='float64' size='1' >
+			<digest>Custom Color for color index 9 </digest>
+			<description>Custom Color for color index 9 </description>
+		</attribute>
+
+		<attribute name='custompallet' get='1' set='1' type='long' size='1' >
+			<digest>Use custom color pallet for frames with indexed colors</digest>
+			<description>Use custom color pallet for frames with indexed colors. </description>
+		</attribute>
+
+		<attribute name='drawblanking' get='1' set='1' type='long' size='1' >
+			<digest>Draw lines where the laser is blanked</digest>
+			<description>Draw lines where the laser is blanked. (default=0) </description>
+		</attribute>
+
+		<attribute name='drawto' get='1' set='1' type='symbol' size='1' >
+			<digest>The named drawing context in which to draw (default = none) A named drawing context is a named instance of a jit.window, jit.pwindow, or jit.matrix object that has an instance of the jit.gl.render object associated with it</digest>
+			<description>The named drawing context in which to draw (default = none) A named drawing context is a named instance of a jit.window, jit.pwindow, or jit.matrix object that has an instance of the jit.gl.render object associated with it. </description>
+		</attribute>
+
+		<attribute name='force_2d' get='1' set='1' type='long' size='1' >
+			<digest>Set to 1 the z-axis position is ignored, regardles of the specified format in a frame</digest>
+			<description>Set to 1 the z-axis position is ignored, regardles of the specified format in a frame. This can help to remove distortions in some cases, when the file is not properly generated. </description>
+		</attribute>
+
+		<attribute name='lighting_enable' get='1' set='1' type='long' size='1' >
+			<digest>Lighting enabled flag (default = 0) When the flag is set, lighting is calculated</digest>
+			<description>Lighting enabled flag (default = 0) When the flag is set, lighting is calculated. </description>
+		</attribute>
+
+		<attribute name='linewidth' get='1' set='1' type='long' size='1' >
+			<digest>Line width for drawing regular segments</digest>
+			<description>Line width for drawing regular segments. </description>
+		</attribute>
+
+		<attribute name='linewidth_blanking' get='1' set='1' type='long' size='1' >
+			<digest>Line width for drawing blanking segments</digest>
+			<description>Line width for drawing blanking segments. </description>
+		</attribute>
+
+		<attribute name='monochrome' get='1' set='1' type='long' size='1' >
+			<digest>Igore color information and draw everything  in 'monochromecolor'</digest>
+			<description>Igore color information and draw everything  in 'monochromecolor'. </description>
+		</attribute>
+
+		<attribute name='monochromecolor' get='1' set='1' type='float64' size='1' >
+			<digest>If 'monochrome' is enabled, the color everything will be drawn</digest>
+			<description>If 'monochrome' is enabled, the color everything will be drawn. </description>
+		</attribute>
+
+		<attribute name='opacity' get='1' set='1' type='float64' size='1' >
+			<digest>Opacity value applied when 'overrideopacity' is set to 1</digest>
+			<description>Opacity value applied when 'overrideopacity' is set to 1. </description>
+		</attribute>
+
+		<attribute name='overrideopacity' get='1' set='1' type='long' size='1' >
+			<digest>Override color opacity values when rendering a frame and use the value from the 'opacity' attribute instead.<br/><b>Note</b>: 'blend_enable' must be set to 1 for this to take effect</digest>
+			<description>Override color opacity values when rendering a frame and use the value from the 'opacity' attribute instead.<br/><b>Note</b>: 'blend_enable' must be set to 1 for this to take effect. </description>
+		</attribute>
+
+		<attribute name='position' get='1' set='1' type='float64' size='1' >
+			<digest>The 3D origin in the form x y z (default = 0</digest>
+			<description>The 3D origin in the form x y z (default = 0. 0. 0.) </description>
+		</attribute>
+
+		<attribute name='rotate' get='1' set='1' type='float64' size='1' >
+			<digest>The angle of rotation and the xyz vector about which the rotation is performed in the form rotation-angle x y z (default = 0</digest>
+			<description>The angle of rotation and the xyz vector about which the rotation is performed in the form rotation-angle x y z (default = 0. 0. 0. 1.) </description>
+		</attribute>
+
+		<attribute name='scale' get='1' set='1' type='float64' size='1' >
+			<digest>The 3D scaling factor in the form x y z (default = 1</digest>
+			<description>The 3D scaling factor in the form x y z (default = 1. 1. 1.) </description>
 		</attribute>
 
 	</attributelist>

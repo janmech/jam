@@ -284,6 +284,7 @@ public:
         this, "clear", "Clear loaded file",
         MIN_FUNCTION {
             this->_fileProcessor.clearFileData();
+            this->_getStructPointer()->clearInstanceFile(this->_instance_id);
             atoms msg_atoms;
             queued_message_t msg;
             msg_atoms.clear();
