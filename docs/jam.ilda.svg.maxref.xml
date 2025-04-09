@@ -31,6 +31,11 @@
 
 	<methodlist>
 
+		<method name='open'>
+			<digest>open a SVG file </digest>
+			<description>open a SVG file </description>
+		</method>
+
 		<method name='bang'>
 			<digest>test </digest>
 			<description>test </description>

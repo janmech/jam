@@ -56,7 +56,7 @@ protected:
     } queued_message_t;
     
     jam::ilda::IldaFileProcessor _fileProcessor;     // Class with functions for ILDA file processing/parsing
-    fifo<queued_message_t> _to_max_queue_2 { 1000 }; // FIFO queue for messages to be sent to outlets
+    fifo<queued_message_t> _to_max_queue { 1000 }; // FIFO queue for messages to be sent to outlets
     std::mutex _enqueue_msg_lock;                    // Mutex lock for outlet message thread safty
     std::thread _device_scan_thread;                 // Thread for parsing ILDA file asynchronously
     
@@ -70,7 +70,7 @@ protected:
     }
     
         // Set if the instance currently in the process of importing a file
-    void _setParingState(bool state) {
+    void _setParsingState(bool state) {
         if(state != this->_is_parsing) {
             this->_is_parsing = state;
         }
@@ -83,14 +83,14 @@ protected:
         // enqueueing queued outlet messages (thread safe)
     void _enqueue_msg_to_max(const queued_message_t &msg_to_max) {
         _enqueue_msg_lock.lock();
-        this->_to_max_queue_2.try_enqueue(msg_to_max);
+        this->_to_max_queue.try_enqueue(msg_to_max);
         _enqueue_msg_lock.unlock();
     }
     
         // deueueing queued outlet messages (thread safe)
     bool _dequeue_msg_to_max(queued_message_t &msg_data) {
         _enqueue_msg_lock.lock();
-        bool result = this->_to_max_queue_2.try_dequeue(msg_data);
+        bool result = this->_to_max_queue.try_dequeue(msg_data);
         _enqueue_msg_lock.unlock();
         return result;
     }
@@ -148,7 +148,7 @@ public:
                 return {};
             }
             
-            this->_setParingState(true);
+            this->_setParsingState(true);
             
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'import'" << endl;
@@ -165,15 +165,15 @@ public:
             
             if (this->_import_args.size() == 0) {
                 open_result = c74::max::open_dialog(filename, &path, &outtype, &filetype, (short)1);
-                if(open_result != 0) {
-                    cerr << "Couldn't open file" << endl;
+                if(open_result != c74::max::MAX_ERR_NONE) {
+                    cerr << "couldn't open file" << endl;
                     msg_atoms.clear();
                     msg_atoms.push_back("import");
                     msg_atoms.push_back(filename);
                     msg_atoms.push_back(0);
                     msg.set(&o_load_result, msg_atoms);
                     msg.send(this);
-                    this->_setParingState(false);
+                    this->_setParsingState(false);
                     return{};
                 }
             }
@@ -187,14 +187,14 @@ public:
                     msg_atoms.push_back(0);
                     msg.set(&o_load_result, msg_atoms);
                     msg.send(this);
-                    this->_setParingState(false);
+                    this->_setParsingState(false);
                     return {};
                     
                 }
                 strcpy(filename, user_filename.c_str());
                 
                 open_result = c74::max::locatefile_extended(filename, &path, &outtype, &filetype, (short)1);
-                if(open_result != 0) {
+                if(open_result != c74::max::MAX_ERR_NONE) {
                     cerr << "Couldn't open file" << endl;
                     msg_atoms.clear();
                     msg_atoms.push_back("import");
@@ -202,22 +202,22 @@ public:
                     msg_atoms.push_back(0);
                     msg.set(&o_load_result, msg_atoms);
                     msg.send(this);
-                    this->_setParingState(false);
+                    this->_setParsingState(false);
                     return {};
                 }
             }
             
             open_result = c74::max::path_opensysfile( filename, path, &ilda_file_handle,c74::max::READ_PERM);
             
-            if(open_result != 0) {
-                cerr << "Couldn't open file" << endl;
+            if(open_result != c74::max::MAX_ERR_NONE) {
+                cerr << "couldn't open file" << endl;
                 msg_atoms.clear();
                 msg_atoms.push_back("import");
                 msg_atoms.push_back(filename);
                 msg_atoms.push_back(0);
                 msg.set(&o_load_result, msg_atoms);
                 msg.send(this);
-                this->_setParingState(false);
+                this->_setParsingState(false);
                 return {};
             }
             
@@ -227,7 +227,7 @@ public:
                 b("startprogress", &current_progress);
                 atoms msg_atoms;
                 queued_message_t msg;
-                this->_setParingState(true);
+                this->_setParsingState(true);
                 
                 
                 std::vector<char> ilda_file_bytes;
@@ -271,7 +271,7 @@ public:
                 
                 b("stopprogress");
                 
-                this->_setParingState(false);
+                this->_setParsingState(false);
             });
             
             
