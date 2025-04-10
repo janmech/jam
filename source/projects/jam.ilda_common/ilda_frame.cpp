@@ -17,6 +17,7 @@ namespace jam::ilda {
     
     void IldaFrame::pushRecord(IldaDataRecord data_record) {
         this->_data_records.push_back(data_record);
+        this->_header.setDataRecordCount(this->_data_records.size());
     };
     
     bool IldaFrame::get(IldaDataRecord* data_record, size_t index) {

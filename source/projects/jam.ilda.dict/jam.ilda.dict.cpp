@@ -108,7 +108,7 @@ public:
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
     
-    outlet<> outlet_dict      { this, "ILDA file content as dictionary" };
+    outlet<> outlet_dict      { this, "ILDA file content information as dictionary" };
     
     
     message<>bang  {

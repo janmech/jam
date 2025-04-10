@@ -1721,7 +1721,7 @@ public:
                                      );
             bool is_2d = (
                           format_code == (int)jam::ilda::RecordFormat::FORMAT_1
-                          || format_code ==  (int)jam::ilda::RecordFormat::FORMAT_4
+                          || format_code ==  (int)jam::ilda::RecordFormat::FORMAT_5
                           );
             
             typedmess(this->_getSketchObject(),symbol("reset"),0,0L);

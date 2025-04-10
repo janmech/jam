@@ -14,24 +14,31 @@
 #include <cstdio>
 
 namespace jam::svg {
-    constexpr float PI_VAL = 3.14159265358979f;
+    constexpr double PI_VAL = 3.14159265358979f;
     
     struct Point2D {
-        float x, y;
+        double x, y;
     };
     
-    // Mathematically both are the same (a struct with an x and value). For better code readability we use DirectionVector instead of Point2D
+        // Mathematically both are the same (a struct with an x and value). For better code readability we use DirectionVector instead of Point2D
     using DirectionVector = Point2D;
     
     struct RGBColor {
-        double r = 1.;
-        double g = 1.;
-        double b = 1.;
+        uint8_t r = 255;
+        uint8_t g = 255;
+        uint8_t b = 255;
+        bool visible = true;
     };
     
     class Shape {
         
     protected:
+        
+        RGBColor color;
+        
+        std::vector<Point2D> points;
+        
+        std::string name;
         
         float _vecScalarProduct(const Point2D& a, const Point2D& b);
         
@@ -40,22 +47,30 @@ namespace jam::svg {
         float _vecAngle(const Point2D& a, const Point2D& b);
         
         
-        
     public:
-        RGBColor color;
-        std::vector<Point2D> points;
-        std::string name;
+        
         
         Shape() = default;
         Shape(const std::string& shapeName) : name(shapeName) {}
         
+        std::string getName();
         
-        void clear();
+        void setName(std::string name);
+        
+        void clearPoints();
+        
+        std::vector<Point2D> getPoints();
+        
+        void setPoints(std::vector<Point2D> points);
         
         void addPoint(const Point2D& point);
         
-        //// Thin out points to simplify the shape for better performace. Desctructive
-        ///
+        RGBColor getColor();
+        
+        void setColor(RGBColor color);
+        
+            //// Thin out points to simplify the shape for better performace. Desctructive
+            ///
         void thinShape(float angleThresholdRadians = 0.01f);
         
             //        // Circle

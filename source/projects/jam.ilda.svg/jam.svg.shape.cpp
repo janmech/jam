@@ -11,9 +11,34 @@ namespace jam::svg {
     
         // Public Methods
     
-    void Shape::clear() {
+    std::string Shape::getName() {
+        return this->name;;
+    };
+    
+    void Shape::setName(std::string name) {
+        this->name = name;
+    };
+    
+    void Shape::clearPoints() {
         this->points.clear();
     }
+    
+    std::vector<Point2D> Shape::getPoints() {
+        return this->points;;
+    };
+    
+    
+    void Shape::setPoints(std::vector<Point2D> points){
+        this->points =points;
+    };
+    
+    RGBColor Shape::getColor() {
+        return this->color;;
+    };
+    
+    void Shape::setColor(RGBColor color) {
+        this->color = color;
+    };
     
     void Shape::addPoint(const Point2D& point) {
         this->points.push_back(point);

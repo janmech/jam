@@ -36,6 +36,11 @@
 			<description>open a SVG file </description>
 		</method>
 
+		<method name='clear'>
+			<digest>Remove all frames </digest>
+			<description>Remove all frames </description>
+		</method>
+
 		<method name='bang'>
 			<digest>test </digest>
 			<description>test </description>
