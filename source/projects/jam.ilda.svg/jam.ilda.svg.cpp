@@ -22,6 +22,10 @@
 #include "../jam.ilda.manager/jam.ilda.manager.hpp"
 #include "nanosvg.h"
 
+#ifndef PI
+#define PI 3.14159265358979323846
+#endif
+
 
 using namespace c74::min;
 
@@ -45,7 +49,7 @@ private:
     
     protected :
     
-        // Struct to encapsulate sending messages to outlets via the timer - for thread safty
+        /// Struct to encapsulate sending messages to outlets via the timer - for thread safty
     typedef struct QuededMessage {
         outlet<>* out;
         atoms msg_atoms;
@@ -63,21 +67,24 @@ private:
         }
     } queued_message_t;
     
-    fifo<queued_message_t> _to_max_queue { 1000 }; // FIFO queue for messages to be sent to outlets
-    std::mutex _enqueue_msg_lock;                    // Mutex lock for outlet message thread safty
+        /// FIFO queue for messages to be sent to outlets
+    fifo<queued_message_t> _to_max_queue { 1000 };
+    
+        /// Mutex lock for outlet message thread safty
+    std::mutex _enqueue_msg_lock;
     
     bool _is_parsing = false;
     
     std::vector<jam::ilda::IldaFrame> _ilda_frames; // currently loaded/created ilda file frames
     
-        // Set if the instance currently in the process of importing a file
+        /// Set if the instance currently in the process of importing a file
     void _setParsingState(bool state) {
         if(state != this->_is_parsing) {
             this->_is_parsing = state;
         }
     }
     
-        // get if the nstance currently in the process of importing a file
+        /// get if the nstance currently in the process of importing a file
     bool _getParsingState() {
         return this->_is_parsing;
     }
@@ -95,7 +102,7 @@ private:
         _enqueue_msg_lock.unlock();
     }
     
-        // deueueing queued outlet messages (thread safe)
+        /// deueueing queued outlet messages (thread safe)
     bool _dequeue_msg_to_max(queued_message_t &msg_data) {
         _enqueue_msg_lock.lock();
         bool result = this->_to_max_queue.try_dequeue(msg_data);
@@ -103,7 +110,7 @@ private:
         return result;
     }
     
-       // translate from normalized coordinates (-1. to 1.) to ILDA file coordinates
+       /// translate from normalized coordinates (-1. to 1.) to ILDA file coordinates
     int _deNormalizePosition(double pos) {
         return static_cast<int>(pos * 32000);
             //        if(pos < 0) {
@@ -112,6 +119,7 @@ private:
             //        return static_cast<int>(pos * 32767);
     };
     
+        /// adjust the current edit frame index when frame count has changed, to make sure it doen't go out of bounds
     void _updateEditFrame() {
         if(this->_ilda_frames.size() == 0) {
             this->_edit_frame = 0;
@@ -122,6 +130,7 @@ private:
         }
     }
     
+        /// sends out current edit frame, frame count and the file reference
     void _updateOutlets() {
         this->_updateEditFrame();
         atoms msg_atoms;
@@ -144,6 +153,7 @@ private:
         msg.send(this);
     }
     
+      /// add an empty frame at the end
     void _appendEmptyFrame() {
         jam::ilda::IldaFrame f;
         jam::ilda::IldaHeader h;
@@ -162,17 +172,114 @@ private:
         this->_updateOutlets();
     }
     
-    std::vector<jam::svg::Point2D> _approximateCircle(const double c_x,const double c_y, const double r, const int segments = 100) {
-        std::vector<jam::svg::Point2D> circle_points;
-        for (int i = 0; i < segments; ++i) {
+        /// generate point for ellipes/circle
+        /// @param   c_x                               center coordinate x
+        /// @param   c_y                               center coordinate y
+        /// @param   rx                                 radius x
+        /// @param   ry                                 radius y
+        /// @param   theta_start            start angle in degrees (0º - 360º)
+        /// @param   theta_end                 end angle in degrees (0º - 360º)
+        /// @param   segments                   number of line segments
+    std::vector<jam::svg::Point2D> _makeEllipse(
+        const double c_x,
+        const double c_y,
+        const double rx,
+        const double ry,
+        const double theta_start = 0,
+        const double theta_end = 360,
+        int segments = 50
+     ) {
+        double rad_start = theta_start * (PI / 180);
+        double rad_end = theta_end * (PI / 180);
+        double rad_range = rad_end - rad_start;
+        
+        std::vector<jam::svg::Point2D> points;
+        for (int i = 0; i <= segments; ++i) {
             jam::svg::Point2D p;
-            double angle = (2.0f * PI * i) / segments;
-            p.x = c_x + r * std::cos(angle);
-            p.y = c_y + r * std::sin(angle);
-            circle_points.push_back(p);
+            double angle = rad_start + (rad_range * i / segments);
+            p.x = c_x + rx * std::cos(angle);
+            p.y = c_y + ry * std::sin(angle);
+            points.push_back(p);
         }
-        return circle_points;
+        return points;
+        
     }
+    
+    // TODO: continue here
+//    std::vector<Point> createRoundedRect(
+//        float topLeftX, float topLeftY,
+//        float bottomRightX, float bottomRightY,
+//        float cornerRadius,
+//        int segmentsPerCorner = 6
+//    ) {
+//        std::vector<Point> points;
+//
+//        float minX = topLeftX;
+//        float maxX = bottomRightX;
+//        float maxY = topLeftY;
+//        float minY = bottomRightY;
+//
+//        float r = cornerRadius;
+//
+//        // Clamp radius if it's too large
+//        float maxRadius = std::min((maxX - minX) / 2.0f, (maxY - minY) / 2.0f);
+//        r = std::min(r, maxRadius);
+//
+//        // Corner centers
+//        Point tl = {minX + r, maxY - r}; // top-left
+//        Point tr = {maxX - r, maxY - r}; // top-right
+//        Point br = {maxX - r, minY + r}; // bottom-right
+//        Point bl = {minX + r, minY + r}; // bottom-left
+//
+//        // Helper to add arc
+//        auto addArc = [&](Point center, float startAngle, float endAngle) {
+//            for (int i = 0; i <= segmentsPerCorner; ++i) {
+//                float t = (float)i / segmentsPerCorner;
+//                float angle = startAngle + t * (endAngle - startAngle);
+//                float x = center.x + r * std::cos(angle);
+//                float y = center.y + r * std::sin(angle);
+//                points.push_back({x, y});
+//            }
+//        };
+//
+//        // Add corners clockwise: TL -> TR -> BR -> BL
+//
+//        // Top edge (left to right)
+//        addArc(tl, M_PI, 1.5f * M_PI); // Top-left arc
+//        points.push_back({tr.x, maxY}); // Top edge
+//        addArc(tr, 1.5f * M_PI, 2.0f * M_PI); // Top-right arc
+//
+//        points.push_back({maxX, br.y}); // Right edge
+//        addArc(br, 0.0f, 0.5f * M_PI); // Bottom-right arc
+//
+//        points.push_back({bl.x, minY}); // Bottom edge
+//        addArc(bl, 0.5f * M_PI, M_PI); // Bottom-left arc
+//
+//        points.push_back({minX, tl.y}); // Left edge
+//
+//        return points;
+//    }
+    
+    //        // Cubic Bézier
+    //        void approximateBezier(const Point2D& p0, const Point2D& p1, const Point2D& p2, const Point2D& p3, int segments = 24) {
+    //            clear();
+    //            for (int i = 0; i <= segments; ++i) {
+    //                float t = static_cast<float>(i) / segments;
+    //                float u = 1.0f - t;
+    //                float x = u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x;
+    //                float y = u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y;
+    //                addPoint({x, y});
+    //            }
+    //            name = "Bezier";
+    //        }
+    //
+    //        // Debug print
+    //        void print() const {
+    //            printf("Shape: %s\n", name.c_str());
+    //            for (const auto& pt : points) {
+    //                printf("  (%.4f, %.4f)\n", pt.x, pt.y);
+    //            }
+    //        }
     
 public:
     
@@ -215,7 +322,6 @@ public:
         }
     };
     
-    
     message<threadsafe::no> clear {
         this, "clear", "Remove all frames",
         MIN_FUNCTION {
@@ -248,7 +354,6 @@ public:
             int frame_index = args[0];
             
             if(frame_index < 0 || frame_index > this->_ilda_frames.size() - 1) {
-                cwarn << "frame index out of range." << endl;
                 return {};
             }
             
@@ -311,7 +416,6 @@ public:
             int frame_index = args[0];
             
             if(frame_index < 0 || frame_index > this->_ilda_frames.size() - 1) {
-                cwarn << "frame index out of range." << endl;
                 return {};
             }
             this->_ilda_frames.erase(this->_ilda_frames.begin() + frame_index);
@@ -613,8 +717,8 @@ public:
                 this->_appendEmptyFrame();
             }
             
-            double x_center = args[0];
-            double y_center = args[1];
+            double x = args[0];
+            double y = args[1];
             double radius   = args[2];
             
             uint8_t r = 255;
@@ -626,14 +730,21 @@ public:
                 b = uint8_t((float)args[5] * 255.);
             }
             
-            int segments = 100;
-            if(args.size() >= 7) {
-                segments = (int)args[6];
-                segments = (segments < 3) ? 3 : segments;
-                segments = (segments > 200) ? 200 : segments;
+            double t_start = 0;
+            double t_end = 360;
+            if(args.size() >= 8) {
+                t_start = (double)args[6];
+                t_end = (double)args[7];
             }
-            std::vector<jam::svg::Point2D> circle_points = this->_approximateCircle(x_center, y_center, radius, segments);
-            for(size_t i = 0; i < circle_points.size(); i++) {
+            
+            int seg = 50;
+            if(args.size() >= 9) {
+                seg = (int)args[6];
+                seg = (seg < 3) ? 3 : seg;
+                seg = (seg > 200) ? 200 : seg;
+            }
+            std::vector<jam::svg::Point2D> points = this->_makeEllipse(x, y, radius, radius, t_start, t_end, seg);
+            for(size_t i = 0; i < points.size(); i++) {
                 jam::ilda::IldaDataRecord dr;
                 uint8_t dr_r = (i == 0) ? 0 : r;
                 uint8_t dr_g = (i == 0) ? 0 : g;
@@ -642,28 +753,80 @@ public:
                 dr.setRed(dr_r);
                 dr.setGreen(dr_g);
                 dr.setBlue(dr_b);
-                dr.setPosX(this->_deNormalizePosition(circle_points[i].x));
-                dr.setPosY(this->_deNormalizePosition(circle_points[i].y));
+                dr.setPosX(this->_deNormalizePosition(points[i].x));
+                dr.setPosY(this->_deNormalizePosition(points[i].y));
                 dr.setBlanking(is_blanking);
                 this->_ilda_frames[this->_edit_frame].pushRecord(dr);
             }
-            
-            // close shape
-            jam::ilda::IldaDataRecord dr;
-            dr.setRed(r);
-            dr.setGreen(g);
-            dr.setBlue(b);
-            dr.setPosX(this->_deNormalizePosition(circle_points[0].x));
-            dr.setPosY(this->_deNormalizePosition(circle_points[0].y));
-            dr.setBlanking(false);
-            this->_ilda_frames[this->_edit_frame].pushRecord(dr);
-            
-            
+        
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
             
+        }
+    };
+    
+    message<threadsafe::no>ellipse {
+      this, "ellipse", "Draw an ellipse into a frame",
+        MIN_FUNCTION {
+            // ellipse x_center y_center x_radius y_radius r g b segments
+            if(args.size() < 4) {
+                cwarn << "missing argument for message 'circle'" << endl;
+                return {};
+            }
+            if (this->_ilda_frames.size() == 0) {
+                this->_appendEmptyFrame();
+            }
+            
+            double x_c = args[0];
+            double y_c = args[1];
+            double x_r   = args[2];
+            double y_r   = args[3];
+            
+            uint8_t r = 255;
+            uint8_t g = 255;
+            uint8_t b = 255;
+            if(args.size() >= 7) {
+                r = uint8_t((float)args[4] * 255.);
+                g = uint8_t((float)args[5] * 255.);
+                b = uint8_t((float)args[6] * 255.);
+            }
+            
+            double t_start = 0;
+            double t_end   = 360;
+            if(args.size() >= 9) {
+                t_start = (double)args[7];
+                t_end = (double)args[8];
+            }
+            
+            int seg = 50;
+            if(args.size() >= 10) {
+                seg = (int)args[9];
+                seg = (seg < 3) ? 3 : seg;
+                seg = (seg > 200) ? 200 : seg;
+            }
+            
+            std::vector<jam::svg::Point2D> points = this->_makeEllipse(x_c, y_c, x_r, y_r, t_start, t_end, seg);
+            for(size_t i = 0; i < points.size(); i++) {
+                jam::ilda::IldaDataRecord dr;
+                uint8_t dr_r = (i == 0) ? 0 : r;
+                uint8_t dr_g = (i == 0) ? 0 : g;
+                uint8_t dr_b = (i == 0) ? 0 : b;
+                bool is_blanking = (i == 0);
+                dr.setRed(dr_r);
+                dr.setGreen(dr_g);
+                dr.setBlue(dr_b);
+                dr.setPosX(this->_deNormalizePosition(points[i].x));
+                dr.setPosY(this->_deNormalizePosition(points[i].y));
+                dr.setBlanking(is_blanking);
+                this->_ilda_frames[this->_edit_frame].pushRecord(dr);
+            }
+            
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
+            this->_updateOutlets();
+            
+            return {};
         }
     };
     
