@@ -34,7 +34,7 @@ private:
     char filename[c74::max::MAX_PATH_CHARS] = {0};  // File name of ILDA file toi be imported
     c74::max::t_object *_manager;                   // Pointer to global jam.ilda.manager object
                                                     // (stores data to be accasibele by other jam.ilda.* object)
-    t_jam_im * _manager_struct_ptr = NULL;     // Pointer to max-object struct of the jam.ilda.manager object
+    t_jam_im * _manager_struct_ptr = NULL;          // Pointer to max-object struct of the jam.ilda.manager object
     
 protected:
         // Struct to encapsulate sending messages to outlets via the timer - for thread safty
@@ -58,7 +58,7 @@ protected:
     jam::ilda::IldaFileProcessor _fileProcessor;     // Class with functions for ILDA file processing/parsing
     fifo<queued_message_t> _to_max_queue { 1000 }; // FIFO queue for messages to be sent to outlets
     std::mutex _enqueue_msg_lock;                    // Mutex lock for outlet message thread safty
-    std::thread _device_scan_thread;                 // Thread for parsing ILDA file asynchronously
+    std::thread _file_parse_thread;                 // Thread for parsing ILDA file asynchronously
     
     bool _is_parsing = false;
     
@@ -166,13 +166,15 @@ public:
             if (this->_import_args.size() == 0) {
                 open_result = c74::max::open_dialog(filename, &path, &outtype, &filetype, (short)1);
                 if(open_result != c74::max::MAX_ERR_NONE) {
-                    cerr << "couldn't open file" << endl;
-                    msg_atoms.clear();
-                    msg_atoms.push_back("import");
-                    msg_atoms.push_back(filename);
-                    msg_atoms.push_back(0);
-                    msg.set(&o_load_result, msg_atoms);
-                    msg.send(this);
+                    if(open_result < c74::max::MAX_ERR_NONE) {
+                        cerr << "couldn't open file" << endl;
+                        msg_atoms.clear();
+                        msg_atoms.push_back("import");
+                        msg_atoms.push_back(filename);
+                        msg_atoms.push_back(0);
+                        msg.set(&o_load_result, msg_atoms);
+                        msg.send(this);
+                    }
                     this->_setParsingState(false);
                     return{};
                 }
@@ -221,7 +223,7 @@ public:
                 return {};
             }
             
-            this->_device_scan_thread = std::thread([this]() {
+            this->_file_parse_thread = std::thread([this]() {
                 auto b = this->box();
                 number current_progress {-1.};
                 b("startprogress", &current_progress);
@@ -275,7 +277,7 @@ public:
             });
             
             
-            this->_device_scan_thread.detach();
+            this->_file_parse_thread.detach();
             return {};
         }
     };

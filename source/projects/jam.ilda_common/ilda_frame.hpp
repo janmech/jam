@@ -25,6 +25,8 @@ namespace jam::ilda {
         
         void pushRecord(IldaDataRecord data_record);
         
+        void clearRecords();
+        
         bool get(IldaDataRecord* data_record, size_t index);
         bool getNext(IldaDataRecord* data_record);
         void reset();

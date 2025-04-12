@@ -33,7 +33,6 @@ namespace jam::ilda {
         while(true) {
             IldaFrame frame;
             ParseResult result = this->_extractFrame(frame, &byte_index);
-            this->_ilda_frames.push_back(std::move(frame));
             if(result != ParseResult::SUCCESS) {
                 if(result == ParseResult::END_OF_FILE) {
                     parse_result = ParseResult::SUCCESS;
@@ -42,6 +41,8 @@ namespace jam::ilda {
                     parse_result = result;
                     break;
                 }
+            } else {
+                this->_ilda_frames.push_back(std::move(frame));
             }
         }
         
@@ -60,6 +61,16 @@ namespace jam::ilda {
     ParseResult IldaFileProcessor::_extractFrame(IldaFrame &frame, size_t *byte_index) {
         IldaHeader frame_header;
         ParseResult header_parse_result = this->_parseFrameHeader(frame_header, byte_index);
+        
+        // From the ilda file specs:
+        //
+        // 4.2.6. Number of Records
+        // [...]
+        // If the number of records is 0, then this is to be taken as the end of file header and no more data will follow this header.
+        
+        if(frame_header.getDataRecordCount() == 0) {
+            return ParseResult::END_OF_FILE;
+        }
         if(header_parse_result != ParseResult::SUCCESS) {
             this->clearFileData();
             return header_parse_result;

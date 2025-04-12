@@ -1806,6 +1806,7 @@ public:
             if(args.size() > 1) {
                 cwarn << "extras argument for message ilda" << endl;
             }
+            typedmess(this->_getSketchObject(),symbol("reset"),0,0L);
             std::string ilda_file_refence = args[0];
             std::vector<jam::ilda::IldaFrame> frames = this->_getStructPointer()->getFrames(ilda_file_refence);
             this->_frames = frames;

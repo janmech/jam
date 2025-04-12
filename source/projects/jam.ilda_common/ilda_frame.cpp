@@ -8,9 +8,11 @@
 #include "ilda_frame.hpp"
 
 namespace jam::ilda {
+    
     void IldaFrame::setHeader(IldaHeader header) {
         this->_header = header;
     };
+    
     IldaHeader& IldaFrame::getHeader() {
         return this->_header;
     };
@@ -19,6 +21,10 @@ namespace jam::ilda {
         this->_data_records.push_back(data_record);
         this->_header.setDataRecordCount(this->_data_records.size());
     };
+    
+    void IldaFrame::clearRecords() {
+        this->_data_records.clear();
+    }
     
     bool IldaFrame::get(IldaDataRecord* data_record, size_t index) {
         if(this->_data_records.size() > index) {
