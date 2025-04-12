@@ -21,6 +21,7 @@
 #include "../jam.ilda_common/ilda_data_record.hpp"
 #include "../jam.ilda_common/ilda_definitions.hpp"
 #include "../jam.ilda.manager/jam.ilda.manager.hpp"
+#include "../jam.ilda_common/ilda_file_processor.hpp"
 #include "nanosvg.h"
 
 #ifndef PI
@@ -56,6 +57,8 @@ private:
     
     size_t _edit_frame = 0;
     
+    jam::ilda::IldaFileProcessor _fileProcessor;     // Class with functions for ILDA file processing/parsing
+    
     protected :
     
         /// Struct to encapsulate sending messages to outlets via the timer - for thread safty
@@ -84,7 +87,8 @@ private:
     
     bool _is_parsing = false;
     
-    std::vector<jam::ilda::IldaFrame> _frames; // currently loaded/created ilda file frames
+        /// Vector of IldaFrames currenly available
+    std::vector<jam::ilda::IldaFrame> _frames;
     
         /// Set if the instance currently in the process of importing a file
     void _setParsingState(bool state) {
@@ -468,7 +472,7 @@ public:
     outlet<> o_file_reference   { this, "ilda file reference"  };
     outlet<> o_edit_frame       { this, "Frame cureently selected for editing", "int"};
     outlet<> o_framecount       { this, "Number of frames created", "int"};
-    outlet<> o_load_result      { this, "file opration success/failure notification", "list" };
+    outlet<> o_file_result      { this, "file opration success/failure notification", "list" };
     
     
     attribute<symbol> companyname {
@@ -700,7 +704,7 @@ public:
                         msg_atoms.push_back("svg");
                         msg_atoms.push_back(filename);
                         msg_atoms.push_back(0);
-                        msg.set(&o_load_result, msg_atoms);
+                        msg.set(&o_file_result, msg_atoms);
                         msg.send(this);
                     }
                     this->_setParsingState(false);
@@ -715,7 +719,7 @@ public:
                     msg_atoms.push_back("svg");
                     msg_atoms.push_back(filename);
                     msg_atoms.push_back(0);
-                    msg.set(&o_load_result, msg_atoms);
+                    msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
                     this->_setParsingState(false);
                     return {};
@@ -730,7 +734,7 @@ public:
                     msg_atoms.push_back("svg");
                     msg_atoms.push_back(filename);
                     msg_atoms.push_back(0);
-                    msg.set(&o_load_result, msg_atoms);
+                    msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
                     this->_setParsingState(false);
                     return {};
@@ -745,7 +749,7 @@ public:
                 msg_atoms.push_back("svg");
                 msg_atoms.push_back(filename);
                 msg_atoms.push_back(0);
-                msg.set(&o_load_result, msg_atoms);
+                msg.set(&o_file_result, msg_atoms);
                 msg.send(this);
                 this->_setParsingState(false);
                 return {};
@@ -766,7 +770,7 @@ public:
                 msg_atoms.push_back("svg");
                 msg_atoms.push_back(filename);
                 msg_atoms.push_back(0);
-                msg.set(&o_load_result, msg_atoms);
+                msg.set(&o_file_result, msg_atoms);
                 msg.send(this);
                 this->_setParsingState(false);
                 return {};
@@ -781,7 +785,7 @@ public:
                 msg_atoms.push_back("svg");
                 msg_atoms.push_back(filename);
                 msg_atoms.push_back(0);
-                msg.set(&o_load_result, msg_atoms);
+                msg.set(&o_file_result, msg_atoms);
                 msg.send(this);
                 this->_setParsingState(false);
                 return {};
@@ -798,7 +802,7 @@ public:
                 msg_atoms.push_back("svg");
                 msg_atoms.push_back(filename);
                 msg_atoms.push_back(0);
-                msg.set(&o_load_result, msg_atoms);
+                msg.set(&o_file_result, msg_atoms);
                 msg.send(this);
                 this->_setParsingState(false);
                 return {};
@@ -809,7 +813,7 @@ public:
             msg_atoms.push_back("svg");
             msg_atoms.push_back(filename);
             msg_atoms.push_back(1);
-            msg.set(&o_load_result, msg_atoms);
+            msg.set(&o_file_result, msg_atoms);
             msg.send(this);
             this->_setParsingState(false);
             
@@ -1221,6 +1225,65 @@ public:
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
             this->_updateOutlets();
             
+            return {};
+        }
+    };
+    
+    message<>export_file {
+        this, "export", "Write the frames to ILDA file. If no path/filename is provided, a dialog will be presented. A success/failure notification will be sent to the rightmost outlet in the form export [filename] 0/1.",
+        MIN_FUNCTION {
+            atoms msg_atoms;
+            queued_message_t msg;
+            
+            char                      filename[c74::max::MAX_PATH_CHARS] = {0};
+            short                     path = 0;
+            c74::max::t_fourcc        types[1] = {'ILDA'};
+            c74::max::t_fourcc        outtype = 0;
+            c74::max::t_max_err       err;
+            c74::max:: t_filehandle fh;
+            
+            
+            std::vector<unsigned char> file_bytes;
+            jam::ilda::ParseResult result = this->_fileProcessor.parseFramesToFileData(file_bytes, this->_frames);
+            
+            unsigned long byte_count = file_bytes.size();
+            c74::max::t_ptr_size *ptr_byte_count = &byte_count;
+            
+            if(result !=jam::ilda::ParseResult::SUCCESS) {
+                goto SEND_RESULT;
+            }
+            
+            c74::max::saveas_promptset("Export as file...");
+            
+            err = c74::max::saveasdialog_extended(filename, &path, &outtype, types, 1);
+            if (err) {       // User Cancelled
+                return {};
+            }
+            
+           
+                // First: Create File
+            err = c74::max::path_createsysfile(filename, path, 'ILDA', &fh);
+            if(err) {
+                fh = 0;
+                result = jam::ilda::ParseResult::ERROR;
+                goto SEND_RESULT;
+            }
+            
+                // Second: Write File
+            err = c74::max::sysfile_write(fh, ptr_byte_count ,&file_bytes[0]);
+            if(err) {
+                result = jam::ilda::ParseResult::ERROR;
+                goto SEND_RESULT;
+            }
+            
+        SEND_RESULT:
+            
+            msg_atoms.clear();
+            msg_atoms.push_back("export");
+            msg_atoms.push_back("---.ild");
+            msg_atoms.push_back(result == jam::ilda::ParseResult::SUCCESS);
+            msg.set(&o_file_result, msg_atoms);
+            msg.send(this);
             return {};
         }
     };

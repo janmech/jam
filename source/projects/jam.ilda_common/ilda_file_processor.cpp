@@ -19,7 +19,8 @@ namespace jam::ilda {
         this->_fileLoaded = false;
     }
     
-    ParseResult IldaFileProcessor::parseFileData() {
+    // TODO: function signature is inconsistent with parseFramesToFileData. Change to make consistet
+    ParseResult IldaFileProcessor::parseFileDataToFrames() {
         ParseResult parse_result = ParseResult::SUCCESS;
         this->_ilda_frames.clear();
         if(!this->fileLoaded()) {
@@ -57,105 +58,147 @@ namespace jam::ilda {
         return this->_ilda_frames;
     }
     
-    
-    ParseResult parseFramesToChar(std::vector<unsigned char> &file_bytes, const std::vector<IldaFrame> &frames) {
+    ParseResult IldaFileProcessor::parseFramesToFileData(std::vector<unsigned char> &file_bytes, const std::vector<IldaFrame> &frames) {
+        if(frames.size() == 0) {
+            return ParseResult::NODATA;
+        }
         for(size_t i = 0; i < frames.size(); i++) {
             IldaFrame f = frames[i];
-                // header bytes 1 – 4: ILDA string
-            file_bytes.push_back(static_cast<unsigned char>('I'));
-            file_bytes.push_back(static_cast<unsigned char>('L'));
-            file_bytes.push_back(static_cast<unsigned char>('D'));
-            file_bytes.push_back(static_cast<unsigned char>('A'));
-                // header bytes 5 - 7: reserved
-            for(size_t j = 0; j < 4; j++) {
-                file_bytes.push_back(0);
-            }
-                // header byte 8: format code
-            file_bytes.push_back(static_cast<unsigned char>(f.getHeader().getFormatCode()));
-            
-                // header bytes 9 – 16: frame name
-                // at this point we rely on propely formatted frames names
-            std::string frame_name = f.getHeader().getFrameName();
-            if(frame_name.size() > 8) {
-                frame_name.resize(8);
-            }
-            for(int n_index = 0; n_index < 8; n_index++) {
-                unsigned char c = 0;
-                if(frame_name.size() > n_index - 1) {
-                    c = static_cast<unsigned char>(frame_name[n_index]);
+            IldaHeader h = f.getHeader();
+            this->_parseHeaderToChar(f.getHeader(), file_bytes);
+            f.reset();
+            IldaDataRecord dr;
+            while (f.getNext(&dr)) {
+                if(h.getFormatCode() == RecordFormat::FORMAT_5) {
+                    this->_parseDataRecordToChar_Format5(dr, file_bytes);
                 }
-                file_bytes.push_back(c);
+                
             }
-            
-                // herader bytes 17 – 24: company name
-                // at this point we rely on propely formatted frames names
-            std::string comp_name = f.getHeader().getCompanyName();
-            if(comp_name.size() > 8) {
-                comp_name.resize(8);
-            }
-            for(int n_index = 0; n_index < 8; n_index++) {
-                unsigned char c = 0;
-                if(comp_name.size() > n_index - 1) {
-                    c = static_cast<unsigned char>(comp_name[n_index]);
-                }
-                file_bytes.push_back(c);
-            }
-            
-               
-            
-                // TODO: check if endianness is correct
-                // header bytes 25 – 26: Number of Records
-            {
-                uint16_t count = static_cast<uint16_t>(f.getHeader().getDataRecordCount());
-                unsigned char lsb = (count & 0x00FF);
-                unsigned char msb = ((count & 0xFF00) >> 8);
-                file_bytes.push_back(msb);
-                file_bytes.push_back(lsb);
-            }
-            
-               
-                // header bytes 27 – 28: frame number
-                // TODO: check if endianness is correct
-            {
-            uint16_t count = static_cast<uint16_t>(f.getHeader().getFrameNumber());
-            unsigned char lsb = (count & 0x00FF);
-            unsigned char msb = ((count & 0xFF00) >> 8);
-            file_bytes.push_back(msb);
-            file_bytes.push_back(lsb);
-            }
-            
-                // header bytes 29 – 30: frames in sequence
-                // TODO: check if endianness is correct
-            {
-            uint16_t count = static_cast<uint16_t>(f.getHeader().getFramesInSequence());
-            unsigned char lsb = (count & 0x00FF);
-            unsigned char msb = ((count & 0xFF00) >> 8);
-            file_bytes.push_back(msb);
-            file_bytes.push_back(lsb);
-            }
-            
-                // header byte 31: projector number - we only support single projector standard, allways 0
-            file_bytes.push_back(0);
-            
-                // header byte 32: reseved
-            file_bytes.push_back(0);
-            
-            // TODO: Continue here
- 
         }
+            // add end of file header
+        IldaFrame last      = frames.back();
+        IldaHeader h_eof    = last.getHeader();
+        h_eof.setFrameName("EOF");
+        h_eof.setDataRecordCount(0);
+        this->_parseHeaderToChar(h_eof, file_bytes);
+        
         return ParseResult::SUCCESS;
     };
     
     /* protected methods */
+    
+    void IldaFileProcessor::_parseHeaderToChar(IldaHeader &h, std::vector<unsigned char> &file_bytes) {
+            // header bytes 1 – 4: ILDA string
+        file_bytes.push_back(static_cast<unsigned char>('I'));
+        file_bytes.push_back(static_cast<unsigned char>('L'));
+        file_bytes.push_back(static_cast<unsigned char>('D'));
+        file_bytes.push_back(static_cast<unsigned char>('A'));
+            // header bytes 5 - 7: reserved
+        for(size_t j = 0; j < 4; j++) {
+            file_bytes.push_back(0);
+        }
+            // header byte 8: format code
+        file_bytes.push_back(static_cast<unsigned char>(h.getFormatCode()));
+        
+            // header bytes 9 – 16: frame name
+            // at this point we rely on propely formatted frames names
+        std::string frame_name = h.getFrameName();
+        if(frame_name.size() > 8) {
+            frame_name.resize(8);
+        }
+        for(int n_index = 0; n_index < 8; n_index++) {
+            unsigned char c = 0;
+            if(frame_name.size() > n_index - 1) {
+                c = static_cast<unsigned char>(frame_name[n_index]);
+            }
+            file_bytes.push_back(c);
+        }
+        
+            // herader bytes 17 – 24: company name
+            // at this point we rely on propely formatted frames names
+        std::string comp_name = h.getCompanyName();
+        if(comp_name.size() > 8) {
+            comp_name.resize(8);
+        }
+        for(int n_index = 0; n_index < 8; n_index++) {
+            unsigned char c = 0;
+            if(comp_name.size() > n_index - 1) {
+                c = static_cast<unsigned char>(comp_name[n_index]);
+            }
+            file_bytes.push_back(c);
+        }
+        
+            // buffer for parsing uint16_t to msb/lsb
+        unsigned char u16Bytes[2] = {0, 0};
+        uint16_t u16Value = 0;
+        
+            // TODO: check if endianness is correct
+            // header bytes 25 – 26: Number of Records
+        u16Value = static_cast<uint16_t>(h.getDataRecordCount());
+        this->_uint16tToChar(u16Value, u16Bytes);
+        file_bytes.push_back(u16Bytes[0]);
+        file_bytes.push_back(u16Bytes[1]);
+        
+            // header bytes 27 – 28: frame number
+        
+        u16Value = static_cast<uint16_t>(h.getFrameNumber());
+        this->_uint16tToChar(u16Value, u16Bytes);
+        file_bytes.push_back(u16Bytes[0]);
+        file_bytes.push_back(u16Bytes[1]);
+        
+            // header bytes 29 – 30: frames in sequence
+        u16Value = static_cast<uint16_t>(h.getFramesInSequence());
+        file_bytes.push_back(u16Bytes[0]);
+        file_bytes.push_back(u16Bytes[1]);
+        
+            // header byte 31: projector number - we only support single projector standard, allways 0
+        file_bytes.push_back(0);
+        
+            // header byte 32: reseved
+        file_bytes.push_back(0);
+        
+    };
+    
+    void IldaFileProcessor::_parseDataRecordToChar_Format5(IldaDataRecord &dr, std::vector<unsigned char> &file_bytes) {
+        unsigned char bytes[2] = {0, 0};
+        int16_t value = 0;
+        
+        // add x-coordinate
+        value = static_cast<int16_t>(dr.getPosX());
+        this->_parseInt16ToChar(value, bytes);
+        file_bytes.push_back(bytes[0]);
+        file_bytes.push_back(bytes[1]);
+        
+        // add x-coordinate
+        value = static_cast<int16_t>(dr.getPosY());
+        this->_parseInt16ToChar(value, bytes);
+        file_bytes.push_back(bytes[0]);
+        file_bytes.push_back(bytes[1]);
+        
+        // adding status byte
+        unsigned char status_byte = 0;
+        if(dr.getBlanking()) {
+            status_byte = status_byte | STATUS_BYTE_BLANKING;
+        }
+        if(dr.getLastPoint()) {
+            status_byte = status_byte | STATUS_BYTE_LAST_POINT;
+        }
+        file_bytes.push_back(status_byte);
+        
+        file_bytes.push_back(dr.getBlue());
+        file_bytes.push_back(dr.getGreen());
+        file_bytes.push_back(dr.getRed());
+        
+    };
+    
     ParseResult IldaFileProcessor::_extractFrame(IldaFrame &frame, size_t *byte_index) {
         IldaHeader frame_header;
-        ParseResult header_parse_result = this->_parseFrameHeader(frame_header, byte_index);
+        ParseResult header_parse_result = this->_parseCharToFrameHeader(frame_header, byte_index);
         
             // From the ilda file specs:
-            //
             // 4.2.6. Number of Records
-            // [...]
-            // If the number of records is 0, then this is to be taken as the end of file header and no more data will follow this header.
+            // If the number of records is 0, then this is to be taken as the end of file header
+            // and no more data will follow this header.
         
         if(frame_header.getDataRecordCount() == 0) {
             return ParseResult::END_OF_FILE;
@@ -178,19 +221,19 @@ namespace jam::ilda {
             IldaDataRecord data_record;
             switch (frame_header.getFormatCode()) {
                 case RecordFormat::FORMAT_0 :
-                    record_parse_result = this->_parseDataRecordFormat_0(data_record, record_buffer);
+                    record_parse_result = this->_parseCharToDataRecord_Format0(data_record, record_buffer);
                     break;
                 case RecordFormat::FORMAT_1 :
-                    record_parse_result = this->_parseDataRecordFormat_1(data_record, record_buffer);
+                    record_parse_result = this->_parseCharToDataRecord_Format1(data_record, record_buffer);
                     break;
                 case RecordFormat::FORMAT_2 :
-                    record_parse_result = this->_parseDataRecordFormat_2(data_record, record_buffer);
+                    record_parse_result = this->_parseCharToDataRecord_Format2(data_record, record_buffer);
                     break;
                 case RecordFormat::FORMAT_4 :
-                    record_parse_result = this->_parseDataRecordFormat_4(data_record, record_buffer);
+                    record_parse_result = this->_parseCharToDataRecord_Format4(data_record, record_buffer);
                     break;
                 case RecordFormat::FORMAT_5 :
-                    record_parse_result = this->_parseDataRecordFormat_5(data_record, record_buffer);
+                    record_parse_result = this->_parseCharToDataRecord_Format5(data_record, record_buffer);
                     break;
                 default:
                     record_parse_result = ParseResult::ERROR;
@@ -210,7 +253,7 @@ namespace jam::ilda {
         return (*byte_index >= this->_ilda_file.size()) ? ParseResult::END_OF_FILE : ParseResult::SUCCESS;
     };
     
-    ParseResult IldaFileProcessor::_parseFrameHeader(IldaHeader &frame_header, size_t *byte_index) {
+    ParseResult IldaFileProcessor::_parseCharToFrameHeader(IldaHeader &frame_header, size_t *byte_index) {
             // check start tag
         size_t header_start_index = *(byte_index) + FILE_HEADER_ILDA_TAG_START;
         char ilda_tag_buffer[FILE_HEADER_ILDA_TAG_LENGTH + 1] = {0};
@@ -266,7 +309,7 @@ namespace jam::ilda {
                             header_start_index,
                             FILE_HEADER_NUMBER_OF_RECODRS_LENGTH
                             );
-        uint16_t num_record = this->_parseUint16(num_records_buffer, sizeof(num_records_buffer));
+        uint16_t num_record = this->_charToUint16(num_records_buffer, sizeof(num_records_buffer));
         frame_header.setDataRecordCount((size_t)num_record);
         
             // read frame number
@@ -278,7 +321,7 @@ namespace jam::ilda {
                             FILE_HEADER_FRAME_NUMBER_LENGTH
                             );
         
-        uint16_t frame_number = this->_parseUint16(frame_number_buffer, sizeof(frame_number_buffer));
+        uint16_t frame_number = this->_charToUint16(frame_number_buffer, sizeof(frame_number_buffer));
         frame_header.setFrameNumber((size_t)frame_number);
         
             // read frames in sequence
@@ -289,7 +332,7 @@ namespace jam::ilda {
                             header_start_index,
                             FILE_HEADER_FRAMES_IN_SEQUENCE_LENGTH
                             );
-        uint16_t frames_in_sequence = this->_parseUint16(frames_in_seq_buffer, sizeof(frames_in_seq_buffer));
+        uint16_t frames_in_sequence = this->_charToUint16(frames_in_seq_buffer, sizeof(frames_in_seq_buffer));
         frame_header.setFramesInSequence((size_t) frames_in_sequence);
         
             // read projector number
@@ -305,10 +348,10 @@ namespace jam::ilda {
     };
     
         // Format 0: 3D Coordinates with Indexed Color; Record Size: 8 Bytes
-    ParseResult IldaFileProcessor::_parseDataRecordFormat_0(IldaDataRecord &data_record, char* buffer) {
-        int pos_x = this->_parseTwosComplement(buffer[0], buffer[1]);
-        int pos_y = this->_parseTwosComplement(buffer[2], buffer[3]);
-        int pos_z = this->_parseTwosComplement(buffer[4], buffer[5]);
+    ParseResult IldaFileProcessor::_parseCharToDataRecord_Format0(IldaDataRecord &data_record, char* buffer) {
+        int pos_x = this->_parseCharToTwosComplement(buffer[0], buffer[1]);
+        int pos_y = this->_parseCharToTwosComplement(buffer[2], buffer[3]);
+        int pos_z = this->_parseCharToTwosComplement(buffer[4], buffer[5]);
         bool is_last_point = buffer[6] & 0b10000000;
         bool blanking = buffer[6] & 0b01000000;
         data_record.setPosX(pos_x);
@@ -322,9 +365,9 @@ namespace jam::ilda {
     };
     
         // Format 1: 2D Coordinates with Indexed Color; Record Size: 6 Bytes
-    ParseResult IldaFileProcessor::_parseDataRecordFormat_1(IldaDataRecord &data_record, char* buffer) {
-        int pos_x = this->_parseTwosComplement(buffer[0], buffer[1]);
-        int pos_y = this->_parseTwosComplement(buffer[2], buffer[3]);
+    ParseResult IldaFileProcessor::_parseCharToDataRecord_Format1(IldaDataRecord &data_record, char* buffer) {
+        int pos_x = this->_parseCharToTwosComplement(buffer[0], buffer[1]);
+        int pos_y = this->_parseCharToTwosComplement(buffer[2], buffer[3]);
         bool is_last_point = buffer[4] & 0b10000000;
         bool blanking = buffer[4] & 0b01000000;
         data_record.setPosX(pos_x);
@@ -337,7 +380,7 @@ namespace jam::ilda {
     };
     
         // Format 2: Color Palette; Record Size: 3 Bytes
-    ParseResult IldaFileProcessor::_parseDataRecordFormat_2(IldaDataRecord &data_record, char* buffer) {
+    ParseResult IldaFileProcessor::_parseCharToDataRecord_Format2(IldaDataRecord &data_record, char* buffer) {
         data_record.setRed(buffer[0]);
         data_record.setGreen(buffer[1]);
         data_record.setBlue(buffer[2]);
@@ -345,10 +388,10 @@ namespace jam::ilda {
     };
     
         //Format 4: 3D Coordinates with True Color; Record Size: 10 Bytes
-    ParseResult IldaFileProcessor::_parseDataRecordFormat_4(IldaDataRecord &data_record, char* buffer) {
-        int pos_x = this->_parseTwosComplement(buffer[0], buffer[1]);
-        int pos_y = this->_parseTwosComplement(buffer[2], buffer[3]);
-        int pos_z = this->_parseTwosComplement(buffer[4], buffer[5]);
+    ParseResult IldaFileProcessor::_parseCharToDataRecord_Format4(IldaDataRecord &data_record, char* buffer) {
+        int pos_x = this->_parseCharToTwosComplement(buffer[0], buffer[1]);
+        int pos_y = this->_parseCharToTwosComplement(buffer[2], buffer[3]);
+        int pos_z = this->_parseCharToTwosComplement(buffer[4], buffer[5]);
         bool is_last_point = buffer[6] & 0b10000000;
         bool blanking = buffer[6] & 0b01000000;
         data_record.setPosX(pos_x);
@@ -364,9 +407,9 @@ namespace jam::ilda {
     };
     
         // Format 5: 2D Coordinates with True Color; Record Size: 8 Bytes
-    ParseResult IldaFileProcessor::_parseDataRecordFormat_5(IldaDataRecord &data_record, char* buffer) {
-        int pos_x = this->_parseTwosComplement(buffer[0], buffer[1]);
-        int pos_y = this->_parseTwosComplement(buffer[2], buffer[3]);
+    ParseResult IldaFileProcessor::_parseCharToDataRecord_Format5(IldaDataRecord &data_record, char* buffer) {
+        int pos_x = this->_parseCharToTwosComplement(buffer[0], buffer[1]);
+        int pos_y = this->_parseCharToTwosComplement(buffer[2], buffer[3]);
         bool is_last_point = buffer[4] & 0b10000000;
         bool blanking = buffer[4] & 0b01000000;
         data_record.setPosX(pos_x);
@@ -390,7 +433,7 @@ namespace jam::ilda {
         }
     }
     
-    std::uint16_t IldaFileProcessor::_parseUint16(char* bytes, std::size_t byte_count) {
+    std::uint16_t IldaFileProcessor::_charToUint16(char* bytes, std::size_t byte_count) {
         uint16_t parsedInt = 0;
         switch (byte_count) {
             case 0:
@@ -400,18 +443,32 @@ namespace jam::ilda {
                 parsedInt = (uint16_t)bytes[0];
                 break;
             default:
-                uint8_t most_sig = bytes[0];
-                uint8_t least_sig = bytes[1];
-                parsedInt = ((uint16_t)most_sig) << 8 | (uint16_t)least_sig;
+                uint8_t msb = bytes[0];
+                uint8_t lsb = bytes[1];
+                parsedInt = ((uint16_t)msb) << 8 | (uint16_t)lsb;
                 break;
         }
         
         return parsedInt;
     }
     
-    int IldaFileProcessor::_parseTwosComplement(char most_significant, char least_significant){
-        short value = (most_significant << 8) | (least_significant & 0xff) ;
+    void IldaFileProcessor::_uint16tToChar(uint16_t value, unsigned char * bytes) {
+        unsigned char lsb = static_cast<unsigned char>(value & 0x00FF);
+        unsigned char msb = static_cast<unsigned char>((value & 0xFF00) >> 8);
+        bytes[0] = msb;
+        bytes[1] = lsb;
+    };
+    
+    int IldaFileProcessor::_parseCharToTwosComplement(char msb, char lsb){
+        short value = (msb << 8) | (lsb & 0xff) ;
         return (int)value;
+    };
+    
+    void  IldaFileProcessor::_parseInt16ToChar(int16_t value, unsigned char * bytes) {
+        unsigned char lsb  = static_cast<uint8_t>(value & 0xFF);        // lower 8 bits
+        unsigned char msb  = static_cast<uint8_t>((value >> 8) & 0xFF); // upper 8 bits
+        bytes[0] = msb;
+        bytes[1] = lsb;
     };
     
     size_t IldaFileProcessor::_getRecordByteSize(RecordFormat format) {

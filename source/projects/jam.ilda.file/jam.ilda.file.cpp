@@ -159,7 +159,7 @@ public:
             queued_message_t msg;
             
             
-            short path;
+            short path = 0;
             short open_result;
             c74::max::t_fourcc filetype = 'ILDA', outtype;
             
@@ -248,7 +248,7 @@ public:
                 }
                     // Set, parse and validate file date
                 this->_fileProcessor.setFileData(ilda_file_bytes);
-                jam::ilda::ParseResult result = this->_fileProcessor.parseFileData();
+                jam::ilda::ParseResult result = this->_fileProcessor.parseFileDataToFrames();
                 int success = 1;
                 if(result != jam::ilda::ParseResult::SUCCESS) {
                     success = 0;
