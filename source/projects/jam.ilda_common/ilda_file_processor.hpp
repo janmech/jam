@@ -30,6 +30,8 @@ namespace jam::ilda {
         bool fileLoaded();
         std::vector<IldaFrame> getFrames();
         
+        static ParseResult parseFramesToChar(std::vector<char> &file_bytes, const std::vector<IldaFrame> &frames);
+        
         
     protected:
         

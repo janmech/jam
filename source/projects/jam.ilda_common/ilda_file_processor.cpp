@@ -57,16 +57,105 @@ namespace jam::ilda {
         return this->_ilda_frames;
     }
     
+    
+    ParseResult parseFramesToChar(std::vector<unsigned char> &file_bytes, const std::vector<IldaFrame> &frames) {
+        for(size_t i = 0; i < frames.size(); i++) {
+            IldaFrame f = frames[i];
+                // header bytes 1 – 4: ILDA string
+            file_bytes.push_back(static_cast<unsigned char>('I'));
+            file_bytes.push_back(static_cast<unsigned char>('L'));
+            file_bytes.push_back(static_cast<unsigned char>('D'));
+            file_bytes.push_back(static_cast<unsigned char>('A'));
+                // header bytes 5 - 7: reserved
+            for(size_t j = 0; j < 4; j++) {
+                file_bytes.push_back(0);
+            }
+                // header byte 8: format code
+            file_bytes.push_back(static_cast<unsigned char>(f.getHeader().getFormatCode()));
+            
+                // header bytes 9 – 16: frame name
+                // at this point we rely on propely formatted frames names
+            std::string frame_name = f.getHeader().getFrameName();
+            if(frame_name.size() > 8) {
+                frame_name.resize(8);
+            }
+            for(int n_index = 0; n_index < 8; n_index++) {
+                unsigned char c = 0;
+                if(frame_name.size() > n_index - 1) {
+                    c = static_cast<unsigned char>(frame_name[n_index]);
+                }
+                file_bytes.push_back(c);
+            }
+            
+                // herader bytes 17 – 24: company name
+                // at this point we rely on propely formatted frames names
+            std::string comp_name = f.getHeader().getCompanyName();
+            if(comp_name.size() > 8) {
+                comp_name.resize(8);
+            }
+            for(int n_index = 0; n_index < 8; n_index++) {
+                unsigned char c = 0;
+                if(comp_name.size() > n_index - 1) {
+                    c = static_cast<unsigned char>(comp_name[n_index]);
+                }
+                file_bytes.push_back(c);
+            }
+            
+               
+            
+                // TODO: check if endianness is correct
+                // header bytes 25 – 26: Number of Records
+            {
+                uint16_t count = static_cast<uint16_t>(f.getHeader().getDataRecordCount());
+                unsigned char lsb = (count & 0x00FF);
+                unsigned char msb = ((count & 0xFF00) >> 8);
+                file_bytes.push_back(msb);
+                file_bytes.push_back(lsb);
+            }
+            
+               
+                // header bytes 27 – 28: frame number
+                // TODO: check if endianness is correct
+            {
+            uint16_t count = static_cast<uint16_t>(f.getHeader().getFrameNumber());
+            unsigned char lsb = (count & 0x00FF);
+            unsigned char msb = ((count & 0xFF00) >> 8);
+            file_bytes.push_back(msb);
+            file_bytes.push_back(lsb);
+            }
+            
+                // header bytes 29 – 30: frames in sequence
+                // TODO: check if endianness is correct
+            {
+            uint16_t count = static_cast<uint16_t>(f.getHeader().getFramesInSequence());
+            unsigned char lsb = (count & 0x00FF);
+            unsigned char msb = ((count & 0xFF00) >> 8);
+            file_bytes.push_back(msb);
+            file_bytes.push_back(lsb);
+            }
+            
+                // header byte 31: projector number - we only support single projector standard, allways 0
+            file_bytes.push_back(0);
+            
+                // header byte 32: reseved
+            file_bytes.push_back(0);
+            
+            // TODO: Continue here
+ 
+        }
+        return ParseResult::SUCCESS;
+    };
+    
     /* protected methods */
     ParseResult IldaFileProcessor::_extractFrame(IldaFrame &frame, size_t *byte_index) {
         IldaHeader frame_header;
         ParseResult header_parse_result = this->_parseFrameHeader(frame_header, byte_index);
         
-        // From the ilda file specs:
-        //
-        // 4.2.6. Number of Records
-        // [...]
-        // If the number of records is 0, then this is to be taken as the end of file header and no more data will follow this header.
+            // From the ilda file specs:
+            //
+            // 4.2.6. Number of Records
+            // [...]
+            // If the number of records is 0, then this is to be taken as the end of file header and no more data will follow this header.
         
         if(frame_header.getDataRecordCount() == 0) {
             return ParseResult::END_OF_FILE;
