@@ -36,17 +36,16 @@ namespace jam::ilda {
             // We not parsing color pallet frames
             if(result == ParseResult::IS_PALLET_FRAME) {
                 continue;
-            }
-            if(result != ParseResult::SUCCESS) {
-                if(result == ParseResult::END_OF_FILE) {
-                    parse_result = ParseResult::SUCCESS;
-                    break;
-                } else {
-                    parse_result = result;
-                    break;
-                }
-            } else {
+            } else if (result == ParseResult::SUCCESS) {
                 this->_ilda_frames.push_back(std::move(frame));
+            } else if (result == ParseResult::END_OF_FILE) {
+                if(frame.getHeader().getDataRecordCount() > 0) {
+                    this->_ilda_frames.push_back(std::move(frame));
+                }
+                parse_result = ParseResult::SUCCESS;
+                break;
+            } else {
+                break;
             }
         }
         
