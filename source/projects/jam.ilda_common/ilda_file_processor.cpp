@@ -71,10 +71,18 @@ namespace jam::ilda {
             this->_parseHeaderToChar(f.getHeader(), file_bytes);
             f.reset();
             IldaDataRecord dr;
+            RecordFormat format = h.getFormatCode();
             while (f.getNext(&dr)) {
-                // Currently the only Record Format we save is FORMAT_5 - created by jam.ilda.compose. Hence the other formats are not implemented at the moment.
-                if(h.getFormatCode() == RecordFormat::FORMAT_5) {
-                    this->_parseDataRecordToChar_Format5(dr, file_bytes);
+                // Currently the only Record Formats we save is FORMAT_4 and FORMAT_5 - created by jam.ilda.compose. Hence the other formats are not implemented at the moment.
+                switch (format) {
+                    case RecordFormat::FORMAT_5:
+                        this->_parseDataRecordToChar_Format5(dr, file_bytes);
+                        break;
+                    case RecordFormat::FORMAT_4:
+                        this->_parseDataRecordToChar_Format4(dr, file_bytes);
+                        break;
+                    default:
+                        break;
                 }
                 
             }
@@ -158,6 +166,7 @@ namespace jam::ilda {
     };
     
     void IldaFileProcessor::_parseDataRecordToChar_Format5(IldaDataRecord &dr, std::vector<unsigned char> &file_bytes) {
+        // buffer to hold msb/lsb bytes for int16_t values
         unsigned char bytes[2] = {0, 0};
         int16_t value = 0;
         
@@ -167,7 +176,7 @@ namespace jam::ilda {
         file_bytes.push_back(bytes[0]);
         file_bytes.push_back(bytes[1]);
         
-        // add x-coordinate
+        // add y-coordinate
         value = static_cast<int16_t>(dr.getPosY());
         this->_parseInt16ToChar(value, bytes);
         file_bytes.push_back(bytes[0]);
@@ -187,6 +196,43 @@ namespace jam::ilda {
         file_bytes.push_back(dr.getGreen());
         file_bytes.push_back(dr.getRed());
         
+    };
+    
+    void IldaFileProcessor::_parseDataRecordToChar_Format4(IldaDataRecord &dr, std::vector<unsigned char> &file_bytes) {
+            // buffer to hold msb/lsb bytes for int16_t values
+            unsigned char bytes[2] = {0, 0};
+            int16_t value = 0;
+            
+            // add x-coordinate
+            value = static_cast<int16_t>(dr.getPosX());
+            this->_parseInt16ToChar(value, bytes);
+            file_bytes.push_back(bytes[0]);
+            file_bytes.push_back(bytes[1]);
+            
+            // add x-coordinate
+            value = static_cast<int16_t>(dr.getPosY());
+            this->_parseInt16ToChar(value, bytes);
+            file_bytes.push_back(bytes[0]);
+            file_bytes.push_back(bytes[1]);
+        
+            // add z-coordinate
+            value = static_cast<int16_t>(dr.getPosZ());
+            this->_parseInt16ToChar(value, bytes);
+            file_bytes.push_back(bytes[0]);
+            file_bytes.push_back(bytes[1]);
+            
+            // adding status byte
+            unsigned char status_byte = 0;
+            if(dr.getBlanking()) {
+                status_byte = status_byte | STATUS_BYTE_BLANKING;
+            }
+            if(dr.getLastPoint()) {
+                status_byte = status_byte | STATUS_BYTE_LAST_POINT;
+            }
+            file_bytes.push_back(status_byte);
+            file_bytes.push_back(dr.getBlue());
+            file_bytes.push_back(dr.getGreen());
+            file_bytes.push_back(dr.getRed());
     };
     
     ParseResult IldaFileProcessor::_extractFrame(IldaFrame &frame, size_t *byte_index) {

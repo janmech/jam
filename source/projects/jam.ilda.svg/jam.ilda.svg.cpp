@@ -22,6 +22,7 @@
 #include "../jam.ilda_common/ilda_definitions.hpp"
 #include "../jam.ilda.manager/jam.ilda.manager.hpp"
 #include "../jam.ilda_common/ilda_file_processor.hpp"
+#include "../jam.ilda_common/ilda_colors.hpp"
 #include "nanosvg.h"
 
 #ifndef PI
@@ -198,6 +199,38 @@ private:
         }
     }
     
+    void _parseFramesToTrueColor(std::vector<jam::ilda::IldaFrame> &frames) {
+        jam::ilda::Colors *col = new jam::ilda::Colors();
+        
+        for(size_t i = 0; i < frames.size(); i++) {
+            jam::ilda::IldaHeader h = frames[i].getHeader();
+            jam::ilda::RecordFormat rec_format = h.getFormatCode();
+            
+            switch (rec_format) {
+                case jam::ilda::RecordFormat::FORMAT_0:
+                    h.setFormatCode(jam::ilda::RecordFormat::FORMAT_4);
+                    break;
+                case jam::ilda::RecordFormat::FORMAT_1:
+                    h.setFormatCode(jam::ilda::RecordFormat::FORMAT_5);
+                    break;
+                default:
+                    continue;;
+            }
+            frames[i].setHeader(h);
+            std::vector<jam::ilda::IldaDataRecord> dr = frames[i].getDataRecords();
+            for(size_t j = 0; j < dr.size(); j++) {
+                uint8_t color_index = dr[j].getColorIndex();
+                std::vector<double> col_vals = col->getFloatColorByIndex((size_t)color_index);
+                dr[j].setRed((uint8_t)(col_vals[0] * 255.));
+                dr[j].setGreen((uint8_t)(col_vals[1] * 255.));
+                dr[j].setBlue((uint8_t)(col_vals[2] * 255.));
+            }
+            frames[i].setDataRecords(dr);
+            
+        }
+        delete col;
+    }
+    
         /// Formats string to match the requirements of the ILDA frame header: Non ASCII characters are subtituted with _
         /// @param  s                    string reference to the input name
         /// @param  max_len     maximum output string length
@@ -285,6 +318,9 @@ private:
             dr.setBlue(dr_b);
             dr.setPosX(this->_deNormalizePosition(points[i].x));
             dr.setPosY(this->_deNormalizePosition(points[i].y));
+                // we ondly create/modify 2d data records,but the frame maight be 3d
+                // when it was imported from an ILDA file. hence set the y coordinate to 0
+            dr.setPosZ(0);
             dr.setBlanking(is_blanking);
             this->_frames[this->_edit_frame].pushRecord(dr);
         }
@@ -1156,6 +1192,7 @@ public:
             }
             std::string ilda_file_refence = args[0];
             std::vector<jam::ilda::IldaFrame> frames = this->_getStructPointer()->getFrames(ilda_file_refence);
+            this->_parseFramesToTrueColor(frames);
             if(frames.size() > 0) {
                 this->_frames.insert(this->_frames.end(),frames.begin(), frames.end());
             }

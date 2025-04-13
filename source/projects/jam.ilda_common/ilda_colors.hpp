@@ -19,9 +19,13 @@ namespace jam::ilda {
     class Colors {
         
     public:
-        Colors(){};
+        Colors() = default;
         ~Colors(){};
     
+        /// Translate a color index to float values
+        /// @param    color_index                  the color index
+        /// @param    opacity                           opacity value. default: 1.
+        /// @return   td::vector<double>         Vector with four entries: red, green, blue, opacity
         static std::vector<double> getFloatColorByIndex(size_t color_index, double opacity = 1.);
         
 //        static constexpr uint8_t ilda_color_pallet[192] = {

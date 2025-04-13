@@ -27,8 +27,16 @@ namespace jam::ilda {
         
         void clearRecords();
         
+        /// get  the data records vector
+        std::vector<IldaDataRecord> getDataRecords();
+        
+        void setDataRecords(std::vector<IldaDataRecord> dr);
+        
         bool get(IldaDataRecord* data_record, size_t index);
+        
+        /// convenience iterarator to read out data records.
         bool getNext(IldaDataRecord* data_record);
+        /// reset the internal data record iterator to first element
         void reset();
         
         

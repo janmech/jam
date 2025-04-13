@@ -59,7 +59,9 @@ namespace jam::ilda {
         
             // helper methods to parse jam::ilda::xxx data structure to raw file bytes
         void _parseHeaderToChar(IldaHeader &h, std::vector<unsigned char> &file_bytes);
+        void _parseDataRecordToChar_Format4(IldaDataRecord &dr, std::vector<unsigned char> &file_bytes);
         void _parseDataRecordToChar_Format5(IldaDataRecord &dr, std::vector<unsigned char> &file_bytes);
+        
         
         size_t _getRecordByteSize(RecordFormat format);
         

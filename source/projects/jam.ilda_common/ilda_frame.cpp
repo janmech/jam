@@ -35,6 +35,14 @@ namespace jam::ilda {
         
     };
     
+    std::vector<IldaDataRecord> IldaFrame::getDataRecords() {
+        return this->_data_records;
+    };
+    
+    void IldaFrame::setDataRecords(std::vector<IldaDataRecord> dr) {
+        this->_data_records = dr;
+    };
+    
     bool IldaFrame::getNext(IldaDataRecord* data_record) {
         if(this->_data_records.size() > this->_iteratorIndex) {
             try {
