@@ -54,10 +54,12 @@ namespace jam::ilda {
     };
     
     enum ParseResult {
+        IS_PALLET_FRAME = 1,
         SUCCESS = 0,
         NODATA = -1,
         ERROR = -2,
         END_OF_FILE = -3,
+       
     };
 };
 

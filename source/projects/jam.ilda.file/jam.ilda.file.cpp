@@ -109,7 +109,7 @@ public:
             std::string id_string = std::to_string(rand_id);
             std::ostringstream ss;
             ss << std::setw(12) << std::setfill('0') << id_string;
-            this->_instance_id = "ild_" + std::string(ss.str());
+            this->_instance_id = "ild" + std::string(ss.str());
                 // get the pointer to jam.ilda.manager max-object
             this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
                 // get the pointer to jam.ilda.manager max-object's struct
@@ -140,7 +140,7 @@ public:
         }
     };
     
-    message<threadsafe::no>import {
+    message<threadsafe::no>import_file {
         this, "import", "import an ILDA file",
         MIN_FUNCTION {
             if(this->_getParsingState()) {
@@ -154,6 +154,7 @@ public:
                 cwarn << "extra argument for message 'import'" << endl;
             }
             
+            // store the import args in member variable, to make them accasible in detached loading/parsing thread
             this->_import_args = args;
             atoms msg_atoms;
             queued_message_t msg;

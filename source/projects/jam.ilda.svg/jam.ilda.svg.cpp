@@ -250,12 +250,12 @@ private:
         /// @param   theta_end                 end angle in degrees (0º - 360º)
         /// @param   segments                   number of line segments
     VecPoint2D _makeEllipse(
-        Point2D c,
-        Point2D r,
-        const double theta_start = 0,
-        const double theta_end = 360,
-        int segments = 50
-     ) {
+                            Point2D c,
+                            Point2D r,
+                            const double theta_start = 0,
+                            const double theta_end = 360,
+                            int segments = 50
+                            ) {
         double rad_start = theta_start * (PI / 180);
         double rad_end = theta_end * (PI / 180);
         double rad_range = rad_end - rad_start;
@@ -289,8 +289,8 @@ private:
             this->_frames[this->_edit_frame].pushRecord(dr);
         }
     };
-
-    // TODO: check if nessecary
+    
+        // TODO: check if nessecary
         /// generate point for circle
         /// @param   c_x                               center coordinate x
         /// @param   c_y                               center coordinate y
@@ -299,19 +299,19 @@ private:
         /// @param   theta_end                 end angle in degrees (0º - 360º)
         /// @param   segments                   number of line segments
     VecPoint2D _makeCircle(
-         const double c_x,
-         const double c_y,
-         const double r,
-         const double theta_start = 0,
-         const double theta_end = 360,
-         int segments = 50
-     ) {
+                           const double c_x,
+                           const double c_y,
+                           const double r,
+                           const double theta_start = 0,
+                           const double theta_end = 360,
+                           int segments = 50
+                           ) {
         double rad_start = theta_start * (PI / 180);
         double rad_end = theta_end * (PI / 180);
         double rad_range = rad_end - rad_start;
         
         VecPoint2D points;
-                   
+        
         for (int i = 0; i <= segments; ++i) {
             Point2D p;
             double angle = rad_start + (rad_range * i / segments);
@@ -321,7 +321,7 @@ private:
         }
         return points;
     }
-
+    
     
         /// generate point for a rectange with rounded corners
         /// @param   tl                               top left coordinates of the rectange
@@ -329,11 +329,11 @@ private:
         /// @param   rnd                             corner roundes (0. - 1.) the higer the number the greater the radius of the corner arc
         /// @param   segments                  number of line segments
     VecPoint2D _makeRectangle(
-        Point2D tl,
-        Point2D br,
-        double rnd, // corner roundness
-        int segments = 10
-    ) {
+                              Point2D tl,
+                              Point2D br,
+                              double rnd, // corner roundness
+                              int segments = 10
+                              ) {
         
         VecPoint2D points;
         Point2D tr = {br.x, tl.y};
@@ -348,22 +348,22 @@ private:
         double min_lenght = fmin(length_horizontal, length_vertical);
         double radius = min_lenght * rnd / 2.;
         
-        // arc circle radius
+            // arc circle radius
         Point2D circle_r = {radius, radius};
         
-        // arc top left
+            // arc top left
         Point2D arc_center_tl = {tl.x + radius, tl.y - radius};
         VecPoint2D arc_tl = this->_makeEllipse(arc_center_tl, circle_r, 180, 90, segments);
         
-        // arc top right
+            // arc top right
         Point2D arc_center_tr = {tr.x - radius, tr.y - radius};
         VecPoint2D arc_tr = this->_makeEllipse(arc_center_tr, circle_r, 90, 0, segments);
         
-        // arc bottom right
+            // arc bottom right
         Point2D arc_center_br = {br.x - radius, br.y + radius};
         VecPoint2D arc_br = this->_makeEllipse(arc_center_br, circle_r, 0, -90, segments);
         
-        // arc bottom left
+            // arc bottom left
         Point2D arc_center_bl = {bl.x + radius, bl.y + radius};
         VecPoint2D arc_bl = this->_makeEllipse(arc_center_bl, circle_r, 270, 180, segments);
         
@@ -406,7 +406,7 @@ private:
         std::vector<jam::ilda::IldaDataRecord> rotated_records;
         jam::ilda::IldaDataRecord r;
         while(f.getNext(&r)) {
-
+            
             double dx = (double)r.getPosX() - c.x;
             double dy = (double)r.getPosY() - c.y;
             
@@ -415,7 +415,7 @@ private:
             
             r.setPosX((int)rx);
             r.setPosY((int)ry);
-
+            
             rotated_records.push_back(r);
         }
         
@@ -440,7 +440,7 @@ private:
             f.pushRecord(scaled_records[i]);
         }
     }
-  
+    
     
 public:
     
@@ -453,7 +453,7 @@ public:
             std::string id_string = std::to_string(rand_id);
             std::ostringstream ss;
             ss << std::setw(12) << std::setfill('0') << id_string;
-            this->_instance_id = "ild_" + std::string(ss.str());
+            this->_instance_id = "ild" + std::string(ss.str());
                 // get the pointer to jam.ilda.manager max-object
             this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
                 // get the pointer to jam.ilda.manager max-object's struct
@@ -560,7 +560,7 @@ public:
                && args[0].type() != message_type::float_argument) {
                    cwarn << args[0] << " bad number" << endl;
                    return {};
-            }
+               }
             
             int frame_index = args[0];
             
@@ -622,7 +622,7 @@ public:
                && args[0].type() != message_type::float_argument) {
                    cwarn << args[0] << " bad number" << endl;
                    return {};
-            }
+               }
             
             int frame_index = args[0];
             
@@ -671,7 +671,7 @@ public:
             }
         }
     };
-        
+    
     message<threadsafe::no>svg {
         this, "svg", "Parse a SVG file and append as new frame",
         MIN_FUNCTION {
@@ -808,7 +808,7 @@ public:
                 return {};
                 
             }
-        
+            
             msg_atoms.clear();
             msg_atoms.push_back("svg");
             msg_atoms.push_back(filename);
@@ -818,7 +818,7 @@ public:
             this->_setParsingState(false);
             
             
-            // parse SVG data into shapes
+                // parse SVG data into shapes
             _shapes.clear();
             for (NSVGshape* shape = image->shapes; shape != nullptr; shape = shape->next) {
                 jam::svg::Shape s("SVGPath");
@@ -868,11 +868,11 @@ public:
             
             nsvgDelete(image);
             
-            // Add shape data to current edit_frame
+                // Add shape data to current edit_frame
             if(this->_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
-                
+            
             jam::ilda::IldaFrame f = this->_frames[this->_edit_frame];
             for(size_t i = 0; i< this->_shapes.size(); i++) {
                 for(size_t j = 0; j < this->_shapes[i].getPoints().size(); j++) {
@@ -922,7 +922,7 @@ public:
                 g = uint8_t(std::clamp((double)args[6], 0., 1.) * 255.);
                 b = uint8_t(std::clamp((double)args[6], 0., 1.) * 255.);
             }
-            // move to staring point
+                // move to staring point
             jam::ilda::IldaDataRecord r_start;
             r_start.setRed(0);
             r_start.setGreen(0);
@@ -961,10 +961,10 @@ public:
                 this->_appendEmptyFrame();
             }
             
-            // center point
+                // center point
             Point2D c = {(double)args[0], (double) args[1]};
             
-            // radius x/y
+                // radius x/y
             Point2D radius = {(double)args[2], (double)args[2]};
             
             
@@ -990,7 +990,7 @@ public:
                 seg = (seg < 3) ? 3 : seg;
                 seg = (seg > 200) ? 200 : seg;
             }
-//            VecPoint2D points = this->_makeCircle(x, y, radius, t_start, t_end, seg);
+                //            VecPoint2D points = this->_makeCircle(x, y, radius, t_start, t_end, seg);
             VecPoint2D points = this->_makeEllipse(c, radius, t_start, t_end, seg);
             this->_addDataRecorsToEditFrame(points, r, g, b);
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
@@ -1002,9 +1002,9 @@ public:
     };
     
     message<threadsafe::no>ellipse {
-      this, "ellipse", "Draw an ellipse into a frame",
+        this, "ellipse", "Draw an ellipse into a frame",
         MIN_FUNCTION {
-            // ellipse x_center y_center x_radius y_radius r g b segments
+                // ellipse x_center y_center x_radius y_radius r g b segments
             if(args.size() < 4) {
                 cwarn << "missing argument for message 'circle'" << endl;
                 return {};
@@ -1013,10 +1013,10 @@ public:
                 this->_appendEmptyFrame();
             }
             
-            // center point
+                // center point
             Point2D c = {(double)args[0], (double) args[1]};
             
-            // radius x/y
+                // radius x/y
             Point2D radius = {(double)args[2], (double)args[3]};
             
             
@@ -1053,9 +1053,9 @@ public:
     };
     
     message<threadsafe::no>rect {
-      this, "rect", "Draw a rectangle into a frame",
+        this, "rect", "Draw a rectangle into a frame",
         MIN_FUNCTION {
-            // rect x_topleft y_topleft x_bottomright y_bottomright r g b corner-radius segment
+                // rect x_topleft y_topleft x_bottomright y_bottomright r g b corner-radius segment
             if(args.size() < 4) {
                 cwarn << "missing argument for message 'rect'" << endl;
                 return {};
@@ -1102,7 +1102,7 @@ public:
     message<threadsafe::no>bezier {
         this, "bezier", "Draw a cubic bezier curve into a frame",
         MIN_FUNCTION {
-            //besier x_start y_start x_c1 y_c1 x_c2 y_c2 x_end y_end
+                //besier x_start y_start x_c1 y_c1 x_c2 y_c2 x_end y_end
             if(args.size() < 8) {
                 cwarn << "missing argument for message 'bezier'" << endl;
                 return {};
@@ -1110,16 +1110,16 @@ public:
             if (this->_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
-            // start point
+                // start point
             Point2D start = {(double)args[0], (double) args[1]};
             
-            // control point 1
+                // control point 1
             Point2D c1 = {(double)args[2], (double)args[3]};
             
-            // control point 2
+                // control point 2
             Point2D c2 = {(double)args[4], (double)args[5]};
             
-            // end point
+                // end point
             Point2D end = {(double)args[6], (double)args[7]};
             
             uint8_t r = 255;
@@ -1178,7 +1178,7 @@ public:
     };
     
     message<threadsafe::no>rotate {
-      this, "rotate", "Rotate a frame. If one argument follows the message, the frame will be rotated around the center point. If three arguments are present, the sencond and third arguments specify the rotation center",
+        this, "rotate", "Rotate a frame. If one argument follows the message, the frame will be rotated around the center point. If three arguments are present, the sencond and third arguments specify the rotation center",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message 'rotate'" << endl;
@@ -1245,38 +1245,38 @@ public:
             
             std::vector<unsigned char> file_bytes;
             jam::ilda::ParseResult result = this->_fileProcessor.parseFramesToFileData(file_bytes, this->_frames);
-            
-            unsigned long byte_count = file_bytes.size();
-            c74::max::t_ptr_size *ptr_byte_count = &byte_count;
-            
-            if(result !=jam::ilda::ParseResult::SUCCESS) {
-                goto SEND_RESULT;
-            }
-            
-            c74::max::saveas_promptset("Export as file...");
-            
-            err = c74::max::saveasdialog_extended(filename, &path, &outtype, types, 1);
-            if (err) {       // User Cancelled
-                return {};
-            }
-            
-           
-                // First: Create File
-            err = c74::max::path_createsysfile(filename, path, 'ILDA', &fh);
-            if(err) {
-                fh = 0;
+            if(result == jam::ilda::ParseResult::SUCCESS) {
+                c74::max::saveas_promptset("Export as file...");
+                err = c74::max::saveasdialog_extended(filename, &path, &outtype, types, 1);
+                if (err) {       // User Cancelled
+                    return {};
+                }
+                    // First: Create File
+                err = c74::max::path_createsysfile(filename, path, 'ILDA', &fh);
+                if(err == c74::max::MAX_ERR_NONE) {
+                    unsigned long byte_count = file_bytes.size();
+                        // Second: Write File
+                    unsigned char *raw_data = reinterpret_cast<unsigned char *>(malloc(file_bytes.size() * sizeof(unsigned char)));
+                    
+                    for(unsigned long i = 0; i < byte_count; i++) {
+                        raw_data[i] = file_bytes[i];
+                    }
+                    
+                    err = c74::max::sysfile_write(fh, &byte_count ,raw_data);
+                        // Third: Close File
+                    c74::max::sysfile_seteof(fh, byte_count);
+                    c74::max::sysfile_close(fh);
+                    free(raw_data);
+                    if(err != c74::max::MAX_ERR_NONE) {
+                        result = jam::ilda::ParseResult::ERROR;
+                    }
+                } else {
+                    result = jam::ilda::ParseResult::ERROR;
+                }
+                
+            } else {
                 result = jam::ilda::ParseResult::ERROR;
-                goto SEND_RESULT;
             }
-            
-                // Second: Write File
-            err = c74::max::sysfile_write(fh, ptr_byte_count ,&file_bytes[0]);
-            if(err) {
-                result = jam::ilda::ParseResult::ERROR;
-                goto SEND_RESULT;
-            }
-            
-        SEND_RESULT:
             
             msg_atoms.clear();
             msg_atoms.push_back("export");

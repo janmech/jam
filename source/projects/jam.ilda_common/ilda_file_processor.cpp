@@ -19,7 +19,6 @@ namespace jam::ilda {
         this->_fileLoaded = false;
     }
     
-    // TODO: function signature is inconsistent with parseFramesToFileData. Change to make consistet
     ParseResult IldaFileProcessor::parseFileDataToFrames() {
         ParseResult parse_result = ParseResult::SUCCESS;
         this->_ilda_frames.clear();
@@ -34,6 +33,10 @@ namespace jam::ilda {
         while(true) {
             IldaFrame frame;
             ParseResult result = this->_extractFrame(frame, &byte_index);
+            // We not parsing color pallet frames
+            if(result == ParseResult::IS_PALLET_FRAME) {
+                continue;
+            }
             if(result != ParseResult::SUCCESS) {
                 if(result == ParseResult::END_OF_FILE) {
                     parse_result = ParseResult::SUCCESS;
@@ -69,6 +72,7 @@ namespace jam::ilda {
             f.reset();
             IldaDataRecord dr;
             while (f.getNext(&dr)) {
+                // Currently the only Record Format we save is FORMAT_5 - created by jam.ilda.compose. Hence the other formats are not implemented at the moment.
                 if(h.getFormatCode() == RecordFormat::FORMAT_5) {
                     this->_parseDataRecordToChar_Format5(dr, file_bytes);
                 }
@@ -94,7 +98,7 @@ namespace jam::ilda {
         file_bytes.push_back(static_cast<unsigned char>('D'));
         file_bytes.push_back(static_cast<unsigned char>('A'));
             // header bytes 5 - 7: reserved
-        for(size_t j = 0; j < 4; j++) {
+        for(size_t j = 0; j < 3; j++) {
             file_bytes.push_back(0);
         }
             // header byte 8: format code
@@ -106,11 +110,9 @@ namespace jam::ilda {
         if(frame_name.size() > 8) {
             frame_name.resize(8);
         }
+        
         for(int n_index = 0; n_index < 8; n_index++) {
-            unsigned char c = 0;
-            if(frame_name.size() > n_index - 1) {
-                c = static_cast<unsigned char>(frame_name[n_index]);
-            }
+            auto c = static_cast<unsigned char>(frame_name[n_index]);
             file_bytes.push_back(c);
         }
         
@@ -120,11 +122,8 @@ namespace jam::ilda {
         if(comp_name.size() > 8) {
             comp_name.resize(8);
         }
-        for(int n_index = 0; n_index < 8; n_index++) {
-            unsigned char c = 0;
-            if(comp_name.size() > n_index - 1) {
-                c = static_cast<unsigned char>(comp_name[n_index]);
-            }
+        for(int n_index = 0; n_index < comp_name.size(); n_index++) {
+            auto c = static_cast<unsigned char>(comp_name[n_index]);
             file_bytes.push_back(c);
         }
         
@@ -132,7 +131,6 @@ namespace jam::ilda {
         unsigned char u16Bytes[2] = {0, 0};
         uint16_t u16Value = 0;
         
-            // TODO: check if endianness is correct
             // header bytes 25 – 26: Number of Records
         u16Value = static_cast<uint16_t>(h.getDataRecordCount());
         this->_uint16tToChar(u16Value, u16Bytes);
@@ -227,7 +225,9 @@ namespace jam::ilda {
                     record_parse_result = this->_parseCharToDataRecord_Format1(data_record, record_buffer);
                     break;
                 case RecordFormat::FORMAT_2 :
-                    record_parse_result = this->_parseCharToDataRecord_Format2(data_record, record_buffer);
+                    // We are not parsing color pallets fort now: abort;
+                    return ParseResult::IS_PALLET_FRAME;
+//                    record_parse_result = this->_parseCharToDataRecord_Format2(data_record, record_buffer);
                     break;
                 case RecordFormat::FORMAT_4 :
                     record_parse_result = this->_parseCharToDataRecord_Format4(data_record, record_buffer);
@@ -399,9 +399,9 @@ namespace jam::ilda {
         data_record.setPosZ(pos_z);
         data_record.setLastPoint(is_last_point);
         data_record.setBlanking(blanking);
-        data_record.setRed(buffer[7]);
+        data_record.setBlue(buffer[7]);
         data_record.setGreen(buffer[8]);
-        data_record.setBlue(buffer[9]);
+        data_record.setRed(buffer[9]);
         
         return ParseResult::SUCCESS;
     };
@@ -416,9 +416,9 @@ namespace jam::ilda {
         data_record.setPosY(pos_y);
         data_record.setLastPoint(is_last_point);
         data_record.setBlanking(blanking);
-        data_record.setRed(buffer[5]);
+        data_record.setBlue(buffer[5]);
         data_record.setGreen(buffer[6]);
-        data_record.setBlue(buffer[7]);
+        data_record.setRed(buffer[7]);
         
         return ParseResult::SUCCESS;
     };
