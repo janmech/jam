@@ -533,7 +533,7 @@ public:
             }
         },
         title {"Company Name"},
-        description {"Company name set in the header of the ILDA file.<br />ILDA files contain of a sequence of 'frames'. Every frame has a header summarizing some information about the frame. This attribute sets the value of the header field 'Company Name' (max 8 ASCII characters). "},
+        description {"Company name set in the headers of the ILDA file.<br />ILDA files contain of a sequence of 'frames'. Every frame has a header summarizing some information about the frame. This attribute sets the value of the header field 'Company Name' (max 8 ASCII characters). "},
         category {"ILDA FILE"}
     };
     
@@ -643,28 +643,27 @@ public:
     };
     
     message<threadsafe::no> removeframe {
-        this, "removeframe", "Remove frame by index",
+        this, "removeframe", "Remove frame a frame. If no argument is provided the currently set edit frame is removed. If one argument [frame index] is present, the frame at index will be duplicated.",
         MIN_FUNCTION {
+            if(this->_frames.size() == 0) {
+                return {};
+            }
+            int frame_index = -1;
             if(args.size() == 0) {
-                cwarn << "missing argument for message 'removeframe'" << endl;
+                frame_index = (int)this->_edit_frame;
+            } else {
+                if(args[0].type() != message_type::int_argument && args[0].type() != message_type::float_argument) {
+                       cwarn << args[0] << " bad number" << endl;
+                       return {};
+                   }
+                frame_index = args[0];
+            }
+            
+            if(frame_index < 0 || frame_index > this->_frames.size() -1) {
+                cwarn << "frame index out of range" << endl;
                 return {};
             }
-            if (args.size() > 1) {
-                cwarn << "extra argument for message 'removeframe'" << endl;
-            }
-            
-            if(
-               args[0].type() != message_type::int_argument
-               && args[0].type() != message_type::float_argument) {
-                   cwarn << args[0] << " bad number" << endl;
-                   return {};
-               }
-            
-            int frame_index = args[0];
-            
-            if(frame_index < 0 || frame_index > this->_frames.size() - 1) {
-                return {};
-            }
+
             this->_frames.erase(this->_frames.begin() + frame_index);
             this->_updateFrameHeaders();
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
@@ -675,6 +674,85 @@ public:
             
             this->_updateOutlets();
             
+            return {};
+        }
+    };
+    
+    message<threadsafe::no> duplicateframe {
+        this, "duplicateframe", "Duplicate a frame. If no argument is provided the currently set edit frame is duplicated. If one argument [frame index] is present, the frame at index will be duplicated.",
+        MIN_FUNCTION {
+            if(this->_frames.size() == 0) {
+                return {};
+            }
+            int frame_index = -1;
+            if(args.size() < 1) {
+                frame_index = (int)this->_edit_frame;
+            } else {
+                if(args[0].type() != message_type::int_argument && args[0].type() != message_type::float_argument) {
+                       cwarn << args[0] << " bad number" << endl;
+                       return {};
+                   }
+                frame_index = args[0];
+            }
+            if(frame_index < 0 || frame_index > this->_frames.size() - 1) {
+                cwarn << "frame index out of range" << endl;
+                return {};
+            }
+            
+            jam::ilda::IldaFrame f = this->_frames[frame_index];
+            this->_frames.insert(this->_frames.begin() + frame_index, f);
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_updateOutlets();
+            
+            return {};
+        }
+        
+    };
+    
+    message<threadsafe::no> copyframe {
+        this, "copyframe", "Copy a frame. The message 'copyframe' followed by two arguments <i>source_index</i> <i>destination_index</i> copies a frame from <i>source_index</i> to <i>destination_index</i>",
+        MIN_FUNCTION {
+            if(this->_frames.size() == 0) {
+                return {};
+            }
+            if(args.size() < 2 ) {
+                return {};
+            }
+            if(args[0].type() != message_type::int_argument && args[0].type() != message_type::float_argument) {
+                cwarn << args[0] << " bad number" << endl;
+                return {};
+            }
+            if(args[1].type() != message_type::int_argument && args[1].type() != message_type::float_argument) {
+                cwarn << args[1] << " bad number" << endl;
+                return {};
+            }
+            
+            
+            int source_index = args[0];
+            int dest_index = args[1];
+            
+            if(source_index < 0 || source_index > this->_frames.size() - 1 ) {
+                cwarn << "source_index out of range" << endl;
+                return {};
+            }
+            
+            if(dest_index < 0) {
+                cwarn << "destination_index out of range" << endl;
+                return {};
+            }
+    
+            
+            jam::ilda::IldaFrame f = this->_frames[source_index];
+            if(dest_index >= this->_frames.size()) {
+                this->_frames.push_back(f);
+            } else {
+                this->_frames.insert(this->_frames.begin() + dest_index, f);
+            }
+            
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_updateOutlets();
             return {};
         }
     };
@@ -709,7 +787,7 @@ public:
     };
     
     message<threadsafe::no>svg {
-        this, "svg", "Parse a SVG file and append as new frame",
+        this, "svg", "Parse a SVG file into the current edit frame.",
         MIN_FUNCTION {
             if(this->_getParsingState()) {
                 cwarn << "file loading already in progress" << endl;
@@ -1184,7 +1262,7 @@ public:
     };
     
     message<threadsafe::no>ilda {
-        this, "ilda", "Reference to am ILDA file loaded by jam.ilda.file. The frames from the file will be appended.",
+        this, "ilda", "Reference to am ILDA file loaded by [jam.ilda.file]. The frames from the file will be appended. When imported frames use indexed colors, they are converted to true color mode",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message 'ilda'" << endl;
@@ -1272,52 +1350,80 @@ public:
             atoms msg_atoms;
             queued_message_t msg;
             
+            jam::ilda::ParseResult result = jam::ilda::ParseResult::ERROR;
+            
             char                      filename[c74::max::MAX_PATH_CHARS] = {0};
             short                     path = 0;
             c74::max::t_fourcc        types[1] = {'ILDA'};
             c74::max::t_fourcc        outtype = 0;
             c74::max::t_max_err       err;
-            c74::max:: t_filehandle fh;
+            c74::max:: t_filehandle   fh;
             
-            
-            std::vector<unsigned char> file_bytes;
-            jam::ilda::ParseResult result = this->_fileProcessor.parseFramesToFileData(file_bytes, this->_frames);
-            if(result == jam::ilda::ParseResult::SUCCESS) {
+            if(args.size() > 0) {
+                // some basic sanity checks
+                std::string input_filename = args[0];
+                // check if it ends with .ild
+                std::string suffix = ".ild";
+                bool has_suffix;
+                if(input_filename.length() < suffix.length()) {
+                    has_suffix = false;
+                } else {
+                    has_suffix = (0 == input_filename.compare(input_filename.length() - suffix.length(), suffix.length(), suffix));
+                }
+                 
+                if(!has_suffix) {
+                    input_filename += suffix;
+                }
+                if(input_filename.size() > c74::max::MAX_PATH_CHARS) {
+                    cwarn << "invalid filename" << endl;
+                    msg_atoms.clear();
+                    msg_atoms.push_back("export");
+                    msg_atoms.push_back(input_filename);
+                    msg_atoms.push_back(0);
+                    msg.set(&o_file_result, msg_atoms);
+                    msg.send(this);
+                    return {};
+                }
+                
+                strcpy(filename, input_filename.c_str());
+            } else {
                 c74::max::saveas_promptset("Export as file...");
                 err = c74::max::saveasdialog_extended(filename, &path, &outtype, types, 1);
                 if (err) {       // User Cancelled
                     return {};
                 }
-                    // First: Create File
-                err = c74::max::path_createsysfile(filename, path, 'ILDA', &fh);
-                if(err == c74::max::MAX_ERR_NONE) {
-                    unsigned long byte_count = file_bytes.size();
-                        // Second: Write File
-                    unsigned char *raw_data = reinterpret_cast<unsigned char *>(malloc(file_bytes.size() * sizeof(unsigned char)));
-                    
-                    for(unsigned long i = 0; i < byte_count; i++) {
-                        raw_data[i] = file_bytes[i];
-                    }
-                    
-                    err = c74::max::sysfile_write(fh, &byte_count ,raw_data);
-                        // Third: Close File
-                    c74::max::sysfile_seteof(fh, byte_count);
-                    c74::max::sysfile_close(fh);
-                    free(raw_data);
-                    if(err != c74::max::MAX_ERR_NONE) {
-                        result = jam::ilda::ParseResult::ERROR;
-                    }
-                } else {
-                    result = jam::ilda::ParseResult::ERROR;
+            }
+            
+                // First: Create File
+            err = c74::max::path_createsysfile(filename, path, 'ILDA', &fh);
+            
+            if(err == c74::max::MAX_ERR_NONE) {
+                result = jam::ilda::ParseResult::SUCCESS;
+                std::vector<unsigned char> file_bytes;
+                result = this->_fileProcessor.parseFramesToFileData(file_bytes, this->_frames);
+                unsigned long byte_count = file_bytes.size();
+                    // Second: Write File
+                unsigned char *raw_data = reinterpret_cast<unsigned char *>(malloc(file_bytes.size() * sizeof(unsigned char)));
+                
+                for(unsigned long i = 0; i < byte_count; i++) {
+                    raw_data[i] = file_bytes[i];
                 }
                 
+                err = c74::max::sysfile_write(fh, &byte_count ,raw_data);
+                    // Third: Close File
+                c74::max::sysfile_seteof(fh, byte_count);
+                c74::max::sysfile_close(fh);
+                free(raw_data);
+                if(err != c74::max::MAX_ERR_NONE) {
+                    result = jam::ilda::ParseResult::ERROR;
+                }
             } else {
                 result = jam::ilda::ParseResult::ERROR;
             }
             
             msg_atoms.clear();
             msg_atoms.push_back("export");
-            msg_atoms.push_back("---.ild");
+            msg_atoms.push_back(filename);
             msg_atoms.push_back(result == jam::ilda::ParseResult::SUCCESS);
             msg.set(&o_file_result, msg_atoms);
             msg.send(this);
