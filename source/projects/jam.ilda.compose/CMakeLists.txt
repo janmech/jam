@@ -16,9 +16,15 @@ include_directories(
 	"${C74_INCLUDES}"
 )
 
-
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
+    ./jam.shape.cpp
+    ../jam.helper/attribute_args_helper.cpp
+    ../jam.ilda_common/ilda_data_record.cpp
+    ../jam.ilda_common/ilda_file_processor.cpp
+    ../jam.ilda_common/ilda_frame.cpp
+    ../jam.ilda_common/ilda_header.cpp
+    ../jam.ilda_common/ilda_colors.cpp
 )
 
 

@@ -5,19 +5,22 @@
     //  Created by Jan Mech on 9/4/25.
     //
 
-#ifndef jam_ilda_hpp
-#define jam_ilda_hpp
+#ifndef jam_shape_hpp
+#define jam_shape_hpp
 
 #include <vector>
 #include <cmath>
 #include <string>
 #include <cstdio>
+#include "c74_min_api.h"
+
+using number = c74::min::number;
 
 #ifndef PI
 #define PI 3.14159265358979323846
 #endif
 
-namespace jam::svg {
+namespace jam {
     
     struct Point2D {
         double x, y;
@@ -43,11 +46,11 @@ namespace jam::svg {
         
         std::string name;
         
-        float _vecScalarProduct(const Point2D& a, const Point2D& b);
+        number _vecScalarProduct(const Point2D& a, const Point2D& b);
         
-        float _vecLength(const Point2D& v);
+        number _vecLength(const Point2D& v);
         
-        float _vecAngle(const Point2D& a, const Point2D& b);
+        number _vecAngle(const Point2D& a, const Point2D& b);
         
         
     public:
@@ -73,7 +76,7 @@ namespace jam::svg {
         void setColor(RGBColor color);
         
             //// Thin out points to simplify the shape for better performace. Desctructive
-        void thinShape(float angleThresholdRadians = 0.01f);
+        void thinShape(number angleThresholdRadians = 0.01f);
         
     
     };

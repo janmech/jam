@@ -19,6 +19,26 @@ include_directories(
 
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
+    ../jam.helper/attribute_args_helper.cpp
+    ./jam.helios.device_manager.cpp
+    ./helios-sdk/cpp/HeliosDac.cpp
+    ./helios-sdk/cpp/shared_library/HeliosDacAPI.cpp
+    ./libusb/sync.c
+    ./helios-sdk/cpp/idn/idn.cpp
+    ./libusb/io.c
+    ./libusb/strerror.c
+    ./libusb/descriptor.c
+    ./libusb/os/darwin_usb.c
+    ./libusb/hotplug.c
+    ./helios-sdk/cpp/idn/idnServerList.cpp
+    ./helios-sdk/cpp/idn/plt-posix.cpp
+    ./libusb/os/threads_posix.c
+    ./libusb/os/events_posix.c
+    ./libusb/core.c
+    
+    
+    
+        
 )
 
 

@@ -14,7 +14,7 @@
 #include <queue>
 #include <string>
 #include "c74_min.h"
-#include "jam.svg.shape.hpp"
+#include "jam.shape.hpp"
 #include "../jam.helper/attribute_args_helper.hpp"
 #include "../jam.ilda_common/ilda_frame.hpp"
 #include "../jam.ilda_common/ilda_header.hpp"
@@ -31,12 +31,12 @@
 
 
 using namespace c74::min;
-using Point2D = jam::svg::Point2D;
-using VecPoint2D = std::vector<jam::svg::Point2D>;
+using Point2D = jam::Point2D;
+using VecPoint2D = std::vector<jam::Point2D>;
 
 
 
-class ildasvg : public object<ildasvg>
+class ildacompose : public object<ildacompose>
 {
 private:
     std::string _instance_id = "";                  // Unique ID for each object instance.
@@ -50,7 +50,7 @@ private:
     c74::max::t_filehandle file_handle;             // File handle for importing SVG files.
     char filename[c74::max::MAX_PATH_CHARS] = {0};  // File name of ILDA file toi be imported
     
-    std::vector<jam::svg::Shape> _shapes;           // Vector of Shapes from parsed SVG file
+    std::vector<jam::Shape> _shapes;           // Vector of Shapes from parsed SVG file
     
     std::string _company_name = "NOT_SET";          // Company name set to frame headers
     
@@ -74,7 +74,7 @@ private:
             this->msg_atoms.clear();
             this->msg_atoms = ma;
         }
-        void send(ildasvg* me) {
+        void send(ildacompose* me) {
             me->_enqueue_msg_to_max(*this);
             me->deliverer_to_max.delay(0);
         }
@@ -480,7 +480,7 @@ private:
     
 public:
     
-    ildasvg(const atoms& args = {}) {
+    ildacompose(const atoms& args = {}) {
         if(!dummy()) {
             struct timespec ts;
             clock_gettime(CLOCK_REALTIME, &ts);
@@ -497,7 +497,7 @@ public:
         }
     };
     
-    ~ildasvg() {};
+    ~ildacompose() {};
     
     MIN_DESCRIPTION     { "Parse SVG file to ILDA file format." };
     MIN_TAGS            { "ILDA, laser tools, utilities" };
@@ -935,7 +935,7 @@ public:
                 // parse SVG data into shapes
             _shapes.clear();
             for (NSVGshape* shape = image->shapes; shape != nullptr; shape = shape->next) {
-                jam::svg::Shape s("SVGPath");
+                jam::Shape s("SVGPath");
                 
                 if(shape->stroke.type == NSVG_PAINT_COLOR) {
                         // AAAAAAAA BBBBBBB  GGGGGGGG RRRRRRRR
@@ -949,7 +949,7 @@ public:
                     if(r + g + g == 0) {
                         r = g = b = 255;
                     }
-                    jam::svg::RGBColor color;
+                    jam::RGBColor color;
                     color.r = static_cast<uint8_t>(r);
                     color.g = static_cast<uint8_t>(g);
                     color.b = static_cast<uint8_t>(b);
@@ -958,13 +958,13 @@ public:
                 
                 for (NSVGpath* path = shape->paths; path != nullptr; path = path->next) {
                     for (int i = 0; i < path->npts; ++i) {
-                        float x = path->pts[i * 2];       // x coordinate
-                        float y = path->pts[i * 2 + 1];   // y coordinate
+                        number x = path->pts[i * 2];       // x coordinate
+                        number y = path->pts[i * 2 + 1];   // y coordinate
                                                           // Y-Axis Flip
                         y = image->height - y;
                             // Normalize to [-1, 1]
-                        float nx = (x / image->width) * 2.0f - 1.0f;
-                        float ny = (y / image->height) * 2.0f - 1.0f;
+                        number nx = (x / image->width) * 2.0f - 1.0f;
+                        number ny = (y / image->height) * 2.0f - 1.0f;
                         s.addPoint({nx, ny});
                     }
                     
@@ -1023,18 +1023,18 @@ public:
             if (this->_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
-            double x_start = args[0];
-            double y_start = args[1];
-            double x_end   = args[2];
-            double y_end   = args[3];
+            number x_start = args[0];
+            number y_start = args[1];
+            number x_end   = args[2];
+            number y_end   = args[3];
             
             uint8_t r = 255;
             uint8_t g = 255;
             uint8_t b = 255;
             if(args.size() >= 7) {
-                r = uint8_t(std::clamp((double)args[4], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((double)args[6], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((double)args[6], 0., 1.) * 255.);
+                r = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
+                g = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
+                b = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
             }
                 // move to staring point
             jam::ilda::IldaDataRecord r_start;
@@ -1076,26 +1076,26 @@ public:
             }
             
                 // center point
-            Point2D c = {(double)args[0], (double) args[1]};
+            Point2D c = {(number)args[0], (number) args[1]};
             
                 // radius x/y
-            Point2D radius = {(double)args[2], (double)args[2]};
+            Point2D radius = {(number)args[2], (number)args[2]};
             
             
             uint8_t r = 255;
             uint8_t g = 255;
             uint8_t b = 255;
             if(args.size() >= 6) {
-                r = uint8_t(std::clamp((double)args[3], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((double)args[4], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((double)args[5], 0., 1.) * 255.);
+                r = uint8_t(std::clamp((number)args[3], 0., 1.) * 255.);
+                g = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
+                b = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
             }
             
-            double t_start = 0;
-            double t_end = 360;
+            number t_start = 0;
+            number t_end = 360;
             if(args.size() >= 8) {
-                t_start = (double)args[6];
-                t_end = (double)args[7];
+                t_start = (number)args[6];
+                t_end = (number)args[7];
             }
             
             int seg = 50;
@@ -1128,26 +1128,26 @@ public:
             }
             
                 // center point
-            Point2D c = {(double)args[0], (double) args[1]};
+            Point2D c = {(number)args[0], (number) args[1]};
             
                 // radius x/y
-            Point2D radius = {(double)args[2], (double)args[3]};
+            Point2D radius = {(number)args[2], (number)args[3]};
             
             
             uint8_t r = 255;
             uint8_t g = 255;
             uint8_t b = 255;
             if(args.size() >= 7) {
-                r = uint8_t(std::clamp((double)args[4], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((double)args[5], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((double)args[6], 0., 1.) * 255.);
+                r = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
+                g = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
+                b = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
             }
             
-            double t_start = 0;
-            double t_end   = 360;
+            number t_start = 0;
+            number t_end   = 360;
             if(args.size() >= 9) {
-                t_start = (double)args[7];
-                t_end = (double)args[8];
+                t_start = (number)args[7];
+                t_end = (number)args[8];
             }
             
             int seg = 50;
@@ -1178,23 +1178,23 @@ public:
                 this->_appendEmptyFrame();
             }
             
-            double tl_x = args[0];
-            double tl_y = args[1];
-            double br_x = args[2];
-            double br_y = args[3];
+            number tl_x = args[0];
+            number tl_y = args[1];
+            number br_x = args[2];
+            number br_y = args[3];
             
             uint8_t r = 255;
             uint8_t g = 255;
             uint8_t b = 255;
             
             if(args.size() >= 7) {
-                r = uint8_t(std::clamp((double)args[4], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((double)args[5], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((double)args[6], 0., 1.) * 255.);
+                r = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
+                g = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
+                b = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
             }
-            double border_radius = 0.;
+            number border_radius = 0.;
             if(args.size() >= 8) {
-                border_radius = std::clamp((double)args[7], 0., 1.);
+                border_radius = std::clamp((number)args[7], 0., 1.);
             }
             int seg = 10;
             if(args.size() >= 9) {
@@ -1225,24 +1225,24 @@ public:
                 this->_appendEmptyFrame();
             }
                 // start point
-            Point2D start = {(double)args[0], (double) args[1]};
+            Point2D start = {(number)args[0], (number) args[1]};
             
                 // control point 1
-            Point2D c1 = {(double)args[2], (double)args[3]};
+            Point2D c1 = {(number)args[2], (number)args[3]};
             
                 // control point 2
-            Point2D c2 = {(double)args[4], (double)args[5]};
+            Point2D c2 = {(number)args[4], (number)args[5]};
             
                 // end point
-            Point2D end = {(double)args[6], (double)args[7]};
+            Point2D end = {(number)args[6], (number)args[7]};
             
             uint8_t r = 255;
             uint8_t g = 255;
             uint8_t b = 255;
             if(args.size() >= 11) {
-                r = uint8_t(std::clamp((double)args[8], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((double)args[9], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((double)args[10], 0., 1.) * 255.);
+                r = uint8_t(std::clamp((number)args[8], 0., 1.) * 255.);
+                g = uint8_t(std::clamp((number)args[9], 0., 1.) * 255.);
+                b = uint8_t(std::clamp((number)args[10], 0., 1.) * 255.);
             }
             
             int seg = 50;
@@ -1281,8 +1281,8 @@ public:
         }
     };
     
-    message<threadsafe::no> reverse {
-        this, "reverse", "Reverse the order of the frames",
+    message<threadsafe::no> reverseframes {
+        this, "reverseframes", "Reverse the order of the frames",
         MIN_FUNCTION {
             std::reverse(this->_frames.begin(), this->_frames.end());
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
@@ -1302,11 +1302,11 @@ public:
             if (this->_frames.size() == 0) {
                 return {};
             }
-            double angle = args[0];
+            number angle = args[0];
             Point2D c = {0., 0.};
             if(args.size() >= 3) {
-                c.x = this->_deNormalizePosition((double)args[1]);
-                c.y = this->_deNormalizePosition((double)args[2]);
+                c.x = this->_deNormalizePosition((number)args[1]);
+                c.y = this->_deNormalizePosition((number)args[2]);
             }
             this->_rotateFrame(this->_frames[this->_edit_frame], c, angle);
             this->_updateFrameHeaders();
@@ -1317,11 +1317,11 @@ public:
         }
     };
     
-    message<threadsafe::no>scale {
-        this, "scale", "Scale a frame. If one argument follows the message x and y axis are scaled by that value. If 2 arguments are present the first argument specifies the scaling along the x-axis, the second along the y-axis.<br/>Note: All frame modifications are done destructively, meaning information lost e.g. by scaling to 0 cannot be recovered by scaling up again.",
+    message<threadsafe::no>scaleframe {
+        this, "scaleframe", "Scale a frame. If one argument follows the message x and y axis are scaled by that value. If 2 arguments are present the first argument specifies the scaling along the x-axis, the second along the y-axis.<br/>Note: All frame modifications are done destructively, meaning information lost e.g. by scaling to 0 cannot be recovered by scaling up again.",
         MIN_FUNCTION {
             if(args.size() < 1) {
-                cwarn << "missing argument for message 'scale'" << endl;
+                cwarn << "missing argument for message 'scaleframe'" << endl;
                 return {};
             }
             if (this->_frames.size() == 0) {
@@ -1445,6 +1445,6 @@ public:
 };
 
 
-MIN_EXTERNAL(ildasvg);
+MIN_EXTERNAL(ildacompose);
 
 

@@ -19,6 +19,8 @@ include_directories(
 
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
+    ../jam.device_manager/jam.dmxusbpro.dmx_device.cpp
+    ../jam.helper/attribute_args_helper.cpp
 )
 
 

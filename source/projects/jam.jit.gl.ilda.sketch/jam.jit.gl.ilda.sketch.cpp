@@ -29,7 +29,7 @@ using namespace c74::min;
 using fvec = std::vector<double>;
 using ivec = std::vector<int>;
 
-class ildaframe : public object<ildaframe>
+class ildasketch : public object<ildasketch>
 {
     
 private:
@@ -70,7 +70,7 @@ protected:
             this->msg_atoms.clear();
             this->msg_atoms = ma;
         }
-        void send(ildaframe* me) {
+        void send(ildasketch* me) {
             me->_enqueue_msg_to_max(*this);
             me->deliverer_to_max.delay(0);
         }
@@ -273,7 +273,7 @@ protected:
     
 public:
     
-    ildaframe(const atoms& args = {}) {
+    ildasketch(const atoms& args = {}) {
         if (args.size() > 0) {
             cwarn << "Extra argumnt for oject jam.jit.gl.frame" << endl;
         }
@@ -281,7 +281,7 @@ public:
         this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
     }
     
-    ~ildaframe() {
+    ~ildasketch() {
         c74::max::freeobject(this->_getSketchObject());
         
     }
@@ -1959,4 +1959,4 @@ public:
 };
 
 
-MIN_EXTERNAL(ildaframe);
+MIN_EXTERNAL(ildasketch);
