@@ -26,7 +26,7 @@
 
 
 using namespace c74::min;
-using fvec = std::vector<double>;
+using fvec = std::vector<number>;
 using ivec = std::vector<int>;
 
 class ildasketch : public object<ildasketch>
@@ -133,11 +133,11 @@ protected:
     
     bool _override_opacity = false;
     
-    double _opacity = false;
+    number _opacity = false;
     
     bool _monochrome = false;
     
-    void _setCustomColorByIndex(size_t color_index, double r, double g, double b, double a) {
+    void _setCustomColorByIndex(size_t color_index, number r, number g, number b, number a) {
         int offset = (int)color_index * 4;
         this->_custom_color_pallet[offset]   = r;
         this->_custom_color_pallet[offset+1] = g;
@@ -369,8 +369,8 @@ public:
         this, "blankingcolor", { 0.31, 0.31, 0.31, 1.},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(0,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(0,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             this->_blanking_color[0] = cleaned_args[0];
             this->_blanking_color[1] = cleaned_args[1];
             this->_blanking_color[2] = cleaned_args[2];
@@ -424,15 +424,15 @@ public:
         category {"Drawing"}
     };
     
-    attribute<double> opacity {
+    attribute<number> opacity {
         this, "opacity", 1.,
         title {"Opacity"},
         description {"Opacity value applied when 'overrideopacity' is set to 1."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
-                jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 1, 1.);
-                double opac_val = cleaned_args[0];
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 1.);
+                number opac_val = cleaned_args[0];
                 opac_val = opac_val > 1. ? 1. : opac_val;
                 opac_val = opac_val < 0. ? 0. : opac_val;
                 cleaned_args[0] = opac_val;
@@ -487,8 +487,8 @@ public:
         this, "monochromecolor", { 1., 1., 1., 1.},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(0,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(0,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             this->_monochrome_color[0] = cleaned_args[0];
             this->_monochrome_color[1] = cleaned_args[1];
             this->_monochrome_color[2] = cleaned_args[2];
@@ -753,8 +753,8 @@ public:
         setter { MIN_FUNCTION {
             atoms cleaned_args;
            
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(0,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(0,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 00"},
@@ -767,8 +767,8 @@ public:
         this, "customcolor_1", { 1.0 , 0.0627451 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(1,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(1,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 01"},
@@ -781,8 +781,8 @@ public:
         this, "customcolor_2", { 1.0 , 0.1254902 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(2,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(2,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 02"},
@@ -795,8 +795,8 @@ public:
         this, "customcolor_3", { 1.0 , 0.18823529 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(3,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(3,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 03"},
@@ -809,8 +809,8 @@ public:
         this, "customcolor_4", {1.0 , 0.25098039 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(4,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(4,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 04"},
@@ -823,8 +823,8 @@ public:
         this, "customcolor_5", { 1.0 , 0.31372549 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(5,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(5,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 05"},
@@ -837,8 +837,8 @@ public:
         this, "customcolor_6", { 1.0 , 0.37647059 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(6,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(6,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 06"},
@@ -851,8 +851,8 @@ public:
         this, "customcolor_7", { 1.0 , 0.43921569 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(7,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(7,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 07"},
@@ -865,8 +865,8 @@ public:
         this, "customcolor_8", {1.0 , 0.50196078 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(8,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(8,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 08"},
@@ -879,8 +879,8 @@ public:
         this, "customcolor_9", { 1.0 , 0.56470588 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(9,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(9,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 09"},
@@ -893,8 +893,8 @@ public:
         this, "customcolor_10", { 1.0 , 0.62745098 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(10,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(10,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 10"},
@@ -907,8 +907,8 @@ public:
         this, "customcolor_11", { 1.0 , 0.69019608 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(11,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(11,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 11"},
@@ -921,8 +921,8 @@ public:
         this, "customcolor_12", { 1.0 , 0.75294118 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(12,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(12,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 12"},
@@ -935,8 +935,8 @@ public:
         this, "customcolor_13", { 1.0 , 0.81568627 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(13,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(13,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 13"},
@@ -949,8 +949,8 @@ public:
         this, "customcolor_14", { 1.0 , 0.87843137 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(14,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(14,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 14"},
@@ -963,8 +963,8 @@ public:
         this, "customcolor_15", { 1.0 , 0.94117647 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(15,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(15,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 15"},
@@ -977,8 +977,8 @@ public:
         this, "customcolor_16", { 1.0 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(16,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(16,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 16"},
@@ -991,8 +991,8 @@ public:
         this, "customcolor_17", {0.87843137 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(17,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(17,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 17"},
@@ -1005,8 +1005,8 @@ public:
         this, "customcolor_18", {0.75294118 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(18,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(18,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 18"},
@@ -1019,8 +1019,8 @@ public:
         this, "customcolor_19", { 0.62745098 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(19,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(19,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 19"},
@@ -1033,8 +1033,8 @@ public:
         this, "customcolor_20", { 0.50196078 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(20,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(20,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 20"},
@@ -1047,8 +1047,8 @@ public:
         this, "customcolor_21", { 0.37647059 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(21,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(21,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 21"},
@@ -1061,8 +1061,8 @@ public:
         this, "customcolor_22", { 0.25098039 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(22,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(22,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 22"},
@@ -1075,8 +1075,8 @@ public:
         this, "customcolor_23", { 0.1254902 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(23,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(23,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 23"},
@@ -1089,8 +1089,8 @@ public:
         this, "customcolor_24", { 0.0 , 1.0 , 0.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(24,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(24,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 24"},
@@ -1103,8 +1103,8 @@ public:
         this, "customcolor_25", { 0.0 , 1.0 , 0.14117647 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(25,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(25,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 25"},
@@ -1117,8 +1117,8 @@ public:
         this, "customcolor_26", { 0.0 , 1.0 , 0.28627451 , 1.00},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(26,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(26,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 26"},
@@ -1131,8 +1131,8 @@ public:
         this, "customcolor_27", { 0.0 , 1.0 , 0.42745098 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(27,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(27,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 27"},
@@ -1145,8 +1145,8 @@ public:
         this, "customcolor_28", { 0.0 , 1.0 , 0.57254902 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(28,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(28,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 28"},
@@ -1159,8 +1159,8 @@ public:
         this, "customcolor_29", { 0.0 , 1.0 , 0.71372549 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(29,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(29,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 29"},
@@ -1173,8 +1173,8 @@ public:
         this, "customcolor_30", {0.0 , 1.0 , 0.85882353 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(30,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(30,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 30"},
@@ -1187,8 +1187,8 @@ public:
         this, "customcolor_31", { 0.0 , 1.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(31,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(31,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 31"},
@@ -1201,8 +1201,8 @@ public:
         this, "customcolor_32", { 0.0 , 0.89019608 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(32,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(32,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 32"},
@@ -1215,8 +1215,8 @@ public:
         this, "customcolor_33", { 0.0 , 0.77647059 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(33,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(33,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 33"},
@@ -1229,8 +1229,8 @@ public:
         this, "customcolor_34", { 0.0 , 0.66666667 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(34,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(34,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 34"},
@@ -1243,8 +1243,8 @@ public:
         this, "customcolor_35", { 0.0 , 0.55686275 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(35,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(35,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 35"},
@@ -1257,8 +1257,8 @@ public:
         this, "customcolor_36", { 0.0 , 0.44313725 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(36,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(36,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 36"},
@@ -1271,8 +1271,8 @@ public:
         this, "customcolor_37", { 0.0 , 0.33333333 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(37,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(37,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 37"},
@@ -1285,8 +1285,8 @@ public:
         this, "customcolor_38", { 0.0 , 0.21960784 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(38,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(38,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 38"},
@@ -1299,8 +1299,8 @@ public:
         this, "customcolor_39", { 0.0 , 0.10980392 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(39,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(39,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 39"},
@@ -1313,8 +1313,8 @@ public:
         this, "customcolor_40", { 0.0 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(40,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(40,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 40"},
@@ -1327,8 +1327,8 @@ public:
         this, "customcolor_41", { 0.1254902 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(41,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(41,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 41"},
@@ -1341,8 +1341,8 @@ public:
         this, "customcolor_42", {0.25098039 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(42,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(42,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 42"},
@@ -1355,8 +1355,8 @@ public:
         this, "customcolor_43", { 0.37647059 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(43,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(43,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 43"},
@@ -1369,8 +1369,8 @@ public:
         this, "customcolor_44", { 0.50196078 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(44,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(44,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 44"},
@@ -1383,8 +1383,8 @@ public:
         this, "customcolor_45", { 0.62745098 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(45,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(45,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 45"},
@@ -1397,8 +1397,8 @@ public:
         this, "customcolor_46", { 0.75294118 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(46,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(46,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 46"},
@@ -1411,8 +1411,8 @@ public:
         this, "customcolor_47", { 0.87843137 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(47,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(47,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 47"},
@@ -1425,8 +1425,8 @@ public:
         this, "customcolor_48", {1.0 , 0.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(48,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(48,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 48"},
@@ -1439,8 +1439,8 @@ public:
         this, "customcolor_49", { 1.0 , 0.1254902 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(49,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(49,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 49"},
@@ -1453,8 +1453,8 @@ public:
         this, "customcolor_50", { 1.0 , 0.25098039 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(50,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(50,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 50"},
@@ -1467,8 +1467,8 @@ public:
         this, "customcolor_51", { 1.0 , 0.37647059 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(51,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(51,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 51"},
@@ -1481,8 +1481,8 @@ public:
         this, "customcolor_52", { 1.0 , 0.50196078 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(52,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(52,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 52"},
@@ -1495,8 +1495,8 @@ public:
         this, "customcolor_53", {1.0 , 0.62745098 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(53,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(53,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 53"},
@@ -1509,8 +1509,8 @@ public:
         this, "customcolor_54", {1.0 , 0.75294118 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(54,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(54,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 54"},
@@ -1523,8 +1523,8 @@ public:
         this, "customcolor_55", { 1.0 , 0.87843137 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(55,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(55,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 55"},
@@ -1537,8 +1537,8 @@ public:
         this, "customcolor_56", { 1.0 , 1.0 , 1.0 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(56,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(56,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 56"},
@@ -1551,8 +1551,8 @@ public:
         this, "customcolor_57", { 1.0 , 0.87843137 , 0.87843137 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(57,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(57,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 57"},
@@ -1565,8 +1565,8 @@ public:
         this, "customcolor_58", { 1.0 , 0.75294118 , 0.75294118 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(58,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(58,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 58"},
@@ -1579,8 +1579,8 @@ public:
         this, "customcolor_59", { 1.0 , 0.62745098 , 0.62745098 , 1.0 },
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(59,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(59,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 59"},
@@ -1593,8 +1593,8 @@ public:
         this, "customcolor_60", { 1.0 , 0.50196078 , 0.50196078 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(60,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(60,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 60"},
@@ -1607,8 +1607,8 @@ public:
         this, "customcolor_61", { 1.0 , 0.37647059 , 0.37647059 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(61,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(61,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 61"},
@@ -1621,8 +1621,8 @@ public:
         this, "customcolor_62", { 1.0 , 0.25098039 , 0.25098039 , 1.0},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(62,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(62,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 62"},
@@ -1635,8 +1635,8 @@ public:
         this, "customcolor_63", { 1.0 , 0.1254902 , 0.1254902 , 1.00},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<double>(args, &cleaned_args, 4, 1.);
-            this->_setCustomColorByIndex(63,(double)cleaned_args[0],(double)cleaned_args[1], (double)cleaned_args[2], (double)cleaned_args[3]);
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            this->_setCustomColorByIndex(63,(number)cleaned_args[0],(number)cleaned_args[1], (number)cleaned_args[2], (number)cleaned_args[3]);
             return cleaned_args;
         }},
         title {"Custom Color 63"},
@@ -1743,7 +1743,7 @@ public:
                 bool blanking = data_record.getBlanking();
                 
                 if(!blanking  || this->_drawblanking) { // Do we need a color to draw?
-                    double opacity = this->_override_opacity ? this->_opacity : 1.;
+                    number opacity = this->_override_opacity ? this->_opacity : 1.;
                     if(this->_monochrome) { // use monochrome color
                         args_color_values[0] = this->_monochrome_color[0];
                         args_color_values[1] = this->_monochrome_color[1];

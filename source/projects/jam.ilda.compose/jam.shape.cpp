@@ -1,7 +1,3 @@
-    //
-    //  jam.ilda.cpp
-    //  jam.ilda.svg
-    //
     //  Created by Jan Mech on 9/4/25.
     //
 

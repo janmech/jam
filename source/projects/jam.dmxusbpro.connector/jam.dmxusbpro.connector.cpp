@@ -1,4 +1,4 @@
-#include "jam.dmxusbpro.dmx_device.hpp"
+#include "jam.dmxusbpro.connector.hpp"
 
 
 std::vector<std::string> & Connector::getDevicePaths() {

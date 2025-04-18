@@ -3,6 +3,8 @@
 
 cmake_minimum_required(VERSION 3.0)
 
+set(C74_BUILD_MAX_EXTENSION 1)
+
 set(C74_MIN_API_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../min-api)
 include(${C74_MIN_API_DIR}/script/min-pretarget.cmake)
 
@@ -19,8 +21,9 @@ include_directories(
 
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
+    ${PROJECT_NAME}.hpp
     ../jam.dmxusbpro.connector/jam.dmxusbpro.connector.cpp
-    ../jam.helper/attribute_args_helper.cpp
+    ../jam.dmxusbpro.connector/jam.dmxusbpro.connector.hpp
 )
 
 

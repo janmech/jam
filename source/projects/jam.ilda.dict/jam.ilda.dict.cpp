@@ -26,8 +26,6 @@
 
 
 using namespace c74::min;
-using fvec = std::vector<double>;
-using ivec = std::vector<int>;
 
 class ildadict : public object<ildadict>
 {
@@ -104,7 +102,7 @@ public:
     MIN_DESCRIPTION     { "Parse ILDA files to dictionary." };
     MIN_TAGS            { "ILDA, laser tools, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.frame"};
+    MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.compose"};
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
     

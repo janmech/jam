@@ -23,7 +23,7 @@ using number = c74::min::number;
 namespace jam {
     
     struct Point2D {
-        double x, y;
+        number x, y;
     };
     
         // Mathematically both are the same (a struct with an x and value). For better code readability we use DirectionVector instead of Point2D

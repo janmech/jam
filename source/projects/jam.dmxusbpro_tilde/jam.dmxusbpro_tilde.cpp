@@ -11,7 +11,7 @@
 #include <queue>
 #include <thread>
 #include <vector>
-#include "../jam.device_manager/jam.dmxusbpro.dmx_device.hpp"
+#include "../jam.dmxusbpro.connector/jam.dmxusbpro.connector.hpp"
 #include "c74_min.h"
 
 #define OBJECT_MESSAGE_PREFIX              "jam.dmxusbpro~ • "

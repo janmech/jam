@@ -22,8 +22,8 @@ void ext_main(void *r)
     t_class *c;
     c = class_new("jam.ilda.manager", (method)jam_im_new, (method)NULL, sizeof(t_jam_im), 0L, 0);
     class_addmethod(c, (method)jam_im_get_struct, "get_struct", 0);
-    class_register(CLASS_NOBOX, c);
     s_jam_im_class = c;
+    class_register(CLASS_NOBOX, c);
 }
 
 void *jam_im_new(t_symbol *s, long argc, t_atom *argv)

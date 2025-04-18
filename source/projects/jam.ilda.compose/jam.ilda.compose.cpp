@@ -502,7 +502,8 @@ public:
     MIN_DESCRIPTION     { "Parse SVG file to ILDA file format." };
     MIN_TAGS            { "ILDA, laser tools, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.frame"};
+    MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.compose"};
+//    MIN_FLAGS           {behavior_flags::nobox};
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
     outlet<> o_file_reference   { this, "ilda file reference"  };
