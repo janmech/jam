@@ -22,7 +22,7 @@ void ext_main(void *r)
 {
     t_class *c;
     c = class_new("jam.dmxusbpro.manager", (method)jam_dmxdm_new, (method)NULL, sizeof(t_jam_dmxdm), 0L, 0);
-    class_addmethod(c, (method)jam_dmxdm_get_connector, "get_device_list", 0);
+    class_addmethod(c, (method)jam_dmxdm_get_connector, "get_connector", 0);
     s_jam_dmxdm_class = c;
     class_register(CLASS_NOBOX, c);
 }

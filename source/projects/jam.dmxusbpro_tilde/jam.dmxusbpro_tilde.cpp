@@ -39,7 +39,17 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
         fifo<atoms> _to_max_queue { 1000 };
         unsigned char _dmx_universe[512];
         unsigned char _serial_in_buffer[SERIAL_IN_BUFF_SIZE];
-        dict _connections { symbol("__jamproconnections__") }; // Workaround until I find a way to make the device manager global
+    
+        c74::max::t_object * _manager = nullptr;
+
+        Connector * _deviceConnector = nullptr;
+
+        Connector * _getConnector() {
+            if(this->_deviceConnector == nullptr) {
+                this->_deviceConnector = (Connector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
+            }
+            return this->_deviceConnector;
+        }
 
         void _enque_msg_to_max(const atoms &msg_to_max) {
             _enque_msg_lock.lock();
@@ -67,7 +77,10 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
         }
 
         void _closeDevice() {
-            if(Connector::get().isConnected(this->_getOpenDeviceName())) {
+            if(!this->initialized()) {
+                return;
+            }
+            if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
 
                 if(!keepsending) {
                     this->_messages_to_device_queue.push(std::vector<unsigned char> {
@@ -83,11 +96,9 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
 
                 this->_io_threads_continue = false;
 
-                if (Connector::get().closeSerialPort(this->_getOpenDeviceName()) != 0) {
+                if (this->_getConnector()->closeSerialPort(this->_getOpenDeviceName()) != 0) {
                     cerr << "Error closing serial port." << endl;
                 }
-
-                this->_connections[this->_open_device_name] = 0;
                 this->_open_device_name                     = "";
 
                 static_cast<void>(this->_messages_to_device_queue.empty());
@@ -105,9 +116,9 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
         void _sendThreadTask() {
             atoms to_max;
 
-            if(Connector::get().isConnected(this->_getOpenDeviceName())) {
+            if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                 // Test if the device is still connected
-                if (Connector::get().connectionState(this->_getOpenDeviceName()) != Connector::ConnectionState::OK) {
+                if (this->_getConnector()->connectionState(this->_getOpenDeviceName()) != Connector::ConnectionState::OK) {
                     return;
                 }
 
@@ -123,7 +134,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                         msg_buffer[i] = msg_bytes[i];
                     }
 
-                    std::size_t                success = write(Connector::get().getFd(this->_getOpenDeviceName()), msg_buffer, msg_size);
+                    std::size_t                success = write(this->_getConnector()->getFd(this->_getOpenDeviceName()), msg_buffer, msg_size);
 
                     if(success < 0) {
                         to_max.clear();
@@ -147,9 +158,9 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
             static s_chrono::time_point       response_paring_start    = s_chrono::steady_clock::now();
 
 
-            if(Connector::get().isConnected(this->_getOpenDeviceName())) {
+            if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                 // Test if the device conntion is healthy
-                int         connectionState = Connector::get().connectionState(this->_getOpenDeviceName());
+                int         connectionState = this->_getConnector()->connectionState(this->_getOpenDeviceName());
 
                 if ( connectionState != Connector::ConnectionState::OK) {
                     switch (connectionState) {
@@ -172,7 +183,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                 // Getting response
                 memset(_serial_in_buffer, 0, SERIAL_IN_BUFF_SIZE);
 
-                std::size_t byte_count = read(Connector::get().getFd(this->_getOpenDeviceName()), _serial_in_buffer, SERIAL_IN_BUFF_SIZE);
+                std::size_t byte_count = read(this->_getConnector()->getFd(this->_getOpenDeviceName()), _serial_in_buffer, SERIAL_IN_BUFF_SIZE);
 
                 if(is_parsing_response) {
                     // Fallback: timeout if response isn't received completly within 200ms
@@ -300,6 +311,11 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
 
         dmxusbpro_tilde(const atoms& args = {}) {
             memset(this->_dmx_universe, 0, 512);
+            
+            if(!dummy()) {
+                this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.dmxusbpro.manager"), 0, NULL);
+                this->_deviceConnector = (Connector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
+            }
 
             if (!args.empty()) {
 
@@ -395,13 +411,14 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
             range {9600, 256000},
             readonly {false},
             setter { MIN_FUNCTION {
-                         if(Connector::get().isConnected(this->_getOpenDeviceName())) {
-                             cerr << "baudrate has changed. closing the connection." << endl;
-                             this->_closeDevice();
-                         }
-
-                         return args;
-                     }
+                    if(this->initialized()) {
+                        if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
+                            cerr << "baudrate has changed. closing the connection." << endl;
+                            this->_closeDevice();
+                        }
+                    }
+                    return args;
+                }
             }
         };
 
@@ -443,17 +460,9 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                 std::string device_name = args[0];
 
                 if(this->_open_device_name != device_name) {
-                    try {
-                        atom connected  = this->_connections.at(device_name);
-                        int  conn_state = (int)connected;
-
-                        if(conn_state == 1) {
-                            cerr << "'" << device_name << "' already opened by another instance." << endl;
-                            return {};
-                        }
-                    } catch (std::runtime_error& e) {
-                        // the devices isn't opened and not registered
-                        this->_connections[device_name] = 0;
+                    if(this->_getConnector()->isConnected(device_name)) {
+                        cerr << "'" << device_name << "' already opened by another instance." << endl;
+                        return {};
                     }
                 }
 
@@ -461,7 +470,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                     cout << "opening " + device_name << endl;
                 }
 
-                if(!Connector::get().deviceExists(device_name)) {
+                if(!this->_getConnector()->deviceExists(device_name)) {
                     cerr << "specified port not available" << endl;
                     return {};
                 }
@@ -469,7 +478,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                 this->_closeDevice();
 
                 int         set_baudrate = baudrate;
-                int         open_success = Connector::get().openSerialPort(device_name, set_baudrate);
+                int         open_success = this->_getConnector()->openSerialPort(device_name, set_baudrate);
 
                 if(open_success == -1) {
                     cerr << "Error opening device" << endl;
@@ -482,7 +491,6 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                 }
 
                 this->_setOpenDeviceName(device_name);
-                this->_connections[symbol(device_name)] = 1;
                 atoms       connection_state;
                 connection_state.push_back(TO_OUTLET_2);
                 connection_state.push_back(1);
@@ -562,7 +570,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                 out_atoms.push_back("(Select Interface)");
                 output_3.send(out_atoms);
 
-                std::vector<std::string> device_names = Connector::get().getDeviceNames(verbose, true);
+                std::vector<std::string> device_names = this->_getConnector()->getDeviceNames(verbose, true);
 
                 for (auto& device_name : device_names) {
                     atoms device_list;
@@ -583,7 +591,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                     cwarn << "extra argument for message 'getparams'" << endl;
                 }
 
-                if(!Connector::get().isConnected(this->_getOpenDeviceName())) {
+                if(!this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                     if(verbose) {
                         cerr << "Can't get DMX parameters, not connected." << endl;
                     }
@@ -609,7 +617,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
                     cwarn << "extra argument for message 'getserial'" << endl;
                 }
 
-                if(!Connector::get().isConnected(this->_getOpenDeviceName())) {
+                if(!this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                     if(verbose) {
                         cerr << "Can't get serial number, not connected." << endl;
                     }

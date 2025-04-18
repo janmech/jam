@@ -36,7 +36,17 @@ class dmxusbpro : public object<dmxusbpro>
         unsigned char _dmx_universe[512];
         unsigned char _dmx_blackout[512];
         unsigned char _serial_in_buffer[SERIAL_IN_BUFF_SIZE];
-        dict _connections { symbol("__jamproconnections__") }; // Workaround until I find a way to make the device manager global
+    
+        c74::max::t_object * _manager = nullptr;
+    
+        Connector * _deviceConnector = nullptr;
+    
+        Connector * _getConnector() {
+            if(this->_deviceConnector == nullptr) {
+                this->_deviceConnector = (Connector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
+            }
+            return this->_deviceConnector;
+        }
 
         void _enqueue_msg_to_max(const atoms &msg_to_max) {
             _enqueue_msg_lock.lock();
@@ -64,7 +74,10 @@ class dmxusbpro : public object<dmxusbpro>
         }
 
         void _closeDevice() {
-            if(Connector::get().isConnected(this->_getOpenDeviceName())) {
+            if(!this->initialized()) {
+                return;
+            }
+            if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
 
                 if(!keepsending) {
                     this->_messages_to_device_queue.push(std::vector<unsigned char> {
@@ -80,11 +93,9 @@ class dmxusbpro : public object<dmxusbpro>
 
                 this->_io_threads_continue = false;
 
-                if (Connector::get().closeSerialPort(this->_getOpenDeviceName()) != 0) {
+                if (this->_getConnector()->closeSerialPort(this->_getOpenDeviceName()) != 0) {
                     cerr << "Error closing serial port." << endl;
                 }
-
-                this->_connections[this->_open_device_name] = 0;
                 this->_open_device_name                     = "";
                 static_cast<void>(this->_messages_to_device_queue.empty());
             }
@@ -100,9 +111,9 @@ class dmxusbpro : public object<dmxusbpro>
         void _sendThreadTask() {
             atoms to_max;
 
-            if(Connector::get().isConnected(this->_getOpenDeviceName())) {
+            if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                 // Test if the device is still connected
-                if (Connector::get().connectionState(this->_getOpenDeviceName()) != Connector::ConnectionState::OK) {
+                if (this->_getConnector()->connectionState(this->_getOpenDeviceName()) != Connector::ConnectionState::OK) {
                     return;
                 }
 
@@ -118,7 +129,7 @@ class dmxusbpro : public object<dmxusbpro>
                         msg_buffer[i] = msg_bytes[i];
                     }
 
-                    std::size_t                success = write(Connector::get().getFd(this->_getOpenDeviceName()), msg_buffer, msg_size);
+                    std::size_t                success = write(this->_getConnector()->getFd(this->_getOpenDeviceName()), msg_buffer, msg_size);
 
                     if(success < 0) {
                         to_max.clear();
@@ -142,9 +153,9 @@ class dmxusbpro : public object<dmxusbpro>
             static s_chrono::time_point       response_paring_start    = s_chrono::steady_clock::now();
 
 
-            if(Connector::get().isConnected(this->_getOpenDeviceName())) {
+            if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                 // Test if the device conntion is healthy
-                int         connectionState = Connector::get().connectionState(this->_getOpenDeviceName());
+                int         connectionState = this->_getConnector()->connectionState(this->_getOpenDeviceName());
 
                 if ( connectionState != Connector::ConnectionState::OK) {
                     switch (connectionState) {
@@ -167,7 +178,7 @@ class dmxusbpro : public object<dmxusbpro>
                 // Getting response
                 memset(_serial_in_buffer, 0, SERIAL_IN_BUFF_SIZE);
 
-                std::size_t byte_count = read(Connector::get().getFd(this->_getOpenDeviceName()), _serial_in_buffer, SERIAL_IN_BUFF_SIZE);
+                std::size_t byte_count = read(this->_getConnector()->getFd(this->_getOpenDeviceName()), _serial_in_buffer, SERIAL_IN_BUFF_SIZE);
 
                 if(is_parsing_response) {
                     // Fallback: timeout if response isn't received completly within 200ms
@@ -335,12 +346,19 @@ class dmxusbpro : public object<dmxusbpro>
     public:
 
         dmxusbpro(const atoms& args = {}) {
-            memset(this->_dmx_universe, 0, 512);
-            memset(this->_dmx_blackout, 0, 512);
+            if(!dummy()) {
+                memset(this->_dmx_universe, 0, 512);
+                memset(this->_dmx_blackout, 0, 512);
+                this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.dmxusbpro.manager"), 0, NULL);
+                this->_deviceConnector = (Connector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
+            }
+            
         }
 
         ~dmxusbpro() {
-            this->_closeDevice();
+            if(!dummy()) {
+                this->_closeDevice();
+            }
         }
 
         MIN_DESCRIPTION     { "Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists. <br/><i>The recommended firmware version is 1.44</i>" };
@@ -426,13 +444,16 @@ class dmxusbpro : public object<dmxusbpro>
             range {9600, 256000},
             readonly {false},
             setter { MIN_FUNCTION {
-                         if(Connector::get().isConnected(this->_getOpenDeviceName())) {
-                             cerr << "baudrate has changed. closing the connection." << endl;
-                             this->_closeDevice();
-                         }
-
-                         return args;
+                if(!this->initialized() ) {
+                    return args;
+                }
+                     if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
+                         cerr << "baudrate has changed. closing the connection." << endl;
+                         this->_closeDevice();
                      }
+
+                     return args;
+                }
             }
         };
 
@@ -455,7 +476,7 @@ class dmxusbpro : public object<dmxusbpro>
             "Set device to receive DMX messages.<br /><b>Note</b>: Sending a list of DMX values or sending the message deviceserial will set the device into send mode again.",
             MIN_FUNCTION {
 
-                if(!Connector::get().isConnected(this->_getOpenDeviceName())) {
+                if(!this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                     if(verbose) {
                         cerr << "Can't set receive mode, not connected." << endl;
                     }
@@ -489,17 +510,9 @@ class dmxusbpro : public object<dmxusbpro>
                 std::string device_name = args[0];
 
                 if(this->_open_device_name != device_name) {
-                    try {
-                        atom connected  = this->_connections.at(device_name);
-                        int  conn_state = (int)connected;
-
-                        if(conn_state == 1) {
-                            cerr << "'" << device_name << "' already opened by another instance." << endl;
-                            return {};
-                        }
-                    } catch (std::runtime_error& e) {
-                        // the devices isn't opened and not registered
-                        this->_connections[device_name] = 0;
+                    if(this->_getConnector()->isConnected(device_name)) {
+                        cerr << "'" << device_name << "' already opened by another instance." << endl;
+                        return {};
                     }
                 }
 
@@ -507,7 +520,7 @@ class dmxusbpro : public object<dmxusbpro>
                     cout << "opening " + device_name << endl;
                 }
 
-                if(!Connector::get().deviceExists(device_name)) {
+                if(!this->_getConnector()->deviceExists(device_name)) {
                     cerr << "specified port not available" << endl;
                     return {};
                 }
@@ -515,7 +528,7 @@ class dmxusbpro : public object<dmxusbpro>
                 this->_closeDevice();
 
                 int         set_baudrate = baudrate;
-                int         open_success = Connector::get().openSerialPort(device_name, set_baudrate);
+                int         open_success = this->_getConnector()->openSerialPort(device_name, set_baudrate);
 
                 if(open_success == -1) {
                     cerr << "Error opening device" << endl;
@@ -528,7 +541,6 @@ class dmxusbpro : public object<dmxusbpro>
                 }
 
                 this->_setOpenDeviceName(device_name);
-                this->_connections[device_name] = 1;
                 atoms       connection_state;
                 connection_state.push_back(TO_OUTLET_2);
                 connection_state.push_back(1);
@@ -606,7 +618,8 @@ class dmxusbpro : public object<dmxusbpro>
                 out_atoms.push_back("(Select Interface)");
                 output_3.send(out_atoms);
 
-                std::vector<std::string> device_names = Connector::get().getDeviceNames(verbose, true);
+                std::vector<std::string> device_names2 = this->_getConnector()->getDeviceNames(verbose, true);
+                std::vector<std::string> device_names = this->_getConnector()->getDeviceNames(verbose, true);
 
                 for (auto& device_name : device_names) {
                     atoms device_list;
@@ -622,7 +635,7 @@ class dmxusbpro : public object<dmxusbpro>
         message<threadsafe::yes> list {
             this, "list", "An even number of integers, indicating pairs of <i>DMX Channel</i> and <i>DMX Value</i>.<br/>Sets the specified channels to the specified values.",
             MIN_FUNCTION {
-                if(!Connector::get().isConnected(this->_getOpenDeviceName())) {
+                if(!this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                     return{};
                 }
 
@@ -671,7 +684,7 @@ class dmxusbpro : public object<dmxusbpro>
                     cwarn << "extra argument for message 'getparams'" << endl;
                 }
 
-                if(!Connector::get().isConnected(this->_getOpenDeviceName())) {
+                if(!this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                     if(verbose) {
                         cerr << "Can't get DMX parameters, not connected." << endl;
                     }
@@ -697,7 +710,7 @@ class dmxusbpro : public object<dmxusbpro>
                     cwarn << "extra argument for message 'getserial'" << endl;
                 }
 
-                if(!Connector::get().isConnected(this->_getOpenDeviceName())) {
+                if(!this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                     if(verbose) {
                         cerr << "Can't get serial number, not connected." << endl;
                     }
@@ -730,7 +743,7 @@ class dmxusbpro : public object<dmxusbpro>
         message<threadsafe::yes> blackout {
             this, "blackout", "Set all DMX channels temporarily to 0.",
             MIN_FUNCTION {
-                if(!Connector::get().isConnected(this->_getOpenDeviceName())) {
+                if(!this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                     if(verbose) {
                         cerr << "Cannot set blackout, not connected" << endl;
                     }
