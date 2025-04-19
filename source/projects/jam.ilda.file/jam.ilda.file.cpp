@@ -18,7 +18,7 @@
 #include "../jam.ilda.manager/jam.ilda.manager.hpp"
 
 
-#define HELIOS_FILE_CHUNK 1024
+#define BINARY_FILE_CHUNK 1024
 
 using namespace c74::min;
 
@@ -31,9 +31,12 @@ private:
     atoms _import_args;                             // Stores arguments of import message,
                                                     // to be accasible in the scope of the file loader thread
     c74::max::t_filehandle ilda_file_handle;        // File handle for importing ILDA files.
+    
     char filename[c74::max::MAX_PATH_CHARS] = {0};  // File name of ILDA file toi be imported
+    
     c74::max::t_object *_manager;                   // Pointer to global jam.ilda.manager object
                                                     // (stores data to be accasibele by other jam.ilda.* object)
+    
     t_jam_im * _manager_struct_ptr = NULL;          // Pointer to max-object struct of the jam.ilda.manager object
     
 protected:
@@ -56,8 +59,11 @@ protected:
     } queued_message_t;
     
     jam::ilda::IldaFileProcessor _fileProcessor;     // Class with functions for ILDA file processing/parsing
+    
     fifo<queued_message_t> _to_max_queue { 1000 }; // FIFO queue for messages to be sent to outlets
+    
     std::mutex _enqueue_msg_lock;                    // Mutex lock for outlet message thread safty
+    
     std::thread _file_parse_thread;                 // Thread for parsing ILDA file asynchronously
     
     bool _is_parsing = false;
@@ -234,8 +240,8 @@ public:
                 
                 
                 std::vector<char> ilda_file_bytes;
-                char file_buffer[HELIOS_FILE_CHUNK];
-                c74::max::t_ptr_size chunk_size = HELIOS_FILE_CHUNK;
+                char file_buffer[BINARY_FILE_CHUNK];
+                c74::max::t_ptr_size chunk_size = BINARY_FILE_CHUNK;
                 c74::max::t_max_err read_result = 0;
                 while(true) {
                     read_result = c74::max::sysfile_read(ilda_file_handle,&chunk_size,file_buffer);
@@ -276,7 +282,6 @@ public:
                 
                 this->_setParsingState(false);
             });
-            
             
             this->_file_parse_thread.detach();
             return {};
