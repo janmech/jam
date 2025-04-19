@@ -4,6 +4,7 @@
     ///	@license	Use of this source code is governed by the MIT License found in the License.md file.
 
 #define NANOSVG_IMPLEMENTATION
+#define STB_TRUETYPE_IMPLEMENTATION
 
 #include <iostream>
 #include <string>
@@ -13,6 +14,8 @@
 #include <mutex>
 #include <queue>
 #include <string>
+#include <CoreText/CoreText.h>
+#include <CoreFoundation/CoreFoundation.h>
 #include "c74_min.h"
 #include "jam.shape.hpp"
 #include "../jam.helper/attribute_args_helper.hpp"
@@ -24,10 +27,13 @@
 #include "../jam.ilda_common/ilda_file_processor.hpp"
 #include "../jam.ilda_common/ilda_colors.hpp"
 #include "nanosvg.h"
+#include "stb_truetype.h"
 
 #ifndef PI
 #define PI 3.14159265358979323846
 #endif
+
+#define BINARY_FILE_CHUNK 1024
 
 
 using namespace c74::min;
@@ -39,6 +45,7 @@ using VecPoint2D = std::vector<jam::Point2D>;
 class ildacompose : public object<ildacompose>
 {
 private:
+
     std::string _instance_id = "";                  // Unique ID for each object instance.
                                                     // Used to itentify loaded ILDA filed data in the global jam.ilda.manager
     c74::max::t_object *_manager;                   // Pointer to global jam.ilda.manager object
@@ -61,6 +68,11 @@ private:
     jam::ilda::IldaFileProcessor _fileProcessor;     // Class with functions for ILDA file processing/parsing
     
     protected :
+    
+
+    std::map<std::string, std::string>_available_fonts;
+    
+    std::vector<unsigned char>_font_buffer;
     
         /// Struct to encapsulate sending messages to outlets via the timer - for thread safty
     typedef struct QuededMessage {
@@ -90,6 +102,55 @@ private:
     
         /// Vector of IldaFrames currenly available
     std::vector<jam::ilda::IldaFrame> _frames;
+    
+    void _updateFonts() {
+        this->_available_fonts.clear();
+        CTFontCollectionRef collection = CTFontCollectionCreateFromAvailableFonts(nullptr);
+        if (!collection) {
+            return;
+        }
+
+        CFArrayRef descriptors = CTFontCollectionCreateMatchingFontDescriptors(collection);
+        if (!descriptors) {
+            CFRelease(collection);
+            return;
+        }
+
+        CFIndex count = CFArrayGetCount(descriptors);
+        for (CFIndex i = 0; i < count; ++i) {
+            CTFontDescriptorRef desc = (CTFontDescriptorRef)CFArrayGetValueAtIndex(descriptors, i);
+
+            // Get font file URL
+            CFURLRef urlRef = (CFURLRef)CTFontDescriptorCopyAttribute(desc, kCTFontURLAttribute);
+            if (!urlRef) continue;
+
+            char path[PATH_MAX];
+            if (!CFURLGetFileSystemRepresentation(urlRef, true, (UInt8*)path, sizeof(path))) {
+                CFRelease(urlRef);
+                continue;
+            }
+
+            std::string pathStr(path);
+            std::string ext = pathStr.substr(pathStr.find_last_of('.') + 1);
+            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+            if (ext == "ttf") {
+                // Get the display name
+                CFStringRef nameRef = (CFStringRef)CTFontDescriptorCopyAttribute(desc, kCTFontDisplayNameAttribute);
+                char name[256] = "Unknown";
+                if (nameRef) {
+                    CFStringGetCString(nameRef, name, sizeof(name), kCFStringEncodingUTF8);
+                    CFRelease(nameRef);
+                }
+                this->_available_fonts[std::string(name)] = pathStr;
+            }
+
+            CFRelease(urlRef);
+        }
+
+        CFRelease(descriptors);
+        CFRelease(collection);
+    }
     
         /// Set if the instance currently in the process of importing a file
     void _setParsingState(bool state) {
@@ -494,6 +555,7 @@ public:
             this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
                 // get the pointer to jam.ilda.manager max-object's struct
             this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
+            this->_updateFonts();
         }
     };
     
@@ -507,9 +569,12 @@ public:
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
     outlet<> o_file_reference   { this, "ilda file reference"  };
+    outlet<> o_font_faces       { this, "Pubulate a umenu with availeble fonts"  };
     outlet<> o_edit_frame       { this, "Frame cureently selected for editing", "int"};
     outlet<> o_framecount       { this, "Number of frames created", "int"};
     outlet<> o_file_result      { this, "file opration success/failure notification", "list" };
+    
+    std::vector<symbol> font_faces = {"BBB", "CCC"};
     
     
     attribute<symbol> companyname {
@@ -535,7 +600,7 @@ public:
         },
         title {"Company Name"},
         description {"Company name set in the headers of the ILDA file.<br />ILDA files contain of a sequence of 'frames'. Every frame has a header summarizing some information about the frame. This attribute sets the value of the header field 'Company Name' (max 8 ASCII characters). "},
-        category {"ILDA FILE"}
+        category {"ILDA File"}
     };
     
     attribute<symbol> frameprefix {
@@ -559,7 +624,30 @@ public:
         },
         title {"Frame Name Prefix"},
         description {"Frame name prefix set in the header of the ILDA file.<br />ILDA files contain of a sequence of 'frames'. Every frame has a header summarizing some information about the frame. Every frame has a frame-name field in the header. jam.ilda.compose names frames automatically by setting the frame number as its name. This attribute sets an optioname prefix to the frame name (max 3 ASCII characters)."},
-        category {"ILDA FILE"}
+        category {"ILDA File"}
+    };
+    
+    message<threadsafe::no> getfonts {
+        this, "getfonts", "",
+        MIN_FUNCTION {
+            atoms msg_atoms;
+            queued_message_t msg;
+            
+            msg_atoms.clear();
+            msg_atoms.push_back("clear");
+            msg.set(&o_font_faces, msg_atoms);
+            msg.send(this);
+            
+            for (const auto& [name, path] : this->_available_fonts) {
+                msg_atoms.clear();
+                msg_atoms.push_back("append");
+                msg_atoms.push_back(name);
+                msg.set(&o_font_faces, msg_atoms);
+                msg.send(this);
+            }
+            
+            return {};
+        }
     };
     
     message<>bang  {
@@ -1014,6 +1102,84 @@ public:
         }
     };
     
+    message<threadsafe::no>font {
+        this, "font", "",
+        MIN_FUNCTION {
+            if(args.size() > 0) {
+                atoms msg_atoms;
+                queued_message_t msg;
+
+                std::string font_name = args[0];
+                if (this->_available_fonts.find(font_name) == this->_available_fonts.end()) {
+                    cwarn << "font '"<< font_name << "' not found or not a TTF font" << endl;
+                    msg_atoms.clear();
+                    msg_atoms.push_back("font");
+                    msg_atoms.push_back(font_name);
+                    msg_atoms.push_back(0);
+                    msg.set(&o_file_result, msg_atoms);
+                    msg.send(this);
+                    return {};
+                } else {
+                    std::string font_path = this->_available_fonts[font_name];
+                    short path = 0;
+                    short open_result;
+                    c74::max::t_fourcc filetype = 'TTF', outtype;
+                    font_path.resize(c74::max::MAX_PATH_CHARS);
+                    char c_font_path[c74::max::MAX_PATH_CHARS] = {0};
+                    strcpy(c_font_path, font_path.c_str());
+                    open_result = c74::max::locatefile_extended(c_font_path, &path, &outtype, NULL, 0);
+                    if(open_result != c74::max::MAX_ERR_NONE) {
+                        cerr << "Couldn't open file" << endl;
+                        msg_atoms.clear();
+                        msg_atoms.push_back("font");
+                        msg_atoms.push_back(font_name);
+                        msg_atoms.push_back(0);
+                        msg.set(&o_file_result, msg_atoms);
+                        msg.send(this);
+                        return {};
+                    }
+                    c74::max::t_filehandle file_handle;
+                    open_result = c74::max::path_opensysfile( c_font_path, path, &file_handle,c74::max::READ_PERM);
+                    if(open_result != c74::max::MAX_ERR_NONE) {
+                        cerr << "Couldn't open file" << endl;
+                    
+                        msg_atoms.clear();
+                        msg_atoms.push_back("font");
+                        msg_atoms.push_back(font_name);
+                        msg_atoms.push_back(0);
+                        msg.set(&o_file_result, msg_atoms);
+                        msg.send(this);
+                        return {};
+                    }
+                    
+                    c74::max::t_max_err read_result = 0;
+                    c74::max::t_ptr_size chunk_size = BINARY_FILE_CHUNK;
+                    char file_buffer[BINARY_FILE_CHUNK];
+                    this->_font_buffer.clear();
+                    while(true) {
+                        read_result = c74::max::sysfile_read(file_handle,&chunk_size,file_buffer);
+                        for(size_t i = 0; i < chunk_size; i++) {
+                            this->_font_buffer.push_back(file_buffer[i]);
+                        }
+                        if (read_result < 0) {
+                            break;
+                        }
+                    }
+                    
+                    
+                    msg_atoms.clear();
+                    msg_atoms.push_back("font");
+                    msg_atoms.push_back(font_name);
+                    msg_atoms.push_back(1);
+                    msg.set(&o_file_result, msg_atoms);
+                    msg.send(this);
+                }
+            }
+            return {};
+        }
+        
+    };
+    
     message<threadsafe::no>line {
         this, "line", "Draw a line into a frame",
         MIN_FUNCTION {
@@ -1293,11 +1459,11 @@ public:
         }
     };
     
-    message<threadsafe::no>rotate {
-        this, "rotate", "Rotate a frame. If one argument follows the message, the frame will be rotated around the center point. If three arguments are present, the sencond and third arguments specify the rotation center",
+    message<threadsafe::no>rotateframe {
+        this, "rotateframe", "Rotate a frame. If one argument follows the message, the frame will be rotated around the center point. If three arguments are present, the sencond and third arguments specify the rotation center",
         MIN_FUNCTION {
             if(args.size() < 1) {
-                cwarn << "missing argument for message 'rotate'" << endl;
+                cwarn << "missing argument for message 'rotateframe'" << endl;
                 return {};
             }
             if (this->_frames.size() == 0) {
@@ -1442,6 +1608,7 @@ public:
             return {};
         }
     };
+    
     
 };
 

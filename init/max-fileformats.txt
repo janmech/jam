@@ -1,1 +1,2 @@
 max fileformat .ild ILDA 0 "ILDA file" ildafile;
+max fileformat .ttf TTF 0 "TrueType font file" ttffile;

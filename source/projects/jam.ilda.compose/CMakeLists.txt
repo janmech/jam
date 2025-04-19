@@ -19,6 +19,8 @@ include_directories(
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
     ./jam.shape.cpp
+    ./stb_truetype.h
+    ./nanosvg.h
     ../jam.helper/attribute_args_helper.cpp
     ../jam.ilda_common/ilda_data_record.cpp
     ../jam.ilda_common/ilda_file_processor.cpp
