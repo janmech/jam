@@ -11,8 +11,9 @@
 #include <queue>
 #include <thread>
 #include <vector>
-#include "../jam.dmxusbpro.connector/jam.dmxusbpro.connector.hpp"
 #include "c74_min.h"
+#include "../jam.dmxusbpro.connector/jam.dmxusbpro.connector.hpp"
+#include "../jam.helper/attribute_args_helper.hpp"
 
 #define OBJECT_MESSAGE_PREFIX              "jam.dmxusbpro~ • "
 
@@ -404,45 +405,68 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
             }
         };
 
-        attribute<int, threadsafe::no, limit::clamp, allow_repetitions::no> baudrate {
+        attribute<int> baudrate {
             this, "baudrate", 56700,
             title {"Device Baud Rate"},
             description{"Set the baud rate for communicating with the interface. Default: 56700"},
-            range {9600, 256000},
-            readonly {false},
-            setter { MIN_FUNCTION {
+            setter {
+                MIN_FUNCTION {
+                    atoms cleaned_args;
+                    jam::checkAndFillAttrArgs<int>(args, &cleaned_args, 1, 56700);
+                    int value = (int)cleaned_args[0];
+                    value = std::clamp(value, 9600, 256000);
+                    cleaned_args[0] = value;
                     if(this->initialized()) {
                         if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
                             cerr << "baudrate has changed. closing the connection." << endl;
                             this->_closeDevice();
                         }
                     }
-                    return args;
+                    return cleaned_args;
                 }
             }
         };
 
-        attribute<bool, threadsafe::no, limit::none, allow_repetitions::no> keepsending {
+        attribute<bool> keepsending {
             this, "keepsending", false,
             title { "Keep sending" },
-            description { "If set to 0 (default), the device will stop sending DMX data when the connection is closed.<br />If set to 1 the device will continue to send the last received DMX data after the connection has been closed." }
+            description { "If set to 0 (default), the device will stop sending DMX data when the connection is closed. If set to 1 the device will continue to send the last received DMX data after the connection has been closed." },
+            setter { MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                return cleaned_args;
+            }},
         };
 
-        attribute<int, threadsafe::yes, limit::clamp, allow_repetitions::no> push {
+
+        attribute<int> push {
             this,
             "push",
             20,
             title { "Push Intermal (ms)" },
             description { "Minimum interval to push DMX value changes to the device in ms."},
-            range { 10, 10000 }
+            setter { MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<int>(args, &cleaned_args, 1, 20);
+                int value = (int)cleaned_args[0];
+                value = std::clamp(value, 10, 10000);
+                cleaned_args[0] = value;
+                return cleaned_args;
+            }}
+            
         };
 
-        attribute<bool, threadsafe::no, limit::none, allow_repetitions::no> verbose {
+        attribute<bool> verbose {
             this,
             "verbose",
             false,
             title { "Verbose" },
-            description { "If set to 0 (default), only serial devices following the ENTTEC USB DMX Pro naming convention will be enabled in a umenu connected to the third outlet. <br /> If set to 1 all serial devices will be enabled and more information about the coinnection state will be printed to the Max console." }
+            description { "If set to 0 (default), only serial devices following the ENTTEC USB DMX Pro naming convention will be enabled in a umenu connected to the third outlet. <br /> If set to 1 all serial devices will be enabled and more information about the coinnection state will be printed to the Max console." },
+            setter { MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                return cleaned_args;
+            }},
         };
 
         message<threadsafe::yes> open {

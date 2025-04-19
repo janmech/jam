@@ -10,8 +10,10 @@
 #include <queue>
 #include <thread>
 #include <vector>
-#include "../jam.dmxusbpro.connector/jam.dmxusbpro.connector.hpp"
 #include "c74_min.h"
+#include "../jam.dmxusbpro.connector/jam.dmxusbpro.connector.hpp"
+#include "../jam.helper/attribute_args_helper.hpp"
+
 
 #define OBJECT_MESSAGE_PREFIX                "jam.dmxusbpro • "
 
@@ -423,52 +425,87 @@ class dmxusbpro : public object<dmxusbpro>
             }
         };
 
-        attribute<bool, threadsafe::no, limit::none, allow_repetitions::no> verbose {
+        attribute<bool> verbose {
             this,
             "verbose",
             false,
             title { "Verbose" },
-            description { "If set to 0 (default), only serial devices following the ENTTEC USB DMX Pro naming convention will be enabled in a umenu connected to the third outlet. <br /> If set to 1 all serial devices will be enabled and more information about the coinnection state will be printed to the Max console." }
+            description { "If set to 0 (default), only serial devices following the ENTTEC USB DMX Pro naming convention will be enabled in a umenu connected to the third outlet. <br /> If set to 1 all serial devices will be enabled and more information about the coinnection state will be printed to the Max console." },
+            setter { MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                return cleaned_args;
+            }},
         };
 
-        attribute<bool, threadsafe::no, limit::none, allow_repetitions::no> keepsending {
+        attribute<bool> keepsending {
             this, "keepsending", false,
             title { "Keep sending" },
-            description { "If set to 0 (default), the device will stop sending DMX data when the connection is closed. If set to 1 the device will continue to send the last received DMX data after the connection has been closed." }
+            description { "If set to 0 (default), the device will stop sending DMX data when the connection is closed. If set to 1 the device will continue to send the last received DMX data after the connection has been closed." },
+            setter { MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                return cleaned_args;
+            }},
         };
 
-        attribute<int, threadsafe::no, limit::clamp, allow_repetitions::no> baudrate {
+        attribute<int> baudrate {
             this, "baudrate", 56700,
             title {"Device Baud Rate"},
             description{"Set the baud rate for communicating with the interface. Default: 56700"},
-            range {9600, 256000},
-            readonly {false},
-            setter { MIN_FUNCTION {
-                if(!this->initialized() ) {
-                    return args;
-                }
-                     if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
-                         cerr << "baudrate has changed. closing the connection." << endl;
-                         this->_closeDevice();
-                     }
-
-                     return args;
+            setter {
+                MIN_FUNCTION {
+                    atoms cleaned_args;
+                    jam::checkAndFillAttrArgs<int>(args, &cleaned_args, 1, 56700);
+                    int value = (int)cleaned_args[0];
+                    value = std::clamp(value, 9600, 256000);
+                    cleaned_args[0] = value;
+                    if(this->initialized()) {
+                        if(this->_getConnector()->isConnected(this->_getOpenDeviceName())) {
+                            cerr << "baudrate has changed. closing the connection." << endl;
+                            this->_closeDevice();
+                        }
+                    }
+                    return cleaned_args;
                 }
             }
         };
 
-        attribute<symbol, threadsafe::no, limit::none, allow_repetitions::no> outformat {
+        attribute<symbol> outformat {
             this, "outformat", "list",
             title { "DMX data output format" },
             description { "DMX data format sent to first outlet. If set to 'list' (default) a list of pairs of <i>DMX Channel</i> and <i>DMX Value</i> will be send out. If set to 'raw' outputs the raw bytes of received DMX data:<br />First byte: Status code. Following Bytes: DMX values.<br />" },
-            range {"raw", "list"}
+            range {"raw", "list"},
+            setter {
+                MIN_FUNCTION {
+                    atoms cleaned_args;
+                    jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "list");
+                    std::string value = cleaned_args[0];
+                    if(value != "list" && value != "raw") {
+                        cleaned_args[0] = "list";
+                    }
+                    return cleaned_args;
+                }
+            }
         };
 
-        attribute<symbol, threadsafe::no, limit::none, allow_repetitions::no> outmode {
+        attribute<symbol> outmode {
             this, "outmode", "onchange",
             title { "DMX data output mode" },
             description { "If set to 'onchange' (default) first outlet will only send out DMX data if values have changed. <bvr />If set to 'always' every received DMX package will we sent out the first outlet." },
-            range {"onchange", "always"}
+            range {"onchange", "always"},
+            setter {
+                MIN_FUNCTION {
+                    atoms cleaned_args;
+                    jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "onchange");
+                    std::string value = cleaned_args[0];
+                    if(value != "onchange" && value != "raw") {
+                        cleaned_args[0] = "onchange";
+                    }
+                    return cleaned_args;
+                }
+            }
+            
         };
 
         message<threadsafe::yes> receive {
