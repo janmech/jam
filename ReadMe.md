@@ -52,10 +52,22 @@ Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
 * 	CoreFoundation.framework
 * 	IOKit.framework
 
+### Target: *jam.dmxusbpro.manager*
+Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
+
+* 	CoreFoundation.framework
+* 	IOKit.framework
+
 ### Target: *jam.helios*
 Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
 
 * 	CoreFoundation.framework
 * 	IOKit.framework
 *  Security.framework
+
+### Target: *jam.ilda.compose*
+Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
+
+* 	CoreFoundation.framework
+* 	CoreText.framework
 

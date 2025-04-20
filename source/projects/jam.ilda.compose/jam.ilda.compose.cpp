@@ -26,8 +26,8 @@
 #include "../jam.ilda.manager/jam.ilda.manager.hpp"
 #include "../jam.ilda_common/ilda_file_processor.hpp"
 #include "../jam.ilda_common/ilda_colors.hpp"
-#include "nanosvg.h"
-#include "stb_truetype.h"
+#include "../jam.ilda_common/ttf_file_processor.hpp"
+#include "../jam.ilda_common/nanosvg.h"
 
 #ifndef PI
 #define PI 3.14159265358979323846
@@ -39,6 +39,7 @@
 using namespace c74::min;
 using Point2D = jam::Point2D;
 using VecPoint2D = std::vector<jam::Point2D>;
+using VecGlyphPoints = std::vector<jam::ttf::GlyphVertex>;
 
 
 
@@ -66,14 +67,16 @@ private:
     
     size_t _edit_frame = 0;
     
-    jam::ilda::IldaFileProcessor _fileProcessor;     // Class with functions for ILDA file processing/parsing
+    jam::ilda::IldaFileProcessor _ildaFileProcessor;     // Class with functions for ILDA file processing/parsing
+    
+    jam::ttf::TtfFileProcessor _ttfFileProcessor;
     
     protected :
     
 
     std::map<std::string, std::string>_available_fonts;
     
-    std::vector<unsigned char>_font_buffer;
+
     
         /// Struct to encapsulate sending messages to outlets via the timer - for thread safty
     typedef struct QuededMessage {
@@ -560,6 +563,7 @@ public:
                 // get the pointer to jam.ilda.manager max-object's struct
             this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
             this->_updateFonts();
+            this->font("Arial");
         }
     };
     
@@ -577,8 +581,6 @@ public:
     outlet<> o_edit_frame       { this, "Frame cureently selected for editing", "int"};
     outlet<> o_framecount       { this, "Number of frames created", "int"};
     outlet<> o_file_result      { this, "file opration success/failure notification", "list" };
-    
-    std::vector<symbol> font_faces = {"BBB", "CCC"};
     
     
     attribute<symbol> companyname {
@@ -1119,7 +1121,7 @@ public:
     };
     
     message<threadsafe::no>font {
-        this, "font", "",
+        this, "font", "Loads a TTF font face",
         MIN_FUNCTION {
             if(args.size() > 0) {
                 atoms msg_atoms;
@@ -1171,22 +1173,28 @@ public:
                     c74::max::t_max_err read_result = 0;
                     c74::max::t_ptr_size chunk_size = BINARY_FILE_CHUNK;
                     char file_buffer[BINARY_FILE_CHUNK];
-                    this->_font_buffer.clear();
+                    std::vector<unsigned char>font_buffer;
                     while(true) {
                         read_result = c74::max::sysfile_read(file_handle,&chunk_size,file_buffer);
                         for(size_t i = 0; i < chunk_size; i++) {
-                            this->_font_buffer.push_back(file_buffer[i]);
+                            font_buffer.push_back(file_buffer[i]);
                         }
                         if (read_result < 0) {
                             break;
                         }
                     }
                     
+                    this->_ttfFileProcessor.setFileData(font_buffer);
+                    int success = 1;
+                    if(this->_ttfFileProcessor.initFont() != jam::ttf::FontError::NO_ERROR) {
+                        success = 0;
+                    };
+                    
                     
                     msg_atoms.clear();
                     msg_atoms.push_back("font");
                     msg_atoms.push_back(font_name);
-                    msg_atoms.push_back(1);
+                    msg_atoms.push_back(success);
                     msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
                 }
@@ -1194,6 +1202,45 @@ public:
             return {};
         }
         
+    };
+    
+    message<threadsafe::no>text {
+        this, "text", "Write a text to the current edit frame",
+        MIN_FUNCTION {
+            std::string in_string = "";
+            if(args.size() < 1) {
+                return {};
+            }
+            
+            in_string = static_cast<std::string>(args[0]);
+            
+            VecGlyphPoints points = this->_ttfFileProcessor.getGlyphVertices(in_string);
+            if (this->_frames.size() == 0) {
+                this->_appendEmptyFrame();
+            }
+            uint8_t r = 255;
+            uint8_t g = 255;
+            uint8_t b = 255;
+            
+            for(size_t i = 0; i < points.size(); i++) {
+                jam::ilda::IldaDataRecord d_r;
+                bool blanking = points[i].type == jam::ttf::VertexType::MoveTo;
+                d_r.setRed(r * !blanking);
+                d_r.setGreen(g * !blanking);
+                d_r.setBlue(b * !blanking);
+                d_r.setPosX(this->_deNormalizePosition(points[i].pos.x));
+                d_r.setPosY(this->_deNormalizePosition(points[i].pos.y));
+                d_r.setBlanking(blanking);
+                this->_frames[this->_edit_frame].pushRecord(d_r);
+            }
+
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            
+            this->_updateOutlets();
+            
+            
+            return {};
+        }
     };
     
     message<threadsafe::no>line {
@@ -1216,7 +1263,7 @@ public:
             uint8_t b = 255;
             if(args.size() >= 7) {
                 r = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
+                g = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
                 b = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
             }
                 // move to staring point
@@ -1583,7 +1630,7 @@ public:
             if(err == c74::max::MAX_ERR_NONE) {
                 result = jam::ilda::ParseResult::SUCCESS;
                 std::vector<unsigned char> file_bytes;
-                result = this->_fileProcessor.parseFramesToFileData(file_bytes, this->_frames);
+                result = this->_ildaFileProcessor.parseFramesToFileData(file_bytes, this->_frames);
                 unsigned long byte_count = file_bytes.size();
                     // Second: Write File
                 unsigned char *raw_data = reinterpret_cast<unsigned char *>(malloc(file_bytes.size() * sizeof(unsigned char)));

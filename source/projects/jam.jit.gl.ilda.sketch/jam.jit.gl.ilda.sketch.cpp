@@ -299,8 +299,8 @@ public:
     outlet<> output_dumpout     { this, "Framecount of currently loaded ILDA file." };
 
     
-    attribute<int> linewidth {
-        this, "linewidth", 2,
+    attribute<number> linewidth {
+        this, "linewidth", 1.,
         setter { MIN_FUNCTION {
             atoms cleaned_args;
             jam::ArgVectSize r = jam::checkAndFillAttrArgs<int>(args, &cleaned_args, 1, 1);
