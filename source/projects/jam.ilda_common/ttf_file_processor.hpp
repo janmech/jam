@@ -61,7 +61,7 @@ namespace jam::ttf {
         void clearFileData();
         FontError initFont();
         bool fontInitialized();
-        std::vector<GlyphVertex> getGlyphVertices(std::string c, double height = 1.f, int segments = 10);
+        std::vector<GlyphVertex> getGlyphVertices(std::string c, Point2D pen_pos, double height = 1.f, int segments = 10);
         
         
     

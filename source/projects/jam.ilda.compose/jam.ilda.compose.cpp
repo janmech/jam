@@ -96,6 +96,15 @@ private:
         }
     } queued_message_t;
     
+    typedef struct RgbColor {
+        uint8_t r = 255;
+        uint8_t g = 255;
+        uint8_t b = 255;
+    } rgb_color_t;
+    
+    rgb_color_t _color;
+    
+    jam::ttf::Point2D _pen_pos = {-1., 1.};
         /// FIFO queue for messages to be sent to outlets
     fifo<queued_message_t> _to_max_queue { 1000 };
     
@@ -254,6 +263,17 @@ private:
         this->_edit_frame = this->_frames.size() - 1;
         
         this->_updateOutlets();
+    }
+    
+    void _removeEmptyFrames() {
+        for (auto it = this->_frames.begin(); it != this->_frames.end();) {
+            auto f = *it;
+            if(f.getHeader().getDataRecordCount() == 0) {
+                it = this->_frames.erase(it);
+            } else {
+                it++;
+            }
+        }
     }
     
         /// update frames in sequens and frame number for all frames
@@ -1204,6 +1224,19 @@ public:
         
     };
     
+    message<>pen {
+        this, "pen", "Set the pen position for wryting text.Arguments:  floats (-1. to 1.) pen_x pen_y",
+        MIN_FUNCTION {
+            if(args.size() < 2) {
+                cwarn << "missing argument for message 'pen'. Expextex two floats" << endl;
+                return {};
+            }
+            this->_pen_pos.x = std::clamp(static_cast<number>(args[0]), -1., 1.);
+            this->_pen_pos.y = std::clamp(static_cast<number>(args[1]), -1., 1.);
+            return {};
+        }
+    };
+    
     message<threadsafe::no>text {
         this, "text", "Write a text to the current edit frame",
         MIN_FUNCTION {
@@ -1211,23 +1244,24 @@ public:
             if(args.size() < 1) {
                 return {};
             }
+            for(size_t i = 0; i < args.size(); i++) {
+                if(i > 0) {
+                    in_string += " ";
+                }
+                in_string += static_cast<std::string>(args[i]);
+            }
             
-            in_string = static_cast<std::string>(args[0]);
-            
-            VecGlyphPoints points = this->_ttfFileProcessor.getGlyphVertices(in_string);
+            VecGlyphPoints points = this->_ttfFileProcessor.getGlyphVertices(in_string, this->_pen_pos);
             if (this->_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
-            uint8_t r = 255;
-            uint8_t g = 255;
-            uint8_t b = 255;
             
             for(size_t i = 0; i < points.size(); i++) {
                 jam::ilda::IldaDataRecord d_r;
                 bool blanking = points[i].type == jam::ttf::VertexType::MoveTo;
-                d_r.setRed(r * !blanking);
-                d_r.setGreen(g * !blanking);
-                d_r.setBlue(b * !blanking);
+                d_r.setRed(this->_color.r * !blanking);
+                d_r.setGreen(this->_color.g * !blanking);
+                d_r.setBlue(this->_color.b * !blanking);
                 d_r.setPosX(this->_deNormalizePosition(points[i].pos.x));
                 d_r.setPosY(this->_deNormalizePosition(points[i].pos.y));
                 d_r.setBlanking(blanking);
@@ -1244,7 +1278,7 @@ public:
     };
     
     message<threadsafe::no>line {
-        this, "line", "Draw a line into a frame",
+        this, "line", "Draw a line into a frame.Arguments: 4 floats (-1. to 1.) start_x start_y end_x end_y",
         MIN_FUNCTION {
             if(args.size() < 4) {
                 cwarn << "missing argument for message 'line'" << endl;
@@ -1258,14 +1292,7 @@ public:
             number x_end   = args[2];
             number y_end   = args[3];
             
-            uint8_t r = 255;
-            uint8_t g = 255;
-            uint8_t b = 255;
-            if(args.size() >= 7) {
-                r = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
-            }
+           
                 // move to staring point
             jam::ilda::IldaDataRecord r_start;
             r_start.setRed(0);
@@ -1276,9 +1303,9 @@ public:
             r_start.setBlanking(true);
             
             jam::ilda::IldaDataRecord r_end;
-            r_end.setRed(r);
-            r_end.setGreen(g);
-            r_end.setBlue(b);
+            r_end.setRed(this->_color.r);
+            r_end.setGreen(this->_color.g);
+            r_end.setBlue(this->_color.b);
             r_end.setPosX(this->_deNormalizePosition(x_end));
             r_end.setPosY(this->_deNormalizePosition(y_end));
             r_end.setBlanking(false);
@@ -1311,32 +1338,22 @@ public:
                 // radius x/y
             Point2D radius = {(number)args[2], (number)args[2]};
             
-            
-            uint8_t r = 255;
-            uint8_t g = 255;
-            uint8_t b = 255;
-            if(args.size() >= 6) {
-                r = uint8_t(std::clamp((number)args[3], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
-            }
-            
             number t_start = 0;
             number t_end = 360;
-            if(args.size() >= 8) {
-                t_start = (number)args[6];
-                t_end = (number)args[7];
+            if(args.size() >= 5) {
+                t_start = (number)args[3];
+                t_end = (number)args[4];
             }
             
             int seg = 50;
-            if(args.size() >= 9) {
-                seg = (int)args[8];
+            if(args.size() >= 6) {
+                seg = (int)args[5];
                 seg = (seg < 3) ? 3 : seg;
                 seg = (seg > 200) ? 200 : seg;
             }
                 //            VecPoint2D points = this->_makeCircle(x, y, radius, t_start, t_end, seg);
             VecPoint2D points = this->_makeEllipse(c, radius, t_start, t_end, seg);
-            this->_addDataRecorsToEditFrame(points, r, g, b);
+            this->_addDataRecorsToEditFrame(points, this->_color.r, this->_color.g, this->_color.b);
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
             this->_updateOutlets();
             
@@ -1364,31 +1381,22 @@ public:
             Point2D radius = {(number)args[2], (number)args[3]};
             
             
-            uint8_t r = 255;
-            uint8_t g = 255;
-            uint8_t b = 255;
-            if(args.size() >= 7) {
-                r = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
-            }
-            
             number t_start = 0;
             number t_end   = 360;
-            if(args.size() >= 9) {
-                t_start = (number)args[7];
-                t_end = (number)args[8];
+            if(args.size() >= 6) {
+                t_start = (number)args[4];
+                t_end = (number)args[5];
             }
             
             int seg = 50;
-            if(args.size() >= 10) {
-                seg = (int)args[9];
+            if(args.size() >= 7) {
+                seg = (int)args[6];
                 seg = (seg < 3) ? 3 : seg;
                 seg = (seg > 200) ? 200 : seg;
             }
             
             VecPoint2D points = this->_makeEllipse(c, radius, t_start, t_end, seg);
-            this->_addDataRecorsToEditFrame(points, r, g, b);
+            this->_addDataRecorsToEditFrame(points, this->_color.r, this->_color.g, this->_color.b);
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
             this->_updateOutlets();
             
@@ -1413,29 +1421,20 @@ public:
             number br_x = args[2];
             number br_y = args[3];
             
-            uint8_t r = 255;
-            uint8_t g = 255;
-            uint8_t b = 255;
-            
-            if(args.size() >= 7) {
-                r = uint8_t(std::clamp((number)args[4], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((number)args[5], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((number)args[6], 0., 1.) * 255.);
-            }
             number border_radius = 0.;
-            if(args.size() >= 8) {
-                border_radius = std::clamp((number)args[7], 0., 1.);
+            if(args.size() >= 5) {
+                border_radius = std::clamp((number)args[4], 0., 1.);
             }
             int seg = 10;
-            if(args.size() >= 9) {
-                seg = (int)args[9];
+            if(args.size() >= 6) {
+                seg = (int)args[5];
                 seg = (seg < 1) ? 1 : seg;
                 seg = (seg > 200) ? 200 : seg;
             }
             Point2D tl = {tl_x, tl_y};
             Point2D br = {br_x, br_y};
             VecPoint2D points = this->_makeRectangle(tl, br, border_radius);
-            this->_addDataRecorsToEditFrame(points, r, g, b);
+            this->_addDataRecorsToEditFrame(points, this->_color.r, this->_color.g, this->_color.b);
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
             this->_updateOutlets();
             
@@ -1466,24 +1465,16 @@ public:
                 // end point
             Point2D end = {(number)args[6], (number)args[7]};
             
-            uint8_t r = 255;
-            uint8_t g = 255;
-            uint8_t b = 255;
-            if(args.size() >= 11) {
-                r = uint8_t(std::clamp((number)args[8], 0., 1.) * 255.);
-                g = uint8_t(std::clamp((number)args[9], 0., 1.) * 255.);
-                b = uint8_t(std::clamp((number)args[10], 0., 1.) * 255.);
-            }
             
             int seg = 50;
-            if(args.size() >= 12) {
-                seg = (int)args[11];
+            if(args.size() >= 9) {
+                seg = (int)args[8];
                 seg = (seg < 3) ? 3 : seg;
                 seg = (seg > 200) ? 200 : seg;
             }
             
             VecPoint2D points = this->_makeCubeBezier(start, c1, c2, end, seg);
-            this->_addDataRecorsToEditFrame(points, r, g, b);
+            this->_addDataRecorsToEditFrame(points, this->_color.r, this->_color.g, this->_color.b);
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
             this->_updateOutlets();
             
@@ -1574,6 +1565,20 @@ public:
         }
     };
     
+    message<>drawcolor {
+      this, "drawcolor", "Set the drawing color. <br/>Arguments: 3 floats for red green and blue",
+        MIN_FUNCTION {
+            if(args.size() < 3) {
+                cwarn << "missing argumnet for message 'drawcolor'. Expected 3 floats" << endl;
+                return {};
+            }
+            this->_color.r = static_cast<uint8_t>(std::clamp(static_cast<number>(args[0]), 0., 1.) * 255);
+            this->_color.g = static_cast<uint8_t>(std::clamp(static_cast<number>(args[1]), 0., 1.) * 255);
+            this->_color.b = static_cast<uint8_t>(std::clamp(static_cast<number>(args[2]), 0., 1.) * 255);
+            return {};
+        }
+    };
+    
     message<>export_file {
         this, "export", "Write the frames to ILDA file. If no path/filename is provided, a dialog will be presented. A success/failure notification will be sent to the rightmost outlet in the form export [filename] 0/1.",
         MIN_FUNCTION {
@@ -1624,8 +1629,15 @@ public:
                 }
             }
             
+            // remove empry frames to be sure to create a valid ILDA file
+            this->_removeEmptyFrames();
+            
+            
                 // First: Create File
             err = c74::max::path_createsysfile(filename, path, 'ILDA', &fh);
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_updateOutlets();
             
             if(err == c74::max::MAX_ERR_NONE) {
                 result = jam::ilda::ParseResult::SUCCESS;

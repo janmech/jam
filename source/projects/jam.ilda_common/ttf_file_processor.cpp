@@ -34,7 +34,7 @@ namespace jam::ttf {
         return this->_font_initialized;
     };
     
-    std::vector<GlyphVertex> TtfFileProcessor::getGlyphVertices(std::string text, double height, int segments) {
+    std::vector<GlyphVertex> TtfFileProcessor::getGlyphVertices(std::string text, Point2D pen_pos, double height, int segments) {
         
         
         std::vector<GlyphVertex> glyph_points;
@@ -51,8 +51,8 @@ namespace jam::ttf {
         
         
         std::string::iterator it = text.begin();
-        double pen_position_x = -1.;
-        double pen_position_y = 1. - ((ascent - line_gap) * scale);
+        double pen_position_x = pen_pos.x;
+        double pen_position_y = pen_pos.y - ((ascent - line_gap) * scale);
         int g_i = 0; // Glyph index
         int prev_g_i = 0; // previous glyph index for kerning
         while (it != text.end()) {
