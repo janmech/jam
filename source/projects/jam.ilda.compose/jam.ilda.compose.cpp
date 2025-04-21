@@ -564,6 +564,7 @@ public:
             this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
             this->_updateFonts();
             this->font("Arial");
+            this->_appendEmptyFrame();
         }
     };
     
@@ -669,8 +670,7 @@ public:
         MIN_FUNCTION {
             this->_frames.clear();
             this->_getStructPointer()->clearInstanceFile(this->_instance_id);
-            this->_updateOutlets();
-            
+            this->_appendEmptyFrame();
             return {};
         }
     };
