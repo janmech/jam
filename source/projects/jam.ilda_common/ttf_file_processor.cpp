@@ -43,19 +43,19 @@ namespace jam::ttf {
         }
         
             // Font metrics
-        int ascent, descent, lineGap;
-        stbtt_GetFontVMetrics(&this->_font, &ascent, &descent, &lineGap);
+        int ascent, descent, line_gap;
+        stbtt_GetFontVMetrics(&this->_font, &ascent, &descent, &line_gap);
         
             // Font scaling factor.
-        double scale = stbtt_ScaleForPixelHeight(&this->_font, .5);
+        double scale = stbtt_ScaleForPixelHeight(&this->_font, .4);
         
         
         std::string::iterator it = text.begin();
-        double pen_position = 0.;
+        double pen_position_x = -1.;
+        double pen_position_y = 1. - ((ascent - line_gap) * scale);
         int g_i = 0; // Glyph index
         int prev_g_i = 0; // previous glyph index for kerning
         while (it != text.end()) {
-            
             utf8::utfchar32_t codepoint = utf8::next(it, text.end()); // get the font glyph index from unicode character
             g_i = stbtt_FindGlyphIndex(&this->_font, codepoint);
         
@@ -64,22 +64,18 @@ namespace jam::ttf {
                 g_i = stbtt_FindGlyphIndex(&this->_font, codepoint);
             }
             
-//            if (prev_g_i) {x
-//                int kern = stbtt_GetGlyphKernAdvance(&this->_font, prev_g_i, g_i);
-//                pen_position += static_cast<double>(kern) * scale;
-//            }
-            
                 // Get advance width and left-side bearing
             int ad_w, lsb;
             stbtt_GetGlyphHMetrics(&this->_font, g_i, &ad_w, &lsb);
             
-                // Glyph metrics
-            int box_x0, box_y0, box_x1, box_y1;
-            stbtt_GetGlyphBox(&this->_font, g_i, &box_x0, &box_y0, &box_x1, &box_y1);
+                // Add kerning and left-side bearing if it is not the first character.
+            if (prev_g_i) {
+                int kern = stbtt_GetGlyphKernAdvance(&this->_font, prev_g_i, g_i);
+                pen_position_x += static_cast<double>(kern) * scale;
+                pen_position_x = pen_position_x + (lsb * scale);
+            }
             
-            double g_width = (box_x1 - box_x0) * scale;
-            
-            
+                // Get glypf vertices and flatten them to line segments
             stbtt_vertex* vertices = nullptr;
             int num_verts = stbtt_GetGlyphShape(&this->_font, g_i, &vertices);
             
@@ -93,8 +89,8 @@ namespace jam::ttf {
                 switch (v.type) {
                     case STBTT_vmove: {
                         gv.type = VertexType::MoveTo;
-                        gv.pos.x = v.x * scale;
-                        gv.pos.y = v.y * scale;
+                        gv.pos.x = (v.x * scale) + pen_position_x;
+                        gv.pos.y = (v.y * scale) + pen_position_y;
                         last_point.x = gv.pos.x;
                         last_point.y = gv.pos.y;
                         glyph_points.push_back(gv);
@@ -102,22 +98,22 @@ namespace jam::ttf {
                         break;
                     case STBTT_vline: {
                         gv.type = VertexType::LineTo;
-                        gv.pos.x = v.x * scale;
-                        gv.pos.y = v.y * scale;
+                        gv.pos.x = (v.x * scale) + pen_position_x;
+                        gv.pos.y = (v.y * scale) + pen_position_y;
                         last_point.x = gv.pos.x;
                         last_point.y = gv.pos.y;
                         glyph_points.push_back(gv);
                     }
                         break;
-                    case STBTT_vcurve: {
+                    case STBTT_vcurve: { // Qudradic bezier curve flattened to line segments
                         gv.type = VertexType::CurveTo;
                         
                         double x0 = last_point.x;
                         double y0 = last_point.y;
-                        double x1 = v.x * scale;
-                        double y1 = v.y * scale;
-                        double cx = v.cx * scale;
-                        double cy = v.cy * scale;
+                        double x1 = (v.x * scale) + pen_position_x;
+                        double y1 = (v.y * scale) + pen_position_y;
+                        double cx = (v.cx * scale) + pen_position_x;
+                        double cy = (v.cy * scale) + pen_position_y;
                             // Approximate the quadratic curve using straight lines
                         for (int i = 1; i <= segments; ++i) {
                             double t = static_cast<double>(i) / segments;
@@ -133,15 +129,15 @@ namespace jam::ttf {
                         last_point.y = gv.pos.y;
                     }
                         break;
-                    case STBTT_vcubic: {
+                    case STBTT_vcubic: { // Cubic bbezier curve flattened to line segments
                         double x0 = last_point.x;
                         double y0 = last_point.y;
-                        double x1 = v.x * scale;
-                        double y1 = v.y * scale;
-                        double cx0 = v.cx * scale;
+                        double x1 = (v.x * scale) + pen_position_x;
+                        double y1 = (v.y * scale) + pen_position_y;
+                        double cx0 = (v.cx * scale) + pen_position_x;
                         double cy0 = v.cy * scale;
-                        double cx1 = v.cx1 * scale;
-                        double cy1 = v.cy1 * scale;
+                        double cx1 = (v.cx1 * scale) + pen_position_x;
+                        double cy1 = (v.cy1 * scale) + pen_position_y;
                         for (int i = 1; i <= segments; ++i) {
                             double t = static_cast<double>(i) / segments;
                             double u = 1.0f - t;
@@ -161,21 +157,10 @@ namespace jam::ttf {
                         break;
                 }
             }
-            
-//            double glyph_x = pen_position + (lsb * scale);
-            double glyph_x = pen_position;
-                //            double glyph_yY = baselineY;
-            for(size_t i = 0; i < glyph_points.size(); i++) {
-                    // adjust to x coordinates -1. to 1.
-                glyph_points[i].pos.x = glyph_points[i].pos.x - 1.;
-                
-                    // add left-side bearing and pen position
-                glyph_points[i].pos.x = glyph_points[i].pos.x + pen_position;
-            }
-            pen_position += ad_w / 2. * scale ;
-//            pen_position += g_width;
+            pen_position_x += ad_w * scale; // Move the pen forward
             prev_g_i = g_i;
             stbtt_FreeShape(&this->_font, vertices);
+            
         }
         
         return glyph_points;
