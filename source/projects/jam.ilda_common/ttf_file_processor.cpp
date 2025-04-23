@@ -34,9 +34,13 @@ namespace jam::ttf {
         return this->_font_initialized;
     };
     
-    std::vector<GlyphVertex> TtfFileProcessor::getGlyphVertices(std::string text, Point2D pen_pos, double height, int segments) {
-        
-        
+    std::vector<GlyphVertex> TtfFileProcessor::getGlyphVertices(
+        std::string text,
+        Point2D pen_pos,
+        bool kerning,
+        double fontsize,
+        int segments
+    ) {
         std::vector<GlyphVertex> glyph_points;
         if(!this->_font_initialized) {
             return glyph_points;
@@ -47,7 +51,7 @@ namespace jam::ttf {
         stbtt_GetFontVMetrics(&this->_font, &ascent, &descent, &line_gap);
         
             // Font scaling factor.
-        double scale = stbtt_ScaleForPixelHeight(&this->_font, .4);
+        double scale = stbtt_ScaleForPixelHeight(&this->_font, .1 * fontsize);
         
         
         std::string::iterator it = text.begin();
@@ -69,7 +73,7 @@ namespace jam::ttf {
             stbtt_GetGlyphHMetrics(&this->_font, g_i, &ad_w, &lsb);
             
                 // Add kerning and left-side bearing if it is not the first character.
-            if (prev_g_i) {
+            if (prev_g_i && kerning) {
                 int kern = stbtt_GetGlyphKernAdvance(&this->_font, prev_g_i, g_i);
                 pen_position_x += static_cast<double>(kern) * scale;
                 pen_position_x = pen_position_x + (lsb * scale);

@@ -76,8 +76,6 @@ private:
 
     std::map<std::string, std::string>_available_fonts;
     
-
-    
         /// Struct to encapsulate sending messages to outlets via the timer - for thread safty
     typedef struct QuededMessage {
         outlet<>* out;
@@ -102,9 +100,17 @@ private:
         uint8_t b = 255;
     } rgb_color_t;
     
+        /// Drawing Color
     rgb_color_t _color;
     
+        /// Pen Position for writing text
     jam::ttf::Point2D _pen_pos = {-1., 1.};
+    
+        /// Apply kerning to text rendering
+    bool _kerning = true;
+    
+    number _font_size = 20;
+    
         /// FIFO queue for messages to be sent to outlets
     fifo<queued_message_t> _to_max_queue { 1000 };
     
@@ -653,6 +659,40 @@ public:
         description {"Frame name prefix set in the header of the ILDA file.<br />ILDA files contain of a sequence of 'frames'. Every frame has a header summarizing some information about the frame. Every frame has a frame-name field in the header. jam.ilda.compose names frames automatically by setting the frame number as its name. This attribute sets an optioname prefix to the frame name (max 3 ASCII characters)."},
         category {"ILDA File"}
     };
+    
+    attribute<bool> kerning {
+        this, "kerning", true,
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, true);
+                this->_kerning = cleaned_args[0];
+                return cleaned_args;
+            }
+        },
+        title {"Kerning"},
+        description{"Apply kerning to text rendering"},
+        category{"Text Rendering"},
+    };
+    
+    attribute<number> textfontsize {
+        this, "textfontsize", 36,
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 20.);
+                cleaned_args[0] = std::clamp(static_cast<number>(cleaned_args[0]), 10., 1000.);
+                this->_font_size = cleaned_args[0];
+                return cleaned_args;
+            }
+        },
+        title {"Font Size"},
+        description{"Font size for text rendering"},
+        category{"Text Rendering"},
+        visibility{visibility::show}
+    };
+    
+    
     
     message<threadsafe::no> getfonts {
         this, "getfonts", "",
@@ -1251,7 +1291,12 @@ public:
                 in_string += static_cast<std::string>(args[i]);
             }
             
-            VecGlyphPoints points = this->_ttfFileProcessor.getGlyphVertices(in_string, this->_pen_pos);
+            VecGlyphPoints points = this->_ttfFileProcessor.getGlyphVertices(
+                 in_string,
+                 this->_pen_pos,
+                 this->_kerning,
+                 this->_font_size / 20.
+            );
             if (this->_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
