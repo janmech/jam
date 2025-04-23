@@ -19,6 +19,7 @@
 #include "c74_min.h"
 #include "jam.shape.hpp"
 #include "../jam.helper/attribute_args_helper.hpp"
+#include "jam_compose_data.hpp"
 #include "../jam.ilda_common/ilda_frame.hpp"
 #include "../jam.ilda_common/ilda_header.hpp"
 #include "../jam.ilda_common/ilda_data_record.hpp"
@@ -45,8 +46,9 @@ using VecGlyphPoints = std::vector<jam::ttf::GlyphVertex>;
 
 class ildacompose : public object<ildacompose>
 {
-private:
 
+protected:
+    
     std::string _instance_id = "";                  // Unique ID for each object instance.
                                                     // Used to itentify loaded ILDA filed data in the global jam.ilda.manager
     c74::max::t_object *_manager;                   // Pointer to global jam.ilda.manager object
@@ -71,9 +73,7 @@ private:
     
     jam::ttf::TtfFileProcessor _ttfFileProcessor;
     
-    protected :
     
-
     std::map<std::string, std::string>_available_fonts;
     
         /// Struct to encapsulate sending messages to outlets via the timer - for thread safty
@@ -100,6 +100,15 @@ private:
         uint8_t b = 255;
     } rgb_color_t;
     
+    typedef struct ComposePoint {
+        number x = 0.;
+        number y = 0.;
+        number z = 0.;
+        number r = 0.;
+        number g = 0.;
+        number b = 0.;
+    } compose_point_t;
+    
         /// Drawing Color
     rgb_color_t _color;
     
@@ -123,7 +132,6 @@ private:
     std::vector<jam::ilda::IldaFrame> _frames;
     
     std::thread _svg_file_parse_thread;                 // Thread for parsing SVG file asynchronously
-    
     
     void _updateFonts() {
         this->_available_fonts.clear();
@@ -293,23 +301,17 @@ private:
         }
     }
     
-    void _parseFramesToTrueColor(std::vector<jam::ilda::IldaFrame> &frames) {
+    void _parseFrames2DToTrueColor(std::vector<jam::ilda::IldaFrame> &frames) {
         jam::ilda::Colors *col = new jam::ilda::Colors();
         
         for(size_t i = 0; i < frames.size(); i++) {
             jam::ilda::IldaHeader h = frames[i].getHeader();
             jam::ilda::RecordFormat rec_format = h.getFormatCode();
             
-            switch (rec_format) {
-                case jam::ilda::RecordFormat::FORMAT_0:
-                    h.setFormatCode(jam::ilda::RecordFormat::FORMAT_4);
-                    break;
-                case jam::ilda::RecordFormat::FORMAT_1:
-                    h.setFormatCode(jam::ilda::RecordFormat::FORMAT_5);
-                    break;
-                default:
-                    continue;;
+            if(rec_format == jam::ilda::RecordFormat::FORMAT_2) { // we ignore color pallet frames
+                continue;
             }
+            h.setFormatCode(jam::ilda::RecordFormat::FORMAT_1); // 2D True Color
             frames[i].setHeader(h);
             std::vector<jam::ilda::IldaDataRecord> dr = frames[i].getDataRecords();
             for(size_t j = 0; j < dr.size(); j++) {
@@ -318,6 +320,7 @@ private:
                 dr[j].setRed((uint8_t)(col_vals[0] * 255.));
                 dr[j].setGreen((uint8_t)(col_vals[1] * 255.));
                 dr[j].setBlue((uint8_t)(col_vals[2] * 255.));
+                dr[j].setPosZ(0);
             }
             frames[i].setDataRecords(dr);
             
@@ -691,8 +694,6 @@ public:
         category{"Text Rendering"},
         visibility{visibility::show}
     };
-    
-    
     
     message<threadsafe::no> getfonts {
         this, "getfonts", "",
@@ -1528,7 +1529,7 @@ public:
     };
     
     message<threadsafe::no>ilda {
-        this, "ilda", "Reference to am ILDA file loaded by [jam.ilda.file]. The frames from the file will be appended. When imported frames use indexed colors, they are converted to true color mode",
+        this, "ilda", "Reference to am ILDA file loaded by [jam.ilda.file]. The frames from the file will be appended. 3D frames will be flattened to 2D frames by discarting the y axis. Frames using indexed colors, they are converted to true color mode",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message 'ilda'" << endl;
@@ -1536,7 +1537,7 @@ public:
             }
             std::string ilda_file_refence = args[0];
             std::vector<jam::ilda::IldaFrame> frames = this->_getStructPointer()->getFrames(ilda_file_refence);
-            this->_parseFramesToTrueColor(frames);
+            this->_parseFrames2DToTrueColor(frames);
             if(frames.size() > 0) {
                 this->_frames.insert(this->_frames.end(),frames.begin(), frames.end());
             }
