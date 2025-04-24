@@ -11,8 +11,15 @@
 #include "c74_min_api.h"
 #include "../jam.ilda_common/ilda_frame.hpp"
 #include "../jam.ilda_common/ilda_data_record.hpp"
+#include "jam.shape.hpp"
+
+#ifndef PI
+/** The pi constant.  */
+#define PI 3.14159265358979323846
+#endif
 
 using number = c74::min::number;
+using Point2D = jam::Point2D;
 
 namespace jam::compose {
     struct DataPoint {
@@ -25,48 +32,31 @@ namespace jam::compose {
         bool blanking = false;
         bool last_point = false;
     };
+
     
     class DataSet {
     protected:
-        int _deNormalizePosition(double pos) {
-            int de_normalized = static_cast<int>(pos * 32000);
-            return std::clamp(de_normalized, -32767, 32767);
-        };
+        Point2D _scale_factor = {1., 1.};           // x/y scale factor
+        number _rotation_rad = 0.;                  // rotation angle in rad
+        Point2D _rotation_anchor = {0., 0.};        // rotate DataSet around this point
+        std::vector<DataPoint> _points_raw;         // raw points: scaling  and rotation not applied
+        std::vector<DataPoint> _points_processed;    // processed points:scaling  and rotation applied
+        
+        int _deNormalizePosition(double pos);       // translate  -1. to 1. coordinates to ILDA coordinates
+        // apply scazling and rotation
+        void _processDataPoints();                  // apply scaling and rotation to raw data points
+
+        
     public:
-        number scale_factor = 1.;
-        number rotation = 0.;
-        std::vector<DataPoint> points;
-        jam::ilda::IldaFrame frameSkeleton(){
-            jam::ilda::IldaFrame f;
-            jam::ilda::IldaHeader h;
-            h.setFormatCode(jam::ilda::FORMAT_1);
-            f.setHeader(h);
-            for(auto it = this->points.begin(); it != this->points.end(); it++) {
-                // point is inside visible area
-                jam::ilda::IldaDataRecord dr;
-                if(it->x <=1. && it->x >= -1. && it->y <=1. && it->y >= 1.) {
-                    dr.setRed(static_cast<uint8_t>(it->r * 255.));
-                    dr.setGreen(static_cast<uint8_t>(it->g * 255.));
-                    dr.setBlue(static_cast<uint8_t>(it->b * 255.));
-                    dr.setBlanking(it->blanking);
-                    dr.setLastPoint(it->last_point);
-                    f.pushRecord(dr);
-                } else { // point is outside visible area
-                    // calculate where it hits the bounds
-                    // make a new point where it hits
-                    // UFF mor difficult than I thought... we need to know then context: where does it come from, where does it go to....
-                    // case A) Point is visible and previous is visible --> add point
-                    // case B) Point is visible as previous is NOT visible  --> add a point where it hits the bounds ad mark as such
-                    // case C) Point is NOT visible and previous point is NOT visible --> ignore point
-                    // case D) Point is NOT visible and previous point IS visible --> add point where it hits the bounds and mark as such
-                    
-                    
-                    // if the previous generated point is a bounding box point set to blanking
-                    
-                }
-            }
-            return f;
-        };
+        void setScale(number s);                    // set scaling factor for x and y direction
+        void setScale(number sx, number sy);        // set scaling factor for x and y direction separately
+        void setRotaion(number angle);              // set rotation in degree (0º to 360º)
+        void setRotationAnchor(Point2D anchor);     // set rotation anchor
+        std::vector<DataPoint> getRawPoints();      // returns a vector with raw DataPoints
+        void addRawPoint(DataPoint p);              // Push back a raw data point
+        void clearRawPoints();                      // Clear raw data points
+        std::vector<DataPoint> getProcessedPoints();// returns processed data points
+        jam::ilda::IldaFrame toIldaFrame();
     };
 };
 

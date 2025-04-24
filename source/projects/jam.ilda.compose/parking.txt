@@ -1,0 +1,32 @@
+       // TODO: check if nessecary
+        /// generate point for circle
+        /// @param   c_x                               center coordinate x
+        /// @param   c_y                               center coordinate y
+        /// @param   r                                   radius
+        /// @param   theta_start            start angle in degrees (0º - 360º)
+        /// @param   theta_end                 end angle in degrees (0º - 360º)
+        /// @param   segments                   number of line segments
+    VecPoint2D _makeCircle(
+                           const number c_x,
+                           const number c_y,
+                           const number r,
+                           const number theta_start = 0,
+                           const number theta_end = 360,
+                           int segments = 50
+                           ) {
+        number rad_start = theta_start * (PI / 180);
+        number rad_end = theta_end * (PI / 180);
+        number rad_range = rad_end - rad_start;
+        
+        VecPoint2D points;
+        
+        for (int i = 0; i <= segments; ++i) {
+            Point2D p;
+            number angle = rad_start + (rad_range * i / segments);
+            p.x = c_x + r * std::cos(angle);
+            p.y = c_y + r * std::sin(angle);
+            points.push_back(p);
+        }
+        return points;
+    }
+    
