@@ -30,3 +30,83 @@
         return points;
     }
     
+
+    VecPoint2D _makeRectangle(
+                              Point2D tl,
+                              Point2D br,
+                              number rnd, // corner roundness
+                              int segments = 10
+                              ) {
+        
+        VecPoint2D points;
+        Point2D tr = {br.x, tl.y};
+        Point2D bl = {tl.x, br.y};
+        
+            // calculate radius as fraction of shorter rectangle side.
+            // the rnd parameter describes the roundness of a corner
+            // 0: no rounding, 1: max rounding
+            // 1 means we calculaten an arc with the radius on 1/2 of the shorter rectangle side.
+        number length_horizontal = abs(tr.x - tl.x);
+        number length_vertical = abs(tl.y - bl.y);
+        number min_lenght = fmin(length_horizontal, length_vertical);
+        number radius = min_lenght * rnd / 2.;
+        
+            // arc circle radius
+        Point2D circle_r = {radius, radius};
+        
+            // arc top left
+        Point2D arc_center_tl = {tl.x + radius, tl.y - radius};
+        VecPoint2D arc_tl = this->_makeEllipse(arc_center_tl, circle_r, 180, 90, segments);
+        
+            // arc top right
+        Point2D arc_center_tr = {tr.x - radius, tr.y - radius};
+        VecPoint2D arc_tr = this->_makeEllipse(arc_center_tr, circle_r, 90, 0, segments);
+        
+            // arc bottom right
+        Point2D arc_center_br = {br.x - radius, br.y + radius};
+        VecPoint2D arc_br = this->_makeEllipse(arc_center_br, circle_r, 0, -90, segments);
+        
+            // arc bottom left
+        Point2D arc_center_bl = {bl.x + radius, bl.y + radius};
+        VecPoint2D arc_bl = this->_makeEllipse(arc_center_bl, circle_r, 270, 180, segments);
+        
+        points.insert(points.end(), arc_tl.begin(), arc_tl.end());
+        points.insert(points.end(), arc_tr.begin(), arc_tr.end());
+        points.insert(points.end(), arc_br.begin(), arc_br.end());
+        points.insert(points.end(), arc_bl.begin(), arc_bl.end());
+        points.push_back(arc_tl[0]);
+        
+        return points;
+    }
+
+
+            /// generate point for ellipes
+        /// @param   c_x                               center coordinate x
+        /// @param   c_y                               center coordinate y
+        /// @param   rx                                 radius x
+        /// @param   ry                                 radius y
+        /// @param   theta_start            start angle in degrees (0º - 360º)
+        /// @param   theta_end                 end angle in degrees (0º - 360º)
+        /// @param   segments                   number of line segments
+    VecPoint2D _makeEllipse(
+                            Point2D c,
+                            Point2D r,
+                            const number theta_start = 0,
+                            const number theta_end = 360,
+                            int segments = 50
+                            ) {
+        number rad_start = theta_start * (PI / 180);
+        number rad_end = theta_end * (PI / 180);
+        number rad_range = rad_end - rad_start;
+        
+        VecPoint2D points;
+        for (int i = 0; i <= segments; ++i) {
+            Point2D p;
+            number angle = rad_start + (rad_range * i / segments);
+            p.x = c.x + r.x * std::cos(angle);
+            p.y = c.y + r.y * std::sin(angle);
+            points.push_back(p);
+        }
+        return points;
+        
+    }

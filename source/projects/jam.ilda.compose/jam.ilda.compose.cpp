@@ -41,6 +41,8 @@ using namespace c74::min;
 using namespace jam::compose;
 using Point2D = jam::Point2D;
 using VecPoint2D = std::vector<jam::Point2D>;
+using VecDataPoints = std::vector<DataPoint>;
+using VecDataSets = std::vector<DataSet>;
 using VecGlyphPoints = std::vector<jam::ttf::GlyphVertex>;
 
 
@@ -62,17 +64,17 @@ protected:
     
     char _filename[c74::max::MAX_PATH_CHARS] = {0}; // File name of ILDA file toi be imported
     
-    std::vector<jam::Shape> _shapes;                // Vector of Shapes from parsed SVG file
+    std::vector<jam::Shape> _svg_shapes;            // Vector of Shapes from parsed SVG file
     
     std::string _company_name = "NOT_SET";          // Company name set to frame headers
     
     std::string _frame_name_prefix = "";            // Prefix for frame name set to frame headers
     
-    size_t _edit_frame = 0;
+    size_t _edit_frame = 0;                         // Frame with this index is selected for editing
     
-    jam::ilda::IldaFileProcessor _ildaFileProcessor;     // Class with functions for ILDA file processing/parsing
+    jam::ilda::IldaFileProcessor _ildaFileProcessor; // Class with functions for ILDA file processing/parsing
     
-    jam::ttf::TtfFileProcessor _ttfFileProcessor;
+    jam::ttf::TtfFileProcessor _ttfFileProcessor;    // Class with function for TrueType font rendering
     
     
     std::map<std::string, std::string>_available_fonts;
@@ -95,11 +97,6 @@ protected:
         }
     } queued_message_t;
     
-    typedef struct RgbColorIlda {
-        uint8_t r = 255;
-        uint8_t g = 255;
-        uint8_t b = 255;
-    } rgb_color_ilda_t;
     
     typedef struct RgbColor {
         number r = 1.;
@@ -107,18 +104,7 @@ protected:
         number b = 1.;
     } rgb_color_t;
     
-    
-    typedef struct ComposePoint {
-        number x = 0.;
-        number y = 0.;
-        number z = 0.;
-        number r = 0.;
-        number g = 0.;
-        number b = 0.;
-    } compose_point_t;
-    
         /// Drawing Color
-    rgb_color_ilda_t _color_ilda;
     rgb_color_t _color;
     
         /// Pen Position for writing text
@@ -138,9 +124,9 @@ protected:
     bool _is_parsing_svg = false;
     
         /// Vector of IldaFrames currenly available
-    std::vector<jam::ilda::IldaFrame> _frames;
+    std::vector<jam::ilda::IldaFrame> _ilda_frames;
     
-    std::vector<DataSet> _raw_frames;
+    std::vector<DataSet> _data_sets;                    // Data sets contain ilda frame information before scale/rotation precessing
     
     std::thread _svg_file_parse_thread;                 // Thread for parsing SVG file asynchronously
     
@@ -194,14 +180,14 @@ protected:
     }
     
         /// Set if the instance currently in the process of importing a file
-    void _setParsingStateSvg(bool state) {
+    void _setSvgParsingState(bool state) {
         if(state != this->_is_parsing_svg) {
             this->_is_parsing_svg = state;
         }
     }
     
         /// get if the nstance currently in the process of importing a file
-    bool _getParsingState() {
+    bool _getSvgParsingState() {
         return this->_is_parsing_svg;
     }
     
@@ -236,17 +222,13 @@ protected:
             //        return static_cast<int>(pos * 32767);
     };
     
-    number _normalizePosition(int pos) {
-        return static_cast<number>(pos) / 32000.;
-    }
-    
         /// adjust the current edit frame index when frame count has changed, to make sure it doen't go out of bounds
     void _updateEditFrame() {
-        if(this->_frames.size() == 0) {
+        if(this->_ilda_frames.size() == 0) {
             this->_edit_frame = 0;
         } else {
-            if(this->_edit_frame > this->_frames.size() - 1) {
-                this->_edit_frame = this->_frames.size() - 1;
+            if(this->_edit_frame > this->_ilda_frames.size() - 1) {
+                this->_edit_frame = this->_ilda_frames.size() - 1;
             }
         }
     }
@@ -258,7 +240,7 @@ protected:
         queued_message_t msg;
         
         msg_atoms.clear();
-        msg_atoms.push_back(this->_frames.size());
+        msg_atoms.push_back(this->_ilda_frames.size());
         msg.set(&o_framecount, msg_atoms);
         msg.send(this);
         
@@ -284,23 +266,31 @@ protected:
         h.setIsColorPallet(false);
         h.setDataRecordCount(0);
         f.setHeader(h);
-        this->_frames.push_back(f);
+        this->_ilda_frames.push_back(f);
         this->_updateFrameHeaders();
-        this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
-        this->_edit_frame = this->_frames.size() - 1;
+        this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
+        this->_edit_frame = this->_ilda_frames.size() - 1;
         
         // add raw frame
         DataSet raw_frame;
-        this->_raw_frames.push_back(raw_frame);
+        this->_data_sets.push_back(raw_frame);
         
         this->_updateOutlets();
     }
     
     void _removeEmptyFrames() {
-        for (auto it = this->_frames.begin(); it != this->_frames.end();) {
+        for (auto it = this->_ilda_frames.begin(); it != this->_ilda_frames.end();) {
             auto f = *it;
             if(f.getHeader().getDataRecordCount() == 0) {
-                it = this->_frames.erase(it);
+                it = this->_ilda_frames.erase(it);
+            } else {
+                it++;
+            }
+        }
+        for (auto it = this->_data_sets.begin(); it != this->_data_sets.end();) {
+            auto ds = *it;
+            if(ds.getDataPoints().size() == 0) {
+                it = this->_data_sets.erase(it);
             } else {
                 it++;
             }
@@ -309,12 +299,12 @@ protected:
     
         /// update frames in sequens and frame number for all frames
     void _updateFrameHeaders() {
-        size_t frame_count = this->_frames.size();
+        size_t frame_count = this->_ilda_frames.size();
         for(size_t i = 0; i < frame_count; i++) {
-            this->_frames[i].getHeader().setFramesInSequence(frame_count);
-            this->_frames[i].getHeader().setFrameNumber(i);
-            this->_frames[i].getHeader().setCompanyName(this->_company_name);
-            this->_frames[i].getHeader().setFrameName(this->_makeFrameName(static_cast<int>(i)));
+            this->_ilda_frames[i].getHeader().setFramesInSequence(frame_count);
+            this->_ilda_frames[i].getHeader().setFrameNumber(i);
+            this->_ilda_frames[i].getHeader().setCompanyName(this->_company_name);
+            this->_ilda_frames[i].getHeader().setFrameName(this->_makeFrameName(static_cast<int>(i)));
         }
     }
     
@@ -396,9 +386,9 @@ protected:
         /// @param   theta_start            start angle in degrees (0º - 360º)
         /// @param   theta_end                 end angle in degrees (0º - 360º)
         /// @param   segments                   number of line segments
-    VecPoint2D _makeEllipse(
-                            Point2D c,
-                            Point2D r,
+    VecDataPoints _makeEllipse(
+                            DataPoint c,
+                            DataPoint r,
                             const number theta_start = 0,
                             const number theta_end = 360,
                             int segments = 50
@@ -407,9 +397,9 @@ protected:
         number rad_end = theta_end * (PI / 180);
         number rad_range = rad_end - rad_start;
         
-        VecPoint2D points;
+        VecDataPoints points;
         for (int i = 0; i <= segments; ++i) {
-            Point2D p;
+            DataPoint p;
             number angle = rad_start + (rad_range * i / segments);
             p.x = c.x + r.x * std::cos(angle);
             p.y = c.y + r.y * std::sin(angle);
@@ -419,44 +409,43 @@ protected:
         
     }
     
-    void _addDataRecorsToEditFrame(VecPoint2D points, uint8_t r, uint8_t g, uint8_t b) {
-        for(size_t i = 0; i < points.size(); i++) {
-            jam::ilda::IldaDataRecord dr;
-            bool is_blanking = (i == 0);
-            uint8_t dr_r = (is_blanking) ? 0 : r;
-            uint8_t dr_g = (is_blanking) ? 0 : g;
-            uint8_t dr_b = (is_blanking) ? 0 : b;
-            
-            dr.setRed(dr_r);
-            dr.setGreen(dr_g);
-            dr.setBlue(dr_b);
-            dr.setPosX(this->_deNormalizePosition(points[i].x));
-            dr.setPosY(this->_deNormalizePosition(points[i].y));
-                // we ondly create/modify 2d data records,but the frame maight be 3d
-                // when it was imported from an ILDA file. hence set the y coordinate to 0
-            dr.setPosZ(0);
-            dr.setBlanking(is_blanking);
-            this->_frames[this->_edit_frame].pushRecord(dr);
+    void _addDataPointsToEditDataSet(VecDataPoints points) {
+        for(auto it = points.begin(); it != points.end(); it++) {
+            bool is_first = it == points.begin();
+            DataPoint dp;
+            dp.x = it->x;
+            dp.y = it->y;
+            dp.r = (is_first) ? 0. : this->_color.r;
+            dp.g = (is_first) ? 0. : this->_color.g;
+            dp.b = (is_first) ? 0. : this->_color.b;
+            dp.blanking = is_first;
+            this->_data_sets[this->_edit_frame].addDataPoint(dp);
         }
-    };
-    
+    }
     
         /// generate point for a rectange with rounded corners
         /// @param   tl                               top left coordinates of the rectange
         /// @param   br                               bottom right coordinates of the rectange
         /// @param   rnd                             corner roundes (0. - 1.) the higer the number the greater the radius of the corner arc
         /// @param   segments                  number of line segments
-    VecPoint2D _makeRectangle(
-                              Point2D tl,
-                              Point2D br,
+    VecDataPoints _makeRectangle(
+                              DataPoint tl,
+                              DataPoint br,
                               number rnd, // corner roundness
                               int segments = 10
                               ) {
         
-        VecPoint2D points;
-        Point2D tr = {br.x, tl.y};
-        Point2D bl = {tl.x, br.y};
-        
+        VecDataPoints points;
+        DataPoint tr = {br.x, tl.y};
+        DataPoint bl = {tl.x, br.y};
+        if(rnd == 0.) {
+            points.push_back(tl);
+            points.push_back(tr);
+            points.push_back(br);
+            points.push_back(bl);
+            points.push_back(tl);
+            return points;
+        }
             // calculate radius as fraction of shorter rectangle side.
             // the rnd parameter describes the roundness of a corner
             // 0: no rounding, 1: max rounding
@@ -467,23 +456,23 @@ protected:
         number radius = min_lenght * rnd / 2.;
         
             // arc circle radius
-        Point2D circle_r = {radius, radius};
+        DataPoint circle_r = {radius, radius};
         
             // arc top left
-        Point2D arc_center_tl = {tl.x + radius, tl.y - radius};
-        VecPoint2D arc_tl = this->_makeEllipse(arc_center_tl, circle_r, 180, 90, segments);
+        DataPoint arc_center_tl = {tl.x + radius, tl.y - radius};
+        VecDataPoints arc_tl = this->_makeEllipse(arc_center_tl, circle_r, 180, 90, segments);
         
             // arc top right
-        Point2D arc_center_tr = {tr.x - radius, tr.y - radius};
-        VecPoint2D arc_tr = this->_makeEllipse(arc_center_tr, circle_r, 90, 0, segments);
+        DataPoint arc_center_tr = {tr.x - radius, tr.y - radius};
+        VecDataPoints arc_tr = this->_makeEllipse(arc_center_tr, circle_r, 90, 0, segments);
         
             // arc bottom right
-        Point2D arc_center_br = {br.x - radius, br.y + radius};
-        VecPoint2D arc_br = this->_makeEllipse(arc_center_br, circle_r, 0, -90, segments);
+        DataPoint arc_center_br = {br.x - radius, br.y + radius};
+        VecDataPoints arc_br = this->_makeEllipse(arc_center_br, circle_r, 0, -90, segments);
         
             // arc bottom left
-        Point2D arc_center_bl = {bl.x + radius, bl.y + radius};
-        VecPoint2D arc_bl = this->_makeEllipse(arc_center_bl, circle_r, 270, 180, segments);
+        DataPoint arc_center_bl = {bl.x + radius, bl.y + radius};
+        VecDataPoints arc_bl = this->_makeEllipse(arc_center_bl, circle_r, 270, 180, segments);
         
         points.insert(points.end(), arc_tl.begin(), arc_tl.end());
         points.insert(points.end(), arc_tr.begin(), arc_tr.end());
@@ -501,19 +490,18 @@ protected:
         /// @param   p03                             end point
         /// @param   segments                  number of line segments
         /// @param   segments                   number of line segments
-    VecPoint2D _makeCubeBezier(const Point2D& p0, const Point2D& p1, const Point2D& p2, const Point2D& p3, int segments = 100) {
-        VecPoint2D points;
+    VecDataPoints _makeCubeBezier(const DataPoint& p0, const DataPoint& p1, const DataPoint& p2, const DataPoint& p3, int segments = 100) {
+        VecDataPoints points;
         for (int i = 0; i <= segments; ++i) {
             number t = static_cast<number>(i) / segments;
             number u = 1.0f - t;
             number x = u*u*u*p0.x + 3*u*u*t*p1.x + 3*u*t*t*p2.x + t*t*t*p3.x;
             number y = u*u*u*p0.y + 3*u*u*t*p1.y + 3*u*t*t*p2.y + t*t*t*p3.y;
-            Point2D p = {x, y};
+            DataPoint p = {x, y};
             points.push_back(p);
         }
         return points;
     };
-    
     
     void _rotateFrame(jam::ilda::IldaFrame &f, Point2D c, number angle) {
         angle = -1. * angle;
@@ -543,23 +531,7 @@ protected:
         }
     }
     
-    void _scaleFrame(jam::ilda::IldaFrame &f, Point2D scale) {
-        f.reset();
-        std::vector<jam::ilda::IldaDataRecord> scaled_records;
-        jam::ilda::IldaDataRecord r;
-        while(f.getNext(&r)) {
-            r.setPosX(r.getPosX() * scale.x);
-            r.setPosY(r.getPosY() * scale.y);
-            scaled_records.push_back(r);
-        }
-        
-        f.clearRecords();
-        for(size_t i = 0; i < scaled_records.size(); i++) {
-            f.pushRecord(scaled_records[i]);
-        }
-    }
-    
-    void _scaleRawFrame(DataSet &ds, Point2D scale) {
+    void _scaleDataSet(DataSet &ds, Point2D scale) {
         ds.setScale(scale.x, scale.y);
     }
     
@@ -616,7 +588,7 @@ public:
                 this->_company_name = name;
                 this->_updateFrameHeaders();
                 if(this->initialized()) {
-                    this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+                    this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
                     this->_updateOutlets();
                 }
                 cleaned_args[0] = name;
@@ -640,7 +612,7 @@ public:
                 this->_updateFrameHeaders();
                 this->_updateFrameHeaders();
                 if(this->initialized()) {
-                    this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+                    this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
                     this->_updateOutlets();
                 }
                 cleaned_args[0] = name;
@@ -718,9 +690,9 @@ public:
     message<threadsafe::no> clear {
         this, "clear", "Remove all frames",
         MIN_FUNCTION {
-            // crear raw frames
-            this->_raw_frames.clear();
-            this->_frames.clear();
+            // clear raw frames
+            this->_data_sets.clear();
+            this->_ilda_frames.clear();
             this->_getStructPointer()->clearInstanceFile(this->_instance_id);
             this->_appendEmptyFrame();
             return {};
@@ -747,7 +719,7 @@ public:
             
             int frame_index = args[0];
             
-            if(frame_index < 0 || frame_index > this->_frames.size() - 1) {
+            if(frame_index < 0 || frame_index > this->_ilda_frames.size() - 1) {
                 return {};
             }
             
@@ -792,7 +764,7 @@ public:
     message<threadsafe::no> removeframe {
         this, "removeframe", "Remove frame a frame. If no argument is provided the currently set edit frame is removed. If one argument [frame index] is present, the frame at index will be duplicated.",
         MIN_FUNCTION {
-            if(this->_frames.size() == 0) {
+            if(this->_ilda_frames.size() == 0) {
                 return {};
             }
             int frame_index = -1;
@@ -806,17 +778,17 @@ public:
                 frame_index = args[0];
             }
             
-            if(frame_index < 0 || frame_index > this->_frames.size() -1) {
+            if(frame_index < 0 || frame_index > this->_ilda_frames.size() -1) {
                 cwarn << "frame index out of range" << endl;
                 return {};
             }
 
-            this->_frames.erase(this->_frames.begin() + frame_index);
+            this->_ilda_frames.erase(this->_ilda_frames.begin() + frame_index);
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             
-            if(this->_edit_frame > this->_frames.size() - 1) {
-                this->_edit_frame = (this->_frames.size() > 0) ? this->_frames.size() - 1 : 0;
+            if(this->_edit_frame > this->_ilda_frames.size() - 1) {
+                this->_edit_frame = (this->_ilda_frames.size() > 0) ? this->_ilda_frames.size() - 1 : 0;
             }
             
             this->_updateOutlets();
@@ -828,7 +800,7 @@ public:
     message<threadsafe::no> duplicateframe {
         this, "duplicateframe", "Duplicate a frame. If no argument is provided the currently set edit frame is duplicated. If one argument [frame index] is present, the frame at index will be duplicated.",
         MIN_FUNCTION {
-            if(this->_frames.size() == 0) {
+            if(this->_ilda_frames.size() == 0) {
                 return {};
             }
             int frame_index = -1;
@@ -841,15 +813,17 @@ public:
                    }
                 frame_index = args[0];
             }
-            if(frame_index < 0 || frame_index > this->_frames.size() - 1) {
+            if(frame_index < 0 || frame_index > this->_ilda_frames.size() - 1) {
                 cwarn << "frame index out of range" << endl;
                 return {};
             }
             
-            jam::ilda::IldaFrame f = this->_frames[frame_index];
-            this->_frames.insert(this->_frames.begin() + frame_index, f);
+            DataSet d = this->_data_sets[frame_index];
+            jam::ilda::IldaFrame f = d.toIldaFrame();
+            this->_data_sets.insert(this->_data_sets.begin() + frame_index, d);
+            this->_ilda_frames.insert(this->_ilda_frames.begin() + frame_index, f);
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
@@ -860,7 +834,7 @@ public:
     message<threadsafe::no> copyframe {
         this, "copyframe", "Copy a frame. The message 'copyframe' followed by two arguments <i>source_index</i> <i>destination_index</i> copies a frame from <i>source_index</i> to <i>destination_index</i>",
         MIN_FUNCTION {
-            if(this->_frames.size() == 0) {
+            if(this->_ilda_frames.size() == 0) {
                 return {};
             }
             if(args.size() < 2 ) {
@@ -879,7 +853,7 @@ public:
             int source_index = args[0];
             int dest_index = args[1];
             
-            if(source_index < 0 || source_index > this->_frames.size() - 1 ) {
+            if(source_index < 0 || source_index > this->_ilda_frames.size() - 1 ) {
                 cwarn << "source_index out of range" << endl;
                 return {};
             }
@@ -889,16 +863,19 @@ public:
                 return {};
             }
     
+            DataSet d = this->_data_sets[source_index];
             
-            jam::ilda::IldaFrame f = this->_frames[source_index];
-            if(dest_index >= this->_frames.size()) {
-                this->_frames.push_back(f);
+            jam::ilda::IldaFrame f = d.toIldaFrame();
+            if(dest_index >= this->_ilda_frames.size()) {
+                this->_data_sets.push_back(d);
+                this->_ilda_frames.push_back(f);
             } else {
-                this->_frames.insert(this->_frames.begin() + dest_index, f);
+                this->_data_sets.insert(this->_data_sets.begin() + dest_index, d);
+                this->_ilda_frames.insert(this->_ilda_frames.begin() + dest_index, f);
             }
             
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             return {};
         }
@@ -911,21 +888,21 @@ public:
                     cwarn << "missing argument for message 'moveto'" << endl;
                     return {};
                 }
-                if (this->_frames.size() == 0) {
+                if (this->_ilda_frames.size() == 0) {
                     this->_appendEmptyFrame();
                 }
                 number x = args[0];
                 number y = args[1];
-                jam::ilda::IldaDataRecord r;
-                r.setRed(0);
-                r.setGreen(0);
-                r.setBlue(0);
-                r.setPosX(this->_deNormalizePosition(x));
-                r.setPosY(this->_deNormalizePosition(y));
-                r.setBlanking(true);
-                this->_frames[this->_edit_frame].pushRecord(r);
-                this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
                 
+                DataPoint dp;
+                dp.x = x;
+                dp.y = y;
+                dp.blanking = true;
+                
+                this->_data_sets[this->_edit_frame].addDataPoint(dp);
+                this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
+                this->_updateFrameHeaders();
+                this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
                 this->_updateOutlets();
                 
                 return {};
@@ -936,12 +913,12 @@ public:
     message<threadsafe::no>svg {
         this, "svg", "Parse a SVG file into the current edit frame.",
         MIN_FUNCTION {
-            if(this->_getParsingState()) {
+            if(this->_getSvgParsingState()) {
                 cwarn << "file loading already in progress" << endl;
                 return {};
             }
             
-            this->_setParsingStateSvg(true);
+            this->_setSvgParsingState(true);
             
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'import'" << endl;
@@ -968,7 +945,7 @@ public:
                         msg.set(&o_file_result, msg_atoms);
                         msg.send(this);
                     }
-                    this->_setParsingStateSvg(false);
+                    this->_setSvgParsingState(false);
                     return{};
                 }
             }
@@ -982,7 +959,7 @@ public:
                     msg_atoms.push_back(0);
                     msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
-                    this->_setParsingStateSvg(false);
+                    this->_setSvgParsingState(false);
                     return {};
                     
                 }
@@ -997,7 +974,7 @@ public:
                     msg_atoms.push_back(0);
                     msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
-                    this->_setParsingStateSvg(false);
+                    this->_setSvgParsingState(false);
                     return {};
                 }
             }
@@ -1012,7 +989,7 @@ public:
                 msg_atoms.push_back(0);
                 msg.set(&o_file_result, msg_atoms);
                 msg.send(this);
-                this->_setParsingStateSvg(false);
+                this->_setSvgParsingState(false);
                 return {};
             }
             
@@ -1036,7 +1013,7 @@ public:
                     msg_atoms.push_back(0);
                     msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
-                    this->_setParsingStateSvg(false);
+                    this->_setSvgParsingState(false);
                     return;
                 }
                 
@@ -1051,7 +1028,7 @@ public:
                     msg_atoms.push_back(0);
                     msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
-                    this->_setParsingStateSvg(false);
+                    this->_setSvgParsingState(false);
                     return;
                 }
                 
@@ -1068,7 +1045,7 @@ public:
                     msg_atoms.push_back(0);
                     msg.set(&o_file_result, msg_atoms);
                     msg.send(this);
-                    this->_setParsingStateSvg(false);
+                    this->_setSvgParsingState(false);
                     return;
                     
                 }
@@ -1079,11 +1056,11 @@ public:
                 msg_atoms.push_back(1);
                 msg.set(&o_file_result, msg_atoms);
                 msg.send(this);
-                this->_setParsingStateSvg(false);
+                this->_setSvgParsingState(false);
                 
                 
                     // parse SVG data into shapes
-                _shapes.clear();
+                _svg_shapes.clear();
                 for (NSVGshape* shape = image->shapes; shape != nullptr; shape = shape->next) {
                     jam::Shape s("SVGPath");
                     
@@ -1125,7 +1102,7 @@ public:
                             }
                             s.thinShape();
                         }
-                        this->_shapes.push_back(s);
+                        this->_svg_shapes.push_back(s);
                     }
                     
                 }
@@ -1133,34 +1110,34 @@ public:
                 nsvgDelete(image);
                 
                     // Add shape data to current edit_frame
-                if(this->_frames.size() == 0) {
+                if(this->_ilda_frames.size() == 0) {
                     this->_appendEmptyFrame();
                 }
                 
-                jam::ilda::IldaFrame f = this->_frames[this->_edit_frame];
-                for(size_t i = 0; i< this->_shapes.size(); i++) {
-                    for(size_t j = 0; j < this->_shapes[i].getPoints().size(); j++) {
+                DataSet ds = this->_data_sets[this->_edit_frame];
+                for(size_t i = 0; i< this->_svg_shapes.size(); i++) {
+                    for(size_t j = 0; j < this->_svg_shapes[i].getPoints().size(); j++) {
                         bool is_blanking = (j == 0);
-                        Point2D p = this->_shapes[i].getPoints()[j];
-                        jam::ilda::IldaDataRecord dr;
-                        dr.setRed(is_blanking ? 0 : this->_shapes[i].getColor().r);
-                        dr.setGreen(is_blanking ? 0 : this->_shapes[i].getColor().g);
-                        dr.setBlue(is_blanking ? 0 : this->_shapes[i].getColor().b);
-                        dr.setBlanking(is_blanking);
-                        dr.setPosX(this->_deNormalizePosition(p.x));
-                        dr.setPosY(this->_deNormalizePosition(p.y));
-                        f.pushRecord(dr);
+                        Point2D p = this->_svg_shapes[i].getPoints()[j];
+                        DataPoint dp;
+                        dp.r = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().r) * 255.;
+                        dp.g = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().g) * 255.;
+                        dp.b = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().b) * 255.;
+                        dp.blanking = is_blanking;
+                        dp.x = p.x;
+                        dp.y = p.y;
+                        ds.addDataPoint(dp);
                     }
-                    
                 }
-                this->_frames[this->_edit_frame] = f;
+                this->_data_sets[this->_edit_frame] = ds;
+                this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
                 this->_updateFrameHeaders();
-                this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+                this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
                 
                 this->_updateOutlets();
                 
                 
-                this->_setParsingStateSvg(false);
+                this->_setSvgParsingState(false);
             });
             
             this->_svg_file_parse_thread.detach();
@@ -1283,30 +1260,30 @@ public:
                 in_string += static_cast<std::string>(args[i]);
             }
             
-            VecGlyphPoints points = this->_ttfFileProcessor.getGlyphVertices(
+            VecGlyphPoints glyph_points = this->_ttfFileProcessor.getGlyphVertices(
                  in_string,
                  this->_pen_pos,
                  this->_kerning,
                  this->_font_size / 20.
             );
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
-            
-            for(size_t i = 0; i < points.size(); i++) {
-                jam::ilda::IldaDataRecord d_r;
-                bool blanking = points[i].type == jam::ttf::VertexType::MoveTo;
-                d_r.setRed(this->_color_ilda.r * !blanking);
-                d_r.setGreen(this->_color_ilda.g * !blanking);
-                d_r.setBlue(this->_color_ilda.b * !blanking);
-                d_r.setPosX(this->_deNormalizePosition(points[i].pos.x));
-                d_r.setPosY(this->_deNormalizePosition(points[i].pos.y));
-                d_r.setBlanking(blanking);
-                this->_frames[this->_edit_frame].pushRecord(d_r);
+            for(size_t i = 0; i < glyph_points.size(); i++) {
+                bool blanking = glyph_points[i].type == jam::ttf::VertexType::MoveTo;
+                DataPoint dp;
+                dp.r = this->_color.r * !blanking;
+                dp.g = this->_color.g * !blanking;
+                dp.b = this->_color.b * !blanking;
+                dp.blanking = blanking;
+                dp.x = glyph_points[i].pos.x;
+                dp.y = glyph_points[i].pos.y;
+                this->_data_sets[this->_edit_frame].addDataPoint(dp);
             }
 
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
-            
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             
@@ -1321,7 +1298,7 @@ public:
                 cwarn << "missing argument for message 'line'" << endl;
                 return {};
             }
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
             number x_start = args[0];
@@ -1329,52 +1306,24 @@ public:
             number x_end   = args[2];
             number y_end   = args[3];
             
-           
-                // move to staring point
-            jam::ilda::IldaDataRecord r_start;
-//            r_start.setRed(0);
-//            r_start.setGreen(0);
-//            r_start.setBlue(0);
-//            r_start.setPosX(this->_deNormalizePosition(x_start));
-//            r_start.setPosY(this->_deNormalizePosition(y_start));
-//            r_start.setBlanking(true);
-//            
-//            jam::ilda::IldaDataRecord r_end;
-//            r_end.setRed(this->_color_ilda.r);
-//            r_end.setGreen(this->_color_ilda.g);
-//            r_end.setBlue(this->_color_ilda.b);
-//            r_end.setPosX(this->_deNormalizePosition(x_end));
-//            r_end.setPosY(this->_deNormalizePosition(y_end));
-//            r_end.setBlanking(false);
-//            
-//            this->_frames[this->_edit_frame].pushRecord(r_start);
-//            this->_frames[this->_edit_frame].pushRecord(r_end);
-            
             
             // create raw data points
             DataPoint raw_start;
             raw_start.x = x_start;
             raw_start.y = y_start;
-            raw_start.r = 0.;
-            raw_start.g = 0.;
-            raw_start.b = 0.;
-            raw_start.blanking = true;
+    
             
             DataPoint raw_end;
             raw_end.x = x_end;
             raw_end.y = y_end;
-            raw_end.r = this->_color.r;
-            raw_end.g = this->_color.g;
-            raw_end.b = this->_color.b;
-            raw_end.blanking = false;
-            
-            this->_raw_frames[this->_edit_frame].addRawPoint(raw_start);
-            this->_raw_frames[this->_edit_frame].addRawPoint(raw_end);
-            
-            this->_frames[this->_edit_frame] = this->_raw_frames[this->_edit_frame].toIldaFrame();
+            VecDataPoints points;
+            points.push_back(raw_start);
+            points.push_back(raw_end);
+        
+            this->_addDataPointsToEditDataSet(points);
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
-            
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
 
             return {};
@@ -1388,15 +1337,15 @@ public:
                 cwarn << "missing argument for message 'circle'" << endl;
                 return {};
             }
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
             
                 // center point
-            Point2D c = {(number)args[0], (number) args[1]};
+            DataPoint c = {(number)args[0], (number) args[1]};
             
                 // radius x/y
-            Point2D radius = {(number)args[2], (number)args[2]};
+            DataPoint radius = {(number)args[2], (number)args[2]};
             
             number t_start = 0;
             number t_end = 360;
@@ -1411,9 +1360,11 @@ public:
                 seg = (seg < 3) ? 3 : seg;
                 seg = (seg > 200) ? 200 : seg;
             }
-            VecPoint2D points = this->_makeEllipse(c, radius, t_start, t_end, seg);
-            this->_addDataRecorsToEditFrame(points, this->_color_ilda.r, this->_color_ilda.g, this->_color_ilda.b);
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            VecDataPoints points = this->_makeEllipse(c, radius, t_start, t_end, seg);
+            this->_addDataPointsToEditDataSet(points);
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
@@ -1429,15 +1380,15 @@ public:
                 cwarn << "missing argument for message 'circle'" << endl;
                 return {};
             }
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
             
                 // center point
-            Point2D c = {(number)args[0], (number) args[1]};
+            DataPoint c = {(number)args[0], (number) args[1]};
             
                 // radius x/y
-            Point2D radius = {(number)args[2], (number)args[3]};
+            DataPoint radius = {(number)args[2], (number)args[3]};
             
             
             number t_start = 0;
@@ -1454,9 +1405,11 @@ public:
                 seg = (seg > 200) ? 200 : seg;
             }
             
-            VecPoint2D points = this->_makeEllipse(c, radius, t_start, t_end, seg);
-            this->_addDataRecorsToEditFrame(points, this->_color_ilda.r, this->_color_ilda.g, this->_color_ilda.b);
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            VecDataPoints points = this->_makeEllipse(c, radius, t_start, t_end, seg);
+            this->_addDataPointsToEditDataSet(points);
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
@@ -1471,7 +1424,7 @@ public:
                 cwarn << "missing argument for message 'rect'" << endl;
                 return {};
             }
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
             
@@ -1490,11 +1443,14 @@ public:
                 seg = (seg < 1) ? 1 : seg;
                 seg = (seg > 200) ? 200 : seg;
             }
-            Point2D tl = {tl_x, tl_y};
-            Point2D br = {br_x, br_y};
-            VecPoint2D points = this->_makeRectangle(tl, br, border_radius);
-            this->_addDataRecorsToEditFrame(points, this->_color_ilda.r, this->_color_ilda.g, this->_color_ilda.b);
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            DataPoint tl = {tl_x, tl_y};
+            DataPoint br = {br_x, br_y};
+            VecDataPoints points = this->_makeRectangle(tl, br, border_radius);
+            
+            this->_addDataPointsToEditDataSet(points);
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
@@ -1509,20 +1465,20 @@ public:
                 cwarn << "missing argument for message 'bezier'" << endl;
                 return {};
             }
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 this->_appendEmptyFrame();
             }
                 // start point
-            Point2D start = {(number)args[0], (number) args[1]};
+            DataPoint start = {(number)args[0], (number) args[1]};
             
                 // control point 1
-            Point2D c1 = {(number)args[2], (number)args[3]};
+            DataPoint c1 = {(number)args[2], (number)args[3]};
             
                 // control point 2
-            Point2D c2 = {(number)args[4], (number)args[5]};
+            DataPoint c2 = {(number)args[4], (number)args[5]};
             
                 // end point
-            Point2D end = {(number)args[6], (number)args[7]};
+            DataPoint end = {(number)args[6], (number)args[7]};
             
             
             int seg = 50;
@@ -1532,9 +1488,11 @@ public:
                 seg = (seg > 200) ? 200 : seg;
             }
             
-            VecPoint2D points = this->_makeCubeBezier(start, c1, c2, end, seg);
-            this->_addDataRecorsToEditFrame(points, this->_color_ilda.r, this->_color_ilda.g, this->_color_ilda.b);
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            VecDataPoints points = this->_makeCubeBezier(start, c1, c2, end, seg);
+            this->_addDataPointsToEditDataSet(points);
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
@@ -1551,11 +1509,15 @@ public:
             std::string ilda_file_refence = args[0];
             std::vector<jam::ilda::IldaFrame> frames = this->_getStructPointer()->getFrames(ilda_file_refence);
             this->_parseFrames2DToTrueColor(frames);
-            if(frames.size() > 0) {
-                this->_frames.insert(this->_frames.end(),frames.begin(), frames.end());
+            
+            VecDataSets data_sets = DataSet::framesToDataSets(frames);
+            
+            for(auto it = data_sets.begin(); it != data_sets.end(); it++) {
+                this->_data_sets.push_back(*it);
+                this->_ilda_frames.push_back(it->toIldaFrame());
             }
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             return {};
         }
@@ -1564,8 +1526,10 @@ public:
     message<threadsafe::no> reverseframes {
         this, "reverseframes", "Reverse the order of the frames",
         MIN_FUNCTION {
-            std::reverse(this->_frames.begin(), this->_frames.end());
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            std::reverse(this->_data_sets.begin(), this->_data_sets.end());
+            std::reverse(this->_ilda_frames.begin(), this->_ilda_frames.end());
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             return {};
             
@@ -1579,7 +1543,7 @@ public:
                 cwarn << "missing argument for message 'rotateframe'" << endl;
                 return {};
             }
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 return {};
             }
             number angle = args[0];
@@ -1588,9 +1552,9 @@ public:
                 c.x = this->_deNormalizePosition((number)args[1]);
                 c.y = this->_deNormalizePosition((number)args[2]);
             }
-            this->_rotateFrame(this->_frames[this->_edit_frame], c, angle);
+            this->_rotateFrame(this->_ilda_frames[this->_edit_frame], c, angle);
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
@@ -1604,7 +1568,7 @@ public:
                 cwarn << "missing argument for message 'scaleframe'" << endl;
                 return {};
             }
-            if (this->_frames.size() == 0) {
+            if (this->_ilda_frames.size() == 0) {
                 return {};
             }
             number scale_x = args[0];
@@ -1615,13 +1579,10 @@ public:
             }
             
             Point2D scale_factors = {scale_x, scale_y};
-            this->_scaleFrame(this->_frames[this->_edit_frame], scale_factors);
-            this->_scaleRawFrame(this->_raw_frames[this->_edit_frame], scale_factors);
-            
-            jam::ilda::IldaFrame nf = this->_raw_frames[this->_edit_frame].toIldaFrame();
-            this->_frames[this->_edit_frame] = nf;
+            this->_scaleDataSet(this->_data_sets[this->_edit_frame], scale_factors);
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             return {};
@@ -1635,11 +1596,7 @@ public:
                 cwarn << "missing argumnet for message 'drawcolor'. Expected 3 floats" << endl;
                 return {};
             }
-        
-            this->_color_ilda.r = static_cast<uint8_t>(std::clamp(static_cast<number>(args[0]), 0., 1.) * 255);
-            this->_color_ilda.g = static_cast<uint8_t>(std::clamp(static_cast<number>(args[1]), 0., 1.) * 255);
-            this->_color_ilda.b = static_cast<uint8_t>(std::clamp(static_cast<number>(args[2]), 0., 1.) * 255);
-            
+    
             // RAW set raw color
             this->_color.r = std::clamp(static_cast<number>(args[0]), 0., 1.);
             this->_color.g = std::clamp(static_cast<number>(args[1]), 0., 1.);
@@ -1706,13 +1663,13 @@ public:
                 // First: Create File
             err = c74::max::path_createsysfile(filename, path, 'ILDA', &fh);
             this->_updateFrameHeaders();
-            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_frames, std::string(""));
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
             
             if(err == c74::max::MAX_ERR_NONE) {
                 result = jam::ilda::ParseResult::SUCCESS;
                 std::vector<unsigned char> file_bytes;
-                result = this->_ildaFileProcessor.parseFramesToFileData(file_bytes, this->_frames);
+                result = this->_ildaFileProcessor.parseFramesToFileData(file_bytes, this->_ilda_frames);
                 unsigned long byte_count = file_bytes.size();
                     // Second: Write File
                 unsigned char *raw_data = reinterpret_cast<unsigned char *>(malloc(file_bytes.size() * sizeof(unsigned char)));
@@ -1753,7 +1710,6 @@ public:
             return {};
         }
     };
-    
     
 };
 

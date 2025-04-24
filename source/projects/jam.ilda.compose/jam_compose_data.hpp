@@ -20,6 +20,8 @@
 
 using number = c74::min::number;
 using Point2D = jam::Point2D;
+using IldaFrame = jam::ilda::IldaFrame;
+using IldaDataRecord = jam::ilda::IldaDataRecord;
 
 namespace jam::compose {
     struct DataPoint {
@@ -52,11 +54,51 @@ namespace jam::compose {
         void setScale(number sx, number sy);        // set scaling factor for x and y direction separately
         void setRotaion(number angle);              // set rotation in degree (0º to 360º)
         void setRotationAnchor(Point2D anchor);     // set rotation anchor
-        std::vector<DataPoint> getRawPoints();      // returns a vector with raw DataPoints
-        void addRawPoint(DataPoint p);              // Push back a raw data point
+        std::vector<DataPoint> getDataPoints();      // returns a vector with raw DataPoints
+        void addDataPoint(DataPoint p);              // Push back a raw data point
         void clearRawPoints();                      // Clear raw data points
         std::vector<DataPoint> getProcessedPoints();// returns processed data points
-        jam::ilda::IldaFrame toIldaFrame();
+        IldaFrame toIldaFrame();
+        
+        static DataSet frameToDataSet(IldaFrame f) {
+            
+            auto normalizePosition = [&](int pos) -> number {
+                pos = (pos < -32768) ? -32768 : pos;
+                pos = (pos > 32767) ? 32767 : pos;
+                if (pos > 0) {
+                    return ((number)pos / 32767.);
+                }
+                return ((number)pos / 32768);
+            };
+            
+            DataSet ds;
+            f.reset();
+            IldaDataRecord data_record;
+            while(f.getNext(&data_record)) {
+                DataPoint dp;
+                dp.blanking = data_record.getBlanking();
+                dp.last_point = data_record.getLastPoint();
+                dp.r = static_cast<number>(data_record.getRed()) / 255.;
+                dp.g = static_cast<number>(data_record.getGreen()) / 255.;
+                dp.b = static_cast<number>(data_record.getBlue()) / 255.;
+                dp.x = normalizePosition(data_record.getPosX());
+                dp.y = normalizePosition(data_record.getPosY());
+                dp.z = normalizePosition(data_record.getPosZ());
+                ds.addDataPoint(dp);
+            }
+            return ds;
+        };
+        
+        static std::vector<DataSet> framesToDataSets(std::vector<IldaFrame> frames) {
+           
+            std::vector<DataSet> data_sets;
+            
+            for(auto it = frames.begin(); it != frames.end(); it++) {
+                data_sets.push_back(DataSet::frameToDataSet(*it));
+            }
+            
+            return data_sets;
+        };
     };
 };
 

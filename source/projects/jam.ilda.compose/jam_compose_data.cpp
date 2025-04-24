@@ -30,11 +30,11 @@ namespace jam::compose {
         this->_rotation_anchor = anchor;
     };
     
-    std::vector<DataPoint> DataSet::getRawPoints() {
+    std::vector<DataPoint> DataSet::getDataPoints() {
         return this->_points_raw;
     };
     
-    void DataSet::addRawPoint(DataPoint p) {
+    void DataSet::addDataPoint(DataPoint p) {
         this->_points_raw.push_back(p);
     };
     
@@ -47,14 +47,14 @@ namespace jam::compose {
     };
     
     
-    jam::ilda::IldaFrame DataSet::toIldaFrame() {
+    IldaFrame DataSet::toIldaFrame() {
         this->_processDataPoints();
         jam::ilda::IldaFrame f;
         jam::ilda::IldaHeader h;
-        h.setFormatCode(jam::ilda::FORMAT_4);
+        h.setFormatCode(jam::ilda::FORMAT_5);
         f.setHeader(h);
         for(auto it = this->_points_processed.begin(); it != this->_points_processed.end(); it++) {
-            jam::ilda::IldaDataRecord dr;
+            IldaDataRecord dr;
             dr.setPosX(this->_deNormalizePosition(it->x));
             dr.setPosY(this->_deNormalizePosition(it->y));
             dr.setRed(static_cast<uint8_t>(it->r * 255.));
