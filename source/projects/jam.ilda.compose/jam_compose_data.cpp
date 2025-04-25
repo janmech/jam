@@ -20,16 +20,13 @@ namespace jam::compose {
         this->_scale_factor.y = sy;
     };
     
-    void DataSet::setRotaion(number angle) {
+    void DataSet::setRotaion(number angle, Point2D anchor) {
         angle = -1. * angle;
         number angle_rad = angle * (PI / 180.);
         this->_rotation_rad = angle_rad;
-    };
-    
-    void DataSet::setRotationAnchor(Point2D anchor) {
         this->_rotation_anchor = anchor;
     };
-    
+
     std::vector<DataPoint> DataSet::getDataPoints() {
         return this->_points_raw;
     };
@@ -140,15 +137,15 @@ namespace jam::compose {
             
             
             // calculate delta x/y - ajust for rotation anchor
-//            Point2D delta = { p.x - this->_rotation_anchor.x, p.y - this->_rotation_anchor.y};
-//            
-//        
-//            // calculate rotated x/y
-//            number rx = (delta.x * cos_a) - (delta.y * sin_a) + this->_rotation_anchor.x;
-//            number ry = (delta.x * sin_a) + (delta.y * cos_a) + this->_rotation_anchor.y;
-//            
-//            pp.x = rx;
-//            pp.y = ry;
+            Point2D delta = { pp.x - this->_rotation_anchor.x, pp.y - this->_rotation_anchor.y};
+            
+        
+            // calculate rotated x/y
+            number rx = (delta.x * cos_a) - (delta.y * sin_a) + this->_rotation_anchor.x;
+            number ry = (delta.x * sin_a) + (delta.y * cos_a) + this->_rotation_anchor.y;
+            
+            pp.x = rx;
+            pp.y = ry;
             
             // add the processed point
             this->_points_processed.push_back(pp);

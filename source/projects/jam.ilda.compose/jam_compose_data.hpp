@@ -54,13 +54,12 @@ namespace jam::compose {
 
         
     public:
-        void setScale(number s);                     // set scaling factor for x and y direction
-        void setScale(number sx, number sy);         // set scaling factor for x and y direction separately
-        void setRotaion(number angle);               // set rotation in degree (0º to 360º)
-        void setRotationAnchor(Point2D anchor);      // set rotation anchor
-        std::vector<DataPoint> getDataPoints();      // returns a vector with raw DataPoints
-        void addDataPoint(DataPoint p);              // Push back a raw data point
-        void clearRawPoints();                       // Clear raw data points
+        void setScale(number s);                       // set scaling factor for x and y direction
+        void setScale(number sx, number sy);           // set scaling factor for x and y direction separately
+        void setRotaion(number angle, Point2D anchor); // set rotation in degree (0º to 360º) and the anchor point to rotate around
+        std::vector<DataPoint> getDataPoints();        // returns a vector with raw DataPoints
+        void addDataPoint(DataPoint p);                // Push back a raw data point
+        void clearRawPoints();                         // Clear raw data points
         IldaFrame toIldaFrame();
         
         static DataSet frameToDataSet(IldaFrame f) {

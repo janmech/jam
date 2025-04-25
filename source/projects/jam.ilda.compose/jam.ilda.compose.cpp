@@ -506,38 +506,13 @@ protected:
         return points;
     };
     
-    void _rotateFrame(jam::ilda::IldaFrame &f, Point2D c, number angle) {
-        angle = -1. * angle;
-        number angle_rad = angle * (PI / 180.);
-        number cosA      = std::cos(angle_rad);
-        number sinA      = std::sin(angle_rad);
-        f.reset();
-        std::vector<jam::ilda::IldaDataRecord> rotated_records;
-        jam::ilda::IldaDataRecord r;
-        while(f.getNext(&r)) {
-            
-            number dx = (number)r.getPosX() - c.x;
-            number dy = (number)r.getPosY() - c.y;
-            
-            number rx = (dx * cosA) - (dy * sinA) + c.x;
-            number ry = (dx * sinA) + (dy * cosA) + c.y;
-            
-            r.setPosX((int)rx);
-            r.setPosY((int)ry);
-            
-            rotated_records.push_back(r);
-        }
-        
-        f.clearRecords();
-        for(size_t i = 0; i < rotated_records.size(); i++) {
-            f.pushRecord(rotated_records[i]);
-        }
-    }
-    
     void _scaleDataSet(DataSet &ds, Point2D scale) {
         ds.setScale(scale.x, scale.y);
     }
     
+    void _rotateDataSet(DataSet &ds, number angle, Point2D anchor) {
+        ds.setRotaion(angle, anchor);
+    }
     
 public:
     
@@ -1548,12 +1523,13 @@ public:
                 return {};
             }
             number angle = args[0];
-            Point2D c = {0., 0.};
+            Point2D anchor = {0., 0.};
             if(args.size() >= 3) {
-                c.x = this->_deNormalizePosition((number)args[1]);
-                c.y = this->_deNormalizePosition((number)args[2]);
+                anchor.x = (number)args[1];
+                anchor.y = (number)args[2];
             }
-            this->_rotateFrame(this->_ilda_frames[this->_edit_frame], c, angle);
+            this->_rotateDataSet(this->_data_sets[this->_edit_frame], angle, anchor);
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
             this->_updateFrameHeaders();
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
