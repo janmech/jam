@@ -44,6 +44,8 @@ namespace jam::compose {
     
     
     IldaFrame DataSet::toIldaFrame() {
+        static std::mutex frame_parsing_lock;
+        frame_parsing_lock.lock();
         this->_processDataPoints();
         
         jam::ilda::IldaFrame f;
@@ -53,11 +55,11 @@ namespace jam::compose {
         
         
         if(this->_points_processed.size() > 1) {
-            for(size_t i = 0; i<this->_points_processed.size() -1; i++) {
+            for(size_t i = 0; i < this->_points_processed.size() - 1; i++) {
                 DataPoint p1 = this->_points_processed[i];
-                DataPoint p2 = this->_points_processed[i+1];
+                DataPoint p2 = this->_points_processed[i + 1];
                 OptionalDataPointPair cp = this->_clipLineSegment(p1,p2);
-                // Line segment is fully invisible, ignore it
+                    // Line segment is fully invisible, ignore it
                 if(cp.has_value()) {
                     std::pair<DataPoint, DataPoint> clipped = cp.value();
                     
@@ -81,31 +83,33 @@ namespace jam::compose {
                     dr_first.setRed(static_cast<uint8_t>(clipped.first.r * 255.));
                     dr_first.setGreen(static_cast<uint8_t>(clipped.first.g * 255.));
                     dr_first.setBlue(static_cast<uint8_t>(clipped.first.b * 255.));
-                    dr_first.setBlanking(p1_clipped ? false : clipped.first.blanking);
-                    dr_first.setLastPoint(clipped.first.last_point);
+                    dr_first.setBlanking(p1.blanking);
+                    dr_first.setLastPoint(p1.last_point);
                     f.pushRecord(dr_first);
                     
-                    if(p2_clipped || i == this->_points_processed.size() - 1) { // if p2 was clipped (outside the visible bounds, draw to the intersection). add the last point in any case
+                        // if(p2_clipped || i + 1 == this->_points_processed.size() - 1) {
+                    if(p2_clipped || i == this->_points_processed.size() - 2) { // if p2 was clipped (outside the visible bounds, draw to the intersection). add the last point in any case
                         IldaDataRecord dr_second;
                         dr_second.setPosX(this->_deNormalizePosition(clipped.second.x));
                         dr_second.setPosY(this->_deNormalizePosition(clipped.second.y));
                         dr_second.setRed(static_cast<uint8_t>(clipped.second.r * 255.));
                         dr_second.setGreen(static_cast<uint8_t>(clipped.second.g * 255.));
                         dr_second.setBlue(static_cast<uint8_t>(clipped.second.b * 255.));
-                        dr_second.setBlanking(false);
-                        dr_second.setLastPoint(clipped.first.last_point);
+                        dr_second.setBlanking(p2.blanking);
+                        dr_second.setLastPoint(p2.blanking);
                         f.pushRecord(dr_second);
                     }
                 }
             }
         }
+        frame_parsing_lock.unlock();
         
         return f;
-            
+        
     }
-
     
-    /// Protected methods
+    
+        /// Protected methods
     int DataSet::_deNormalizePosition(double pos) {
         return static_cast<int>(pos * 32000);
         
@@ -114,6 +118,8 @@ namespace jam::compose {
     }
 
     void DataSet::_processDataPoints() {
+        static std::mutex points_precessing_lock;
+        points_precessing_lock.lock();
         // apply scaling
         // apply rotation
         number cos_a      = std::cos(this->_rotation_rad);
@@ -146,6 +152,8 @@ namespace jam::compose {
             
             // add the processed point
             this->_points_processed.push_back(pp);
+            points_precessing_lock.unlock();
+            
         }
     };
     

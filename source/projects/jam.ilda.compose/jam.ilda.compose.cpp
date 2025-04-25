@@ -120,6 +120,8 @@ protected:
         /// Mutex lock for outlet message thread safty
     std::mutex _enqueue_msg_lock;
     
+    std::mutex _frame_vector_lock;
+    
     bool _is_parsing_svg = false;
     
         /// Vector of IldaFrames currenly available
@@ -257,7 +259,7 @@ protected:
     
       /// add an empty frame at the end
     void _appendEmptyFrame() {
-        
+        this->_frame_vector_lock.lock();
         // add ILDA frame
         jam::ilda::IldaFrame f;
         jam::ilda::IldaHeader h;
@@ -273,6 +275,7 @@ protected:
         // add raw frame
         DataSet raw_frame;
         this->_data_sets.push_back(raw_frame);
+        this->_frame_vector_lock.unlock();
         
         this->_updateOutlets();
     }
@@ -392,14 +395,15 @@ protected:
                             const number theta_end = 360,
                             int segments = 50
                             ) {
-        number rad_start = theta_start * (PI / 180);
-        number rad_end = theta_end * (PI / 180);
+        number rad_start = theta_start * (PI / 180.);
+        number rad_end = theta_end * (PI / 180.);
         number rad_range = rad_end - rad_start;
         
         VecDataPoints points;
         for (int i = 0; i <= segments; ++i) {
             DataPoint p;
             number angle = rad_start + (rad_range * i / segments);
+            // number angle = rad_start + (number)(rad_range * (number)i / (number)segments);
             p.x = c.x + r.x * std::cos(angle);
             p.y = c.y + r.y * std::sin(angle);
             points.push_back(p);
@@ -409,8 +413,8 @@ protected:
     }
     
     void _addDataPointsToEditDataSet(VecDataPoints points) {
-        for(auto it = points.begin(); it <= points.end(); it++) {
-            bool is_first = it == points.begin();
+        for(auto it = points.begin(); it < points.end(); it++) {
+            bool is_first = (it == points.begin());
             DataPoint dp;
             dp.x = it->x;
             dp.y = it->y;
@@ -947,8 +951,7 @@ public:
                     this->_setSvgParsingState(false);
                     return{};
                 }
-            }
-            else {
+            } else {
                 std::string user_filename = this->_import_args[0];
                 if(user_filename.size() > c74::max::MAX_PATH_CHARS - 1) {
                     cerr << "file name too long" << endl;
@@ -992,168 +995,156 @@ public:
                 return {};
             }
             
+            unsigned long size;
+            c74::max::t_max_err read_result = 0;
+            c74::max::t_handle file_content_handle = nullptr;
+            std::string file_content = "";
+            c74::max::sysfile_geteof(_file_handle,&size);
             
-            this->_svg_file_parse_thread = std::thread([this]() {
-                atoms msg_atoms;
-                queued_message_t msg;
-                unsigned long size;
-                c74::max::t_max_err read_result = 0;
-                c74::max::t_handle file_content_handle = nullptr;
-                std::string file_content = "";
-                c74::max::sysfile_geteof(_file_handle,&size);
-                
-                size = c74::max::sysmem_handlesize(file_content_handle);
-                
-                if (!(file_content_handle = c74::max::sysmem_newhandle(size))) {
-                    cerr << "not enough memory to open " << _filename << endl;
-                    msg_atoms.clear();
-                    msg_atoms.push_back("svg");
-                    msg_atoms.push_back(_filename);
-                    msg_atoms.push_back(0);
-                    msg.set(&o_file_result, msg_atoms);
-                    msg.send(this);
-                    this->_setSvgParsingState(false);
-                    return;
-                }
-                
-                    // https://cycling74.com/forums/t_handle-and-sysmem_newhandle-crash-help-needed
-                read_result = c74::max::sysfile_readtextfile(_file_handle,file_content_handle,size, c74::max::TEXT_ENCODING_USE_FILE);
-                if(read_result != c74::max::MAX_ERR_NONE) {
-                    c74::max::sysmem_freehandle(file_content_handle);
-                    cerr << "couldn't read file" << endl;
-                    msg_atoms.clear();
-                    msg_atoms.push_back("svg");
-                    msg_atoms.push_back(_filename);
-                    msg_atoms.push_back(0);
-                    msg.set(&o_file_result, msg_atoms);
-                    msg.send(this);
-                    this->_setSvgParsingState(false);
-                    return;
-                }
-                
-                file_content = *file_content_handle;
-                NSVGimage* image;
-                    // Load SVG
-                image = nsvgParse(*file_content_handle, "px", 96);
-                if(image == NULL) {
-                    c74::max::sysmem_freehandle(file_content_handle);
-                    cerr << "couldn't parse file" << endl;
-                    msg_atoms.clear();
-                    msg_atoms.push_back("svg");
-                    msg_atoms.push_back(_filename);
-                    msg_atoms.push_back(0);
-                    msg.set(&o_file_result, msg_atoms);
-                    msg.send(this);
-                    this->_setSvgParsingState(false);
-                    return;
-                    
-                }
-                
+            size = c74::max::sysmem_handlesize(file_content_handle);
+            
+            if (!(file_content_handle = c74::max::sysmem_newhandle(size))) {
+                cerr << "not enough memory to open " << _filename << endl;
                 msg_atoms.clear();
                 msg_atoms.push_back("svg");
                 msg_atoms.push_back(_filename);
-                msg_atoms.push_back(1);
+                msg_atoms.push_back(0);
                 msg.set(&o_file_result, msg_atoms);
                 msg.send(this);
                 this->_setSvgParsingState(false);
+                return {};
+            }
+            
+                // https://cycling74.com/forums/t_handle-and-sysmem_newhandle-crash-help-needed
+            read_result = c74::max::sysfile_readtextfile(_file_handle,file_content_handle,size, c74::max::TEXT_ENCODING_USE_FILE);
+            if(read_result != c74::max::MAX_ERR_NONE) {
+                c74::max::sysmem_freehandle(file_content_handle);
+                cerr << "couldn't read file" << endl;
+                msg_atoms.clear();
+                msg_atoms.push_back("svg");
+                msg_atoms.push_back(_filename);
+                msg_atoms.push_back(0);
+                msg.set(&o_file_result, msg_atoms);
+                msg.send(this);
+                this->_setSvgParsingState(false);
+                return {};
+            }
+            
+            file_content = *file_content_handle;
+            NSVGimage* image;
+                // Load SVG
+            image = nsvgParse(*file_content_handle, "px", 96);
+            if(image == NULL) {
+                c74::max::sysmem_freehandle(file_content_handle);
+                cerr << "couldn't parse file" << endl;
+                msg_atoms.clear();
+                msg_atoms.push_back("svg");
+                msg_atoms.push_back(_filename);
+                msg_atoms.push_back(0);
+                msg.set(&o_file_result, msg_atoms);
+                msg.send(this);
+                this->_setSvgParsingState(false);
+                return {};
                 
+            }
+            
+            msg_atoms.clear();
+            msg_atoms.push_back("svg");
+            msg_atoms.push_back(_filename);
+            msg_atoms.push_back(1);
+            msg.set(&o_file_result, msg_atoms);
+            msg.send(this);
+            this->_setSvgParsingState(false);
+            
+            
+                // parse SVG data into shapes
+            _svg_shapes.clear();
+            for (NSVGshape* shape = image->shapes; shape != nullptr; shape = shape->next) {
+                jam::Shape s("SVGPath");
                 
-                    // parse SVG data into shapes
-                _svg_shapes.clear();
-                for (NSVGshape* shape = image->shapes; shape != nullptr; shape = shape->next) {
-                    jam::Shape s("SVGPath");
-                    
-                    if(shape->stroke.type == NSVG_PAINT_COLOR) {
-                            // AAAAAAAA BBBBBBB  GGGGGGGG RRRRRRRR
-                            // 11111111 11111111 11111111 11111111
-                        unsigned int strokeColor = shape->stroke.color;
-                        strokeColor = strokeColor & 0x00FFFFFF; // Eliminate Alpha
-                        unsigned int r = (strokeColor &  0x000000FF);
-                        unsigned int g = (strokeColor &  0x0000FF00) >> 8;
-                        unsigned int b = (strokeColor &  0x00FF0000) >> 16;
-                            // Black doesn't exist in lasers, so we change it to white
-                        if(r + g + g == 0) {
-                            r = g = b = 255;
-                        }
-                        jam::RGBColor color;
-                        color.r = static_cast<uint8_t>(r);
-                        color.g = static_cast<uint8_t>(g);
-                        color.b = static_cast<uint8_t>(b);
-                        s.setColor(color);
+                if(shape->stroke.type == NSVG_PAINT_COLOR) {
+                        // AAAAAAAA BBBBBBB  GGGGGGGG RRRRRRRR
+                        // 11111111 11111111 11111111 11111111
+                    unsigned int strokeColor = shape->stroke.color;
+                    strokeColor = strokeColor & 0x00FFFFFF; // Eliminate Alpha
+                    unsigned int r = (strokeColor &  0x000000FF);
+                    unsigned int g = (strokeColor &  0x0000FF00) >> 8;
+                    unsigned int b = (strokeColor &  0x00FF0000) >> 16;
+                        // Black doesn't exist in lasers, so we change it to white
+                    if(r + g + g == 0) {
+                        r = g = b = 255;
                     }
-                    
-                    for (NSVGpath* path = shape->paths; path != nullptr; path = path->next) {
-                        for (int i = 0; i < path->npts; ++i) {
-                            number x = path->pts[i * 2];       // x coordinate
-                            number y = path->pts[i * 2 + 1];   // y coordinate
-                                                              // Y-Axis Flip
-                            y = image->height - y;
-                                // Normalize to [-1, 1]
-                            number nx = (x / image->width) * 2.0f - 1.0f;
-                            number ny = (y / image->height) * 2.0f - 1.0f;
-                            s.addPoint({nx, ny});
-                        }
-                        
-                        if (!s.getPoints().empty()) {
-                                // Close path if marked closed
-                            if (path->closed) {
-                                s.addPoint(s.getPoints().front());
-                            }
-                            s.thinShape();
-                        }
-                        this->_svg_shapes.push_back(s);
-                    }
-                    
+                    jam::RGBColor color;
+                    color.r = static_cast<uint8_t>(r);
+                    color.g = static_cast<uint8_t>(g);
+                    color.b = static_cast<uint8_t>(b);
+                    s.setColor(color);
                 }
                 
-                nsvgDelete(image);
-                
-                    // Add shape data to current edit_frame
-                if(this->_ilda_frames.size() == 0) {
-                    this->_appendEmptyFrame();
+                for (NSVGpath* path = shape->paths; path != nullptr; path = path->next) {
+                    for (int i = 0; i < path->npts; ++i) {
+                        number x = path->pts[i * 2];       // x coordinate
+                        number y = path->pts[i * 2 + 1];   // y coordinate
+                                                          // Y-Axis Flip
+                        y = image->height - y;
+                            // Normalize to [-1, 1]
+                        number nx = (x / image->width) * 2.0f - 1.0f;
+                        number ny = (y / image->height) * 2.0f - 1.0f;
+                        s.addPoint({nx, ny});
+                    }
+                    
+                    if (!s.getPoints().empty()) {
+                            // Close path if marked closed
+                        if (path->closed) {
+                            s.addPoint(s.getPoints().front());
+                        }
+                        s.thinShape();
+                    }
+                    this->_svg_shapes.push_back(s);
                 }
                 
-                DataSet ds = this->_data_sets[this->_edit_frame];
-                for(size_t i = 0; i< this->_svg_shapes.size(); i++) {
-                    for(size_t j = 0; j < this->_svg_shapes[i].getPoints().size(); j++) {
-                        bool is_blanking = (j == 0);
-                        Point2D p = this->_svg_shapes[i].getPoints()[j];
-                        DataPoint dp;
-                        dp.r = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().r) * 255.;
-                        dp.g = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().g) * 255.;
-                        dp.b = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().b) * 255.;
-                        dp.blanking = is_blanking;
-                        dp.x = p.x;
-                        dp.y = p.y;
-                        ds.addDataPoint(dp);
-                    }
-                    // close shape
-                    Point2D p = this->_svg_shapes[i].getPoints()[0];
+            }
+            
+            nsvgDelete(image);
+            
+                // Add shape data to current edit_frame
+            if(this->_ilda_frames.size() == 0) {
+                this->_appendEmptyFrame();
+            }
+            
+            DataSet ds = this->_data_sets[this->_edit_frame];
+            for(size_t i = 0; i< this->_svg_shapes.size(); i++) {
+                for(size_t j = 0; j < this->_svg_shapes[i].getPoints().size(); j++) {
+                    bool is_blanking = (j == 0);
+                    Point2D p = this->_svg_shapes[i].getPoints()[j];
                     DataPoint dp;
-                    dp.r = static_cast<number>(this->_svg_shapes[i].getColor().r) * 255.;
-                    dp.g =  static_cast<number>(this->_svg_shapes[i].getColor().g) * 255.;
-                    dp.b = static_cast<number>(this->_svg_shapes[i].getColor().b) * 255.;
-                    dp.blanking = false;
+                    dp.r = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().r) * 255.;
+                    dp.g = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().g) * 255.;
+                    dp.b = is_blanking ? 0 : static_cast<number>(this->_svg_shapes[i].getColor().b) * 255.;
+                    dp.blanking = is_blanking;
                     dp.x = p.x;
                     dp.y = p.y;
                     ds.addDataPoint(dp);
-                    
                 }
-                this->_data_sets[this->_edit_frame] = ds;
-                this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
-                this->_updateFrameHeaders();
-                this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
+                // close shape
+                Point2D p = this->_svg_shapes[i].getPoints()[0];
+                DataPoint dp;
+                dp.r = static_cast<number>(this->_svg_shapes[i].getColor().r) * 255.;
+                dp.g =  static_cast<number>(this->_svg_shapes[i].getColor().g) * 255.;
+                dp.b = static_cast<number>(this->_svg_shapes[i].getColor().b) * 255.;
+                dp.blanking = false;
+                dp.x = p.x;
+                dp.y = p.y;
+                ds.addDataPoint(dp);
                 
-                this->_updateOutlets();
-                
-                
-                this->_setSvgParsingState(false);
-            });
+            }
+            this->_data_sets[this->_edit_frame] = ds;
+            this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();
+            this->_updateFrameHeaders();
+            this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             
-            this->_svg_file_parse_thread.detach();
-            
-            
-
+            this->_updateOutlets();
+            this->_setSvgParsingState(false);
             
             return {};
         }
@@ -1522,7 +1513,7 @@ public:
             
             VecDataSets data_sets = DataSet::framesToDataSets(frames);
             
-            for(auto it = data_sets.begin(); it != data_sets.end(); it++) {
+            for(auto it = data_sets.begin(); it < data_sets.end(); it++) {
                 this->_data_sets.push_back(*it);
                 this->_ilda_frames.push_back(it->toIldaFrame());
             }
