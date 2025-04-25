@@ -47,6 +47,7 @@ using VecGlyphPoints = std::vector<jam::ttf::GlyphVertex>;
 
 
 
+    /// <#Description#>
 class ildacompose : public object<ildacompose>
 {
 
@@ -76,8 +77,12 @@ protected:
     
     jam::ttf::TtfFileProcessor _ttfFileProcessor;    // Class with function for TrueType font rendering
     
+    struct FontInfo {
+        std::string file_path;
+        int face_index;
+    };
     
-    std::map<std::string, std::string>_available_fonts;
+    std::map<std::string, FontInfo>_available_fonts;
     
         /// Struct to encapsulate sending messages to outlets via the timer - for thread safty
     typedef struct QuededMessage {
@@ -107,7 +112,7 @@ protected:
     rgb_color_t _color;
     
         /// Pen Position for writing text
-    jam::ttf::Point2D _pen_pos = {-1., 1.};
+    jam::ttf::Point2D _pen_pos = { 0., 0.};
     
         /// Apply kerning to text rendering
     bool _kerning = true;
@@ -125,55 +130,65 @@ protected:
     bool _is_parsing_svg = false;
     
         /// Vector of IldaFrames currenly available
-    std::vector<jam::ilda::IldaFrame> _ilda_frames;
+    std::vector<jam::ilda::IldaFrame> _ilda_frames;     // ILDA frames rendered from data sets
     
     std::vector<DataSet> _data_sets;                    // Data sets contain ilda frame information before scale/rotation precessing
     
-    std::thread _svg_file_parse_thread;                 // Thread for parsing SVG file asynchronously
-    
     void _updateFonts() {
-        this->_available_fonts.clear();
+        _available_fonts.clear();
+
         CTFontCollectionRef collection = CTFontCollectionCreateFromAvailableFonts(nullptr);
-        if (!collection) {
-            return;
-        }
+        if (!collection) return;
 
         CFArrayRef descriptors = CTFontCollectionCreateMatchingFontDescriptors(collection);
         if (!descriptors) {
             CFRelease(collection);
             return;
         }
+        
+        CFStringRef font_index_attribute = CFSTR("NSCTFontIndexAttribute");
 
         CFIndex count = CFArrayGetCount(descriptors);
         for (CFIndex i = 0; i < count; ++i) {
             CTFontDescriptorRef desc = (CTFontDescriptorRef)CFArrayGetValueAtIndex(descriptors, i);
 
             // Get font file URL
-            CFURLRef urlRef = (CFURLRef)CTFontDescriptorCopyAttribute(desc, kCTFontURLAttribute);
-            if (!urlRef) continue;
+            CFURLRef url_ref = (CFURLRef)CTFontDescriptorCopyAttribute(desc, kCTFontURLAttribute);
+            if (!url_ref) continue;
 
             char path[PATH_MAX];
-            if (!CFURLGetFileSystemRepresentation(urlRef, true, (UInt8*)path, sizeof(path))) {
-                CFRelease(urlRef);
+            if (!CFURLGetFileSystemRepresentation(url_ref, true, (UInt8*)path, sizeof(path))) {
+                CFRelease(url_ref);
                 continue;
             }
+            std::string path_str(path);
 
-            std::string pathStr(path);
-            std::string ext = pathStr.substr(pathStr.find_last_of('.') + 1);
-            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-
-            if (ext == "ttf") {
-                // Get the display name
-                CFStringRef nameRef = (CFStringRef)CTFontDescriptorCopyAttribute(desc, kCTFontDisplayNameAttribute);
-                char name[256] = "Unknown";
-                if (nameRef) {
-                    CFStringGetCString(nameRef, name, sizeof(name), kCFStringEncodingUTF8);
-                    CFRelease(nameRef);
-                }
-                this->_available_fonts[std::string(name)] = pathStr;
+            // Get the face index (important for TTC files)
+            int face_index = 0;
+            CFNumberRef index_ref = (CFNumberRef)CTFontDescriptorCopyAttribute(desc, font_index_attribute);
+            if (index_ref) {
+                CFNumberGetValue(index_ref, kCFNumberIntType, &face_index);
+                CFRelease(index_ref);
             }
 
-            CFRelease(urlRef);
+            // Get the display name
+            CFStringRef name_ref = (CFStringRef)CTFontDescriptorCopyAttribute(desc, kCTFontDisplayNameAttribute);
+            char name[256] = "Unknown";
+            if (name_ref) {
+                CFStringGetCString(name_ref, name, sizeof(name), kCFStringEncodingUTF8);
+                CFRelease(name_ref);
+            }
+
+            std::string display_Name(name);
+
+            // filter by file extension. We support only TTF and TTC.
+            std::string ext = path_str.substr(path_str.find_last_of('.') + 1);
+            std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+            if (ext == "ttf" || ext == "ttc") {
+                _available_fonts[display_Name] = FontInfo{path_str, face_index};
+            }
+
+            CFRelease(url_ref);
         }
 
         CFRelease(descriptors);
@@ -395,11 +410,15 @@ protected:
                             const number theta_end = 360,
                             int segments = 50
                             ) {
+        VecDataPoints points;
+        if(theta_start == theta_end) {
+            return points;
+        }
         number rad_start = theta_start * (PI / 180.);
         number rad_end = theta_end * (PI / 180.);
         number rad_range = rad_end - rad_start;
         
-        VecDataPoints points;
+        
         for (int i = 0; i <= segments; ++i) {
             DataPoint p;
             number angle = rad_start + (rad_range * i / segments);
@@ -546,7 +565,7 @@ public:
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
     outlet<> o_file_reference   { this, "ilda file reference"  };
-    outlet<> o_font_faces       { this, "Pubulate a umenu with availeble fonts"  };
+    outlet<> o_font_faces       { this, "Pobulate a umenu with availeble fonts"  };
     outlet<> o_edit_frame       { this, "Frame cureently selected for editing", "int"};
     outlet<> o_framecount       { this, "Number of frames created", "int"};
     outlet<> o_file_result      { this, "file opration success/failure notification", "list" };
@@ -634,28 +653,41 @@ public:
         visibility{visibility::show}
     };
     
-    message<threadsafe::no> getfonts {
-        this, "getfonts", "",
-        MIN_FUNCTION {
-            atoms msg_atoms;
-            queued_message_t msg;
-            
-            msg_atoms.clear();
-            msg_atoms.push_back("clear");
-            msg.set(&o_font_faces, msg_atoms);
-            msg.send(this);
-            
-            for (const auto& [name, path] : this->_available_fonts) {
-                msg_atoms.clear();
-                msg_atoms.push_back("append");
-                msg_atoms.push_back(name);
-                msg.set(&o_font_faces, msg_atoms);
-                msg.send(this);
+    attribute<symbol> textalign {
+        this, "textalign", "center",
+        range {"left", "center", "right"},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "center");
+                std::string value = cleaned_args[0];
+                if(value != "left" && value != "right" && value != "center") {
+                    cleaned_args[0] = "center";
+                }
+                return cleaned_args;
             }
-            
-            return {};
-        }
+        },
+        title { "Text Align" },
+        description { "Text alignment mode (default = center) Possible values: <br/><ul><li>left</li><li>center</li><li>right</li></ul>" },
+        category{"Text Rendering"},
     };
+    
+    attribute<number> lineheight {
+        this, "lineheight", 1.2,
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 1.2);
+                number lineheight = cleaned_args[0];
+                cleaned_args[0] = std::clamp(lineheight, 0.1, 5.);
+                return cleaned_args;
+            }
+        },
+        title { "Line Height" },
+        description { "Line height between text lines." },
+        category{"Text Rendering"},
+    };
+    
     
     message<>bang  {
         this, "bang", "Output ILDA file reference",
@@ -888,7 +920,7 @@ public:
         }
     };
     
-    message<threadsafe::no>svg {
+    message<threadsafe::no> svg {
         this, "svg", "Parse a SVG file into the current edit frame.",
         MIN_FUNCTION {
             if(this->_getSvgParsingState()) {
@@ -1125,7 +1157,30 @@ public:
         }
     };
     
-    message<threadsafe::no>font {
+    message<threadsafe::no> getfonts {
+        this, "getfonts", "",
+        MIN_FUNCTION {
+            atoms msg_atoms;
+            queued_message_t msg;
+            
+            msg_atoms.clear();
+            msg_atoms.push_back("clear");
+            msg.set(&o_font_faces, msg_atoms);
+            msg.send(this);
+            
+            for (const auto& [name, path] : this->_available_fonts) {
+                msg_atoms.clear();
+                msg_atoms.push_back("append");
+                msg_atoms.push_back(name);
+                msg.set(&o_font_faces, msg_atoms);
+                msg.send(this);
+            }
+            
+            return {};
+        }
+    };
+    
+    message<threadsafe::no> font {
         this, "font", "Loads a TTF font face",
         MIN_FUNCTION {
             if(args.size() > 0) {
@@ -1143,10 +1198,11 @@ public:
                     msg.send(this);
                     return {};
                 } else {
-                    std::string font_path = this->_available_fonts[font_name];
+                    std::string font_path = this->_available_fonts[font_name].file_path;
                     short path = 0;
                     short open_result;
-                    c74::max::t_fourcc filetype = 'TTF', outtype;
+//                    c74::max::t_fourcc filetype = 'TTF', outtype;
+                    c74::max::t_fourcc outtype;
                     font_path.resize(c74::max::MAX_PATH_CHARS);
                     char c_font_path[c74::max::MAX_PATH_CHARS] = {0};
                     strcpy(c_font_path, font_path.c_str());
@@ -1191,7 +1247,7 @@ public:
                     
                     this->_ttfFileProcessor.setFileData(font_buffer);
                     int success = 1;
-                    if(this->_ttfFileProcessor.initFont() != jam::ttf::FontError::NO_ERROR) {
+                    if(this->_ttfFileProcessor.initFont(this->_available_fonts[font_name].face_index) != jam::ttf::FontError::NO_ERROR) {
                         success = 0;
                     };
                     
@@ -1210,19 +1266,31 @@ public:
     };
     
     message<>pen {
-        this, "pen", "Set the pen position for wryting text.Arguments:  floats (-1. to 1.) pen_x pen_y",
+        this, "pen", "Set the pen position for wryting text. <br/>Arguments:<br/><ul><li>2 floats (-1. to 1.) to set x/y pen postion</li><li>symbol 'down' to move the pen down one line</li><li>symbol 'up' to move the pen up one line</li></ul>",
         MIN_FUNCTION {
-            if(args.size() < 2) {
-                cwarn << "missing argument for message 'pen'. Expextex two floats" << endl;
-                return {};
+            if(args.size() > 0) {
+                if(args[0].type() == message_type::symbol_argument) {
+                    if(args[0] == "up") {
+                        this->_pen_pos.y += std::clamp(this->_ttfFileProcessor.getLineHeight(), -1., 1.) * this->lineheight;
+                    }
+                    if(args[0] == "down") {
+                        this->_pen_pos.y -= std::clamp(this->_ttfFileProcessor.getLineHeight(), -1., 1.) * this->lineheight;
+                    }
+                    
+                }
             }
-            this->_pen_pos.x = std::clamp(static_cast<number>(args[0]), -1., 1.);
-            this->_pen_pos.y = std::clamp(static_cast<number>(args[1]), -1., 1.);
+            if(args.size() >= 2
+               && (args[0].type() == message_type::float_argument || args[0].type() == message_type::int_argument)
+               && (args[1].type() == message_type::float_argument || args[1].type() == message_type::int_argument)
+               ) {
+                this->_pen_pos.x = std::clamp(static_cast<number>(args[0]), -1., 1.);
+                this->_pen_pos.y = std::clamp(static_cast<number>(args[1]), -1., 1.);
+            }
             return {};
         }
     };
     
-    message<threadsafe::no>text {
+    message<threadsafe::no> text {
         this, "text", "Write a text to the current edit frame",
         MIN_FUNCTION {
             std::string in_string = "";
@@ -1235,12 +1303,13 @@ public:
                 }
                 in_string += static_cast<std::string>(args[i]);
             }
-            
+        
             VecGlyphPoints glyph_points = this->_ttfFileProcessor.getGlyphVertices(
                  in_string,
                  this->_pen_pos,
                  this->_kerning,
-                 this->_font_size / 20.
+                 this->_font_size / 20.,
+                 this->textalign
             );
             if (this->_ilda_frames.size() == 0) {
                 this->_appendEmptyFrame();
@@ -1261,7 +1330,6 @@ public:
             this->_updateFrameHeaders();
             this->_getStructPointer()->setInstanceFile(this->_instance_id, this->_ilda_frames, std::string(""));
             this->_updateOutlets();
-            
             
             return {};
         }

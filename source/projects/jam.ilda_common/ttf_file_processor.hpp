@@ -11,8 +11,12 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "c74_min_api.h"
 #include "stb_truetype.h"
 #include "../jam.ilda_common/utfcpp/source/utf8.h"
+
+using number = c74::min::number;
+using symbol = c74::min::symbol;
 
 namespace jam::ttf {
     using uchar = unsigned char;
@@ -23,8 +27,8 @@ namespace jam::ttf {
     };
     
     struct Point2D {
-        double x;
-        double y;
+        number x;
+        number y;
     };
 
     enum class VertexType {
@@ -49,6 +53,8 @@ namespace jam::ttf {
         bool _font_initialized = false;
         
         int _getCodepointFromUTF8(const std::string& utf8);
+        
+        number _measureTextWidth(const std::string& text,bool kerning, number scale);
 
         
     public:
@@ -59,9 +65,10 @@ namespace jam::ttf {
         
         void setFileData(std::vector<uchar>ttf_file);
         void clearFileData();
-        FontError initFont();
+        FontError initFont(int face_index);
         bool fontInitialized();
-        std::vector<GlyphVertex> getGlyphVertices(std::string c, Point2D pen_pos, bool kerning = true, double fontsize = 1.f, int segments = 10);
+        std::vector<GlyphVertex> getGlyphVertices(std::string c, Point2D pen_pos, bool kerning = true, number fontsize = 1., const symbol align="left", int segments = 10);
+        number getLineHeight(number fontsize = 1.);
         
         
     
