@@ -97,7 +97,6 @@ protected:
         }
     } queued_message_t;
     
-    
     typedef struct RgbColor {
         number r = 1.;
         number g = 1.;
@@ -410,7 +409,7 @@ protected:
     }
     
     void _addDataPointsToEditDataSet(VecDataPoints points) {
-        for(auto it = points.begin(); it != points.end(); it++) {
+        for(auto it = points.begin(); it <= points.end(); it++) {
             bool is_first = it == points.begin();
             DataPoint dp;
             dp.x = it->x;
@@ -1128,6 +1127,17 @@ public:
                         dp.y = p.y;
                         ds.addDataPoint(dp);
                     }
+                    // close shape
+                    Point2D p = this->_svg_shapes[i].getPoints()[0];
+                    DataPoint dp;
+                    dp.r = static_cast<number>(this->_svg_shapes[i].getColor().r) * 255.;
+                    dp.g =  static_cast<number>(this->_svg_shapes[i].getColor().g) * 255.;
+                    dp.b = static_cast<number>(this->_svg_shapes[i].getColor().b) * 255.;
+                    dp.blanking = false;
+                    dp.x = p.x;
+                    dp.y = p.y;
+                    ds.addDataPoint(dp);
+                    
                 }
                 this->_data_sets[this->_edit_frame] = ds;
                 this->_ilda_frames[this->_edit_frame] = this->_data_sets[this->_edit_frame].toIldaFrame();

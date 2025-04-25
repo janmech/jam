@@ -42,44 +42,73 @@ namespace jam::compose {
         this->_points_raw.clear();
     };
     
-    std::vector<DataPoint> DataSet::getProcessedPoints() {
-        return this->_points_processed;
-    };
-    
     
     IldaFrame DataSet::toIldaFrame() {
         this->_processDataPoints();
+        
         jam::ilda::IldaFrame f;
         jam::ilda::IldaHeader h;
         h.setFormatCode(jam::ilda::FORMAT_5);
         f.setHeader(h);
-        for(auto it = this->_points_processed.begin(); it != this->_points_processed.end(); it++) {
-            IldaDataRecord dr;
-            dr.setPosX(this->_deNormalizePosition(it->x));
-            dr.setPosY(this->_deNormalizePosition(it->y));
-            dr.setRed(static_cast<uint8_t>(it->r * 255.));
-            dr.setGreen(static_cast<uint8_t>(it->g * 255.));
-            dr.setBlue(static_cast<uint8_t>(it->b * 255.));
-            dr.setBlanking(it->blanking);
-            dr.setLastPoint(it->last_point);
-            f.pushRecord(dr);
-        }
-        return f;
         
-            // UFF mor difficult than I thought... we need to know then context: where does it come from, where does it go to....
-            // case A) Point is visible and previous is visible --> add point
-            // case B) Point is visible as previous is NOT visible  --> add a point where it hits the bounds ad mark as such
-            // case C) Point is NOT visible and previous point is NOT visible --> ignore point
-            // case D) Point is NOT visible and previous point IS visible --> add point where it hits the bounds and mark as such
-            
-            
-            // if the previous generated point is a bounding box point set to blanking
+        
+        if(this->_points_processed.size() > 1) {
+            for(size_t i = 0; i<this->_points_processed.size() -1; i++) {
+                DataPoint p1 = this->_points_processed[i];
+                DataPoint p2 = this->_points_processed[i+1];
+                OptionalDataPointPair cp = this->_clipLineSegment(p1,p2);
+                // Line segment is fully invisible, ignore it
+                if(cp.has_value()) {
+                    std::pair<DataPoint, DataPoint> clipped = cp.value();
+                    
+                    bool p1_clipped = (clipped.first.x != p1.x || clipped.first.y != p1.y);
+                    bool p2_clipped = (clipped.second.x != p2.x || clipped.second.y != p2.y);
+                    if(p1_clipped) { // if p1 was clipped (outside the visible bounds, move to the intersection)
+                        IldaDataRecord dr_move;
+                        dr_move.setPosX(this->_deNormalizePosition(clipped.first.x));
+                        dr_move.setPosY(this->_deNormalizePosition(clipped.first.y));
+                        dr_move.setRed(0);
+                        dr_move.setGreen(0);
+                        dr_move.setBlue(0);
+                        dr_move.setBlanking(true);
+                        dr_move.setLastPoint(clipped.first.last_point);
+                        f.pushRecord(dr_move);
+                    }
+                    
+                    IldaDataRecord dr_first;
+                    dr_first.setPosX(this->_deNormalizePosition(clipped.first.x));
+                    dr_first.setPosY(this->_deNormalizePosition(clipped.first.y));
+                    dr_first.setRed(static_cast<uint8_t>(clipped.first.r * 255.));
+                    dr_first.setGreen(static_cast<uint8_t>(clipped.first.g * 255.));
+                    dr_first.setBlue(static_cast<uint8_t>(clipped.first.b * 255.));
+                    dr_first.setBlanking(p1_clipped ? false : clipped.first.blanking);
+                    dr_first.setLastPoint(clipped.first.last_point);
+                    f.pushRecord(dr_first);
+                    
+                    if(p2_clipped || i == this->_points_processed.size() - 1) { // if p2 was clipped (outside the visible bounds, draw to the intersection). add the last point in any case
+                        IldaDataRecord dr_second;
+                        dr_second.setPosX(this->_deNormalizePosition(clipped.second.x));
+                        dr_second.setPosY(this->_deNormalizePosition(clipped.second.y));
+                        dr_second.setRed(static_cast<uint8_t>(clipped.second.r * 255.));
+                        dr_second.setGreen(static_cast<uint8_t>(clipped.second.g * 255.));
+                        dr_second.setBlue(static_cast<uint8_t>(clipped.second.b * 255.));
+                        dr_second.setBlanking(false);
+                        dr_second.setLastPoint(clipped.first.last_point);
+                        f.pushRecord(dr_second);
+                    }
+                }
+            }
+        }
+        
+        return f;
             
     }
 
     
     /// Protected methods
     int DataSet::_deNormalizePosition(double pos) {
+        return static_cast<int>(pos * 32000);
+        
         int de_normalized = static_cast<int>(pos * 32000);
         return std::clamp(de_normalized, -32767, 32767);
     }
@@ -119,4 +148,46 @@ namespace jam::compose {
             this->_points_processed.push_back(pp);
         }
     };
+    
+        // Liang-Barsky clipping
+    OptionalDataPointPair DataSet::_clipLineSegment(const DataPoint& p1, const DataPoint& p2) {
+        number x1 = p1.x, y1 = p1.y;
+        number dx = p2.x - x1;
+        number dy = p2.y - y1;
+
+        number tMin = 0.0f;
+        number tMax = 1.0f;
+
+        auto clip = [&](number p, number q) -> bool {
+            if (p == 0) return q >= 0; // Parallel line
+            number r = q / p;
+            if (p < 0) {
+                if (r > tMax) return false;
+                if (r > tMin) tMin = r;
+            } else {
+                if (r < tMin) return false;
+                if (r < tMax) tMax = r;
+            }
+            return true;
+        };
+
+        // Test all 4 boundaries
+        if (
+            clip(-dx, x1 + 1) &&
+            clip( dx, 1 - x1) &&
+            clip(-dy, y1 + 1) &&
+            clip( dy, 1 - y1)
+        ) {
+            DataPoint clipped_1 = p1;
+            clipped_1.x = x1 + dx * tMin;
+            clipped_1.y = y1 + dy * tMin;
+            
+            DataPoint clipped_2 = p2;
+            clipped_2.x = x1 + dx * tMax;
+            clipped_2.y = y1 + dy * tMax;
+        
+            return std::make_pair(clipped_1, clipped_2);
+        }
+        return std::nullopt; // Fully outside
+    }
 };

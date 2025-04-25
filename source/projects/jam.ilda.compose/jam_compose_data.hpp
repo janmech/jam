@@ -34,6 +34,8 @@ namespace jam::compose {
         bool blanking = false;
         bool last_point = false;
     };
+    
+    using OptionalDataPointPair = std::optional<std::pair<DataPoint, DataPoint>>;
 
     
     class DataSet {
@@ -46,18 +48,19 @@ namespace jam::compose {
         
         int _deNormalizePosition(double pos);       // translate  -1. to 1. coordinates to ILDA coordinates
         // apply scazling and rotation
-        void _processDataPoints();                  // apply scaling and rotation to raw data points
+        void _processDataPoints();                   // apply scaling and rotation to raw data points
+        
+        OptionalDataPointPair _clipLineSegment(const DataPoint& p1, const DataPoint& p2);
 
         
     public:
-        void setScale(number s);                    // set scaling factor for x and y direction
-        void setScale(number sx, number sy);        // set scaling factor for x and y direction separately
-        void setRotaion(number angle);              // set rotation in degree (0º to 360º)
-        void setRotationAnchor(Point2D anchor);     // set rotation anchor
+        void setScale(number s);                     // set scaling factor for x and y direction
+        void setScale(number sx, number sy);         // set scaling factor for x and y direction separately
+        void setRotaion(number angle);               // set rotation in degree (0º to 360º)
+        void setRotationAnchor(Point2D anchor);      // set rotation anchor
         std::vector<DataPoint> getDataPoints();      // returns a vector with raw DataPoints
         void addDataPoint(DataPoint p);              // Push back a raw data point
-        void clearRawPoints();                      // Clear raw data points
-        std::vector<DataPoint> getProcessedPoints();// returns processed data points
+        void clearRawPoints();                       // Clear raw data points
         IldaFrame toIldaFrame();
         
         static DataSet frameToDataSet(IldaFrame f) {
