@@ -51,6 +51,11 @@ namespace jam::compose {
         void _processDataPoints();                   // apply scaling and rotation to raw data points
         
         OptionalDataPointPair _clipLineSegment(const DataPoint& p1, const DataPoint& p2);
+        
+        // remove consecutive blanked DataRecords
+        void _thinFrameData(IldaFrame &f);
+        
+        bool _dataRecordsRedundant(IldaDataRecord &d1, IldaDataRecord &d2);
 
         
     public:
@@ -61,6 +66,7 @@ namespace jam::compose {
         void addDataPoint(DataPoint p);                // Push back a raw data point
         void clearRawPoints();                         // Clear raw data points
         IldaFrame toIldaFrame();
+        
         
         static DataSet frameToDataSet(IldaFrame f) {
             

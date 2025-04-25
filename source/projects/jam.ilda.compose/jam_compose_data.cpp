@@ -39,7 +39,6 @@ namespace jam::compose {
         this->_points_raw.clear();
     };
     
-    
     IldaFrame DataSet::toIldaFrame() {
         static std::mutex frame_parsing_lock;
         frame_parsing_lock.lock();
@@ -51,6 +50,7 @@ namespace jam::compose {
         f.setHeader(h);
         
         
+        // parse processed points to IldaDataRecods
         if(this->_points_processed.size() > 1) {
             for(size_t i = 0; i < this->_points_processed.size() - 1; i++) {
                 DataPoint p1 = this->_points_processed[i];
@@ -99,12 +99,13 @@ namespace jam::compose {
                 }
             }
         }
+        
+         this->_thinFrameData(f);
         frame_parsing_lock.unlock();
         
         return f;
         
     }
-    
     
         /// Protected methods
     int DataSet::_deNormalizePosition(double pos) {
@@ -113,18 +114,18 @@ namespace jam::compose {
         int de_normalized = static_cast<int>(pos * 32000);
         return std::clamp(de_normalized, -32767, 32767);
     }
-
+    
     void DataSet::_processDataPoints() {
         static std::mutex points_precessing_lock;
         points_precessing_lock.lock();
-        // apply scaling
-        // apply rotation
+            // apply scaling
+            // apply rotation
         number cos_a      = std::cos(this->_rotation_rad);
         number sin_a      = std::sin(this->_rotation_rad);
         this->_points_processed.clear();
         for (auto p : this->_points_raw) {
             DataPoint pp;
-            // Copy color information
+                // Copy color information
             pp.r = p.r;
             pp.g = p.g;
             pp.b = p.b;
@@ -136,18 +137,18 @@ namespace jam::compose {
             pp.y = p.y * this->_scale_factor.y;
             
             
-            // calculate delta x/y - ajust for rotation anchor
+                // calculate delta x/y - ajust for rotation anchor
             Point2D delta = { pp.x - this->_rotation_anchor.x, pp.y - this->_rotation_anchor.y};
             
-        
-            // calculate rotated x/y
+            
+                // calculate rotated x/y
             number rx = (delta.x * cos_a) - (delta.y * sin_a) + this->_rotation_anchor.x;
             number ry = (delta.x * sin_a) + (delta.y * cos_a) + this->_rotation_anchor.y;
             
             pp.x = rx;
             pp.y = ry;
             
-            // add the processed point
+                // add the processed point
             this->_points_processed.push_back(pp);
             points_precessing_lock.unlock();
             
@@ -159,40 +160,72 @@ namespace jam::compose {
         number x1 = p1.x, y1 = p1.y;
         number dx = p2.x - x1;
         number dy = p2.y - y1;
-
-        number tMin = 0.0f;
-        number tMax = 1.0f;
-
+        
+        number t_min = 0.0f;
+        number t_max = 1.0f;
+        
         auto clip = [&](number p, number q) -> bool {
             if (p == 0) return q >= 0; // Parallel line
             number r = q / p;
             if (p < 0) {
-                if (r > tMax) return false;
-                if (r > tMin) tMin = r;
+                if (r > t_max) return false;
+                if (r > t_min) t_min = r;
             } else {
-                if (r < tMin) return false;
-                if (r < tMax) tMax = r;
+                if (r < t_min) return false;
+                if (r < t_max) t_max = r;
             }
             return true;
         };
-
-        // Test all 4 boundaries
+        
+            // Test all 4 boundaries
         if (
             clip(-dx, x1 + 1) &&
             clip( dx, 1 - x1) &&
             clip(-dy, y1 + 1) &&
             clip( dy, 1 - y1)
-        ) {
-            DataPoint clipped_1 = p1;
-            clipped_1.x = x1 + dx * tMin;
-            clipped_1.y = y1 + dy * tMin;
-            
-            DataPoint clipped_2 = p2;
-            clipped_2.x = x1 + dx * tMax;
-            clipped_2.y = y1 + dy * tMax;
-        
-            return std::make_pair(clipped_1, clipped_2);
-        }
+            ) {
+                DataPoint clipped_1 = p1;
+                clipped_1.x = x1 + dx * t_min;
+                clipped_1.y = y1 + dy * t_min;
+                
+                DataPoint clipped_2 = p2;
+                clipped_2.x = x1 + dx * t_max;
+                clipped_2.y = y1 + dy * t_max;
+                
+                return std::make_pair(clipped_1, clipped_2);
+            }
         return std::nullopt; // Fully outside
     }
+    
+    void DataSet::_thinFrameData(IldaFrame &f) {
+        std::vector<IldaDataRecord> frame_data_records = f.getDataRecords();
+        std::vector<IldaDataRecord> no_redundan;
+        size_t i = 0;
+        // always add the first
+        while (i < frame_data_records.size()) {
+            if(i == 0) {
+                no_redundan.push_back(frame_data_records[i]);
+            };
+            // look for the next non redundant frame
+            size_t j = i;
+            while (j + 1 < frame_data_records.size() && this->_dataRecordsRedundant(frame_data_records[i], frame_data_records[j + 1])) {
+                ++j;
+            }
+            no_redundan.push_back(frame_data_records[j]); // Keep only the last blanking point
+            i = j + 1;
+        }
+        
+        f.setDataRecords(no_redundan);
+    };
+    
+    bool DataSet::_dataRecordsRedundant(IldaDataRecord &d1, IldaDataRecord &d2) {
+        
+            // DR are redundant if they are either Identical or both blanked
+        return (d1.getRed() == d2.getRed()
+                && d1.getGreen() == d2.getGreen()
+                && d1.getBlue() == d2.getBlue()
+                && d1.getPosX() == d2.getPosX()
+                && d1.getPosY() == d2.getPosY())
+        || (d1.getBlanking() && d2.getBlanking());
+    };
 };
