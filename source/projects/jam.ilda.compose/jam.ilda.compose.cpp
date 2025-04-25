@@ -636,21 +636,20 @@ public:
         category{"Text Rendering"},
     };
     
-    attribute<number> textfontsize {
-        this, "textfontsize", 36,
+    attribute<number> lineheight {
+        this, "lineheight", 1.2,
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
-                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 20.);
-                cleaned_args[0] = std::clamp(static_cast<number>(cleaned_args[0]), 10., 1000.);
-                this->_font_size = cleaned_args[0];
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 1.2);
+                number lineheight = cleaned_args[0];
+                cleaned_args[0] = std::clamp(lineheight, 0.1, 5.);
                 return cleaned_args;
             }
         },
-        title {"Font Size"},
-        description{"Font size for text rendering"},
+        title { "Line Height" },
+        description { "Line height between text lines." },
         category{"Text Rendering"},
-        visibility{visibility::show}
     };
     
     attribute<symbol> textalign {
@@ -672,22 +671,23 @@ public:
         category{"Text Rendering"},
     };
     
-    attribute<number> lineheight {
-        this, "lineheight", 1.2,
+    attribute<number> textfontsize {
+        this, "textfontsize", 36,
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
-                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 1.2);
-                number lineheight = cleaned_args[0];
-                cleaned_args[0] = std::clamp(lineheight, 0.1, 5.);
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 20.);
+                cleaned_args[0] = std::clamp(static_cast<number>(cleaned_args[0]), 10., 1000.);
+                this->_font_size = cleaned_args[0];
                 return cleaned_args;
             }
         },
-        title { "Line Height" },
-        description { "Line height between text lines." },
+        title {"Font Size"},
+        description{"Font size for text rendering"},
         category{"Text Rendering"},
+        visibility{visibility::show}
     };
-    
+
     
     message<>bang  {
         this, "bang", "Output ILDA file reference",
