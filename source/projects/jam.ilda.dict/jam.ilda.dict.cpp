@@ -99,7 +99,7 @@ public:
     
     dict d_ilda_file = dict(symbol(true));
     
-    MIN_DESCRIPTION     { "Parse ILDA files structure to dictionary." };
+    MIN_DESCRIPTION     { "Create a dictionary from an ILDA file with file information - such as file name number of frames and information about each frame.<br/><br/>For more information about the ILDA file structure open the <i>Jam Package Overview</i> in the documentation browser and read the topic about <i>ILDA Files</i>" };
     MIN_TAGS            { "ILDA, laser controll, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.compose"};

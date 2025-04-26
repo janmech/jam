@@ -558,7 +558,7 @@ public:
     
     ~ildacompose() {};
     
-    MIN_DESCRIPTION     { "Parse SVG file to ILDA file format." };
+    MIN_DESCRIPTION     { "Create and mofify ILDA files for laser animation." };
     MIN_TAGS            { "ILDA, laser tools, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.compose"};

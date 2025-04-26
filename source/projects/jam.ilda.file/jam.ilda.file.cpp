@@ -120,22 +120,27 @@ public:
             this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
                 // get the pointer to jam.ilda.manager max-object's struct
             this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
+            if(args.size() > 0) {
+                this->import_file(args[0]);
+            }
         }
     }
     
     ~ildafile() {}
     
-    MIN_DESCRIPTION     { "Load a ILDA file (laser animation file) from disk. A loaded file can be used - among others - to control a ILDA capable laser projectot via a HELIOS Laser DAC using the [jam.helios] object, editied with [jam.ilda.compose] or rendered to jitter context using [jam.ilda.jit.gl.sketch]" };
+    MIN_DESCRIPTION     { "Load an ILDA file (laser animation file) from disk.<br/><br/>A loaded file can be used - among others - to control a ILDA capable laser projector via a HELIOS Laser DAC using the [jam.helios] object, editied with [jam.ilda.compose] or rendered to jitter context using [jam.ilda.jit.gl.sketch]" };
     MIN_TAGS            { "ILDA, laser controll" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.compose, jam.ilda.dict, jam.jit.gl.ilda.sketch, jam.helios"};
+    
+    argument<symbol> file { this, "file", "ILDA file name to be loaded." };
     
     inlet<> input_1    { this, "(anything) Control Messages", "anything" };
     outlet<> o_file_reference   { this, "ilda file reference"  };
     outlet<> o_load_result   { this, "file opration success/failure notification", "list" };
     
     message<> bang {
-        this, "bang", "Output the the reference to loaded ILDA file",
+        this, "bang", "Output a reference to loaded ILDA file out of the leftmost outlet.",
         MIN_FUNCTION {
             if(!this->_fileProcessor.fileLoaded()) {
                 cwarn << "No file loaded." << endl;
@@ -146,7 +151,7 @@ public:
     };
     
     message<threadsafe::no>import_file {
-        this, "import", "import an ILDA file",
+        this, "import", "Load an ILDA file to memory.<br/><br/>The message <m>import</m> with no arguments opens a dialog to select an ILDA file to be loaded.<br/>When followed by a symbol, [jam.ilda.file] tries to find and open the file.<br/><br/>When successful, a message <m>import file_name 1</m> will be send out through the rightmost outlet. On failiure <m>import file_name 0</m> will be send out.",
         MIN_FUNCTION {
             if(this->_getParsingState()) {
                 cwarn << "file loading already in progress" << endl;
@@ -288,7 +293,7 @@ public:
     };
     
     message<threadsafe::no> clear {
-        this, "clear", "Clear loaded file",
+        this, "clear", "Clear loaded file.",
         MIN_FUNCTION {
             this->_fileProcessor.clearFileData();
             this->_getStructPointer()->clearInstanceFile(this->_instance_id);

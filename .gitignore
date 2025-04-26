@@ -16,4 +16,5 @@ tests
 tmp
 .DS_Store
 .vs
-docs
+docs/*
+!docs/topics

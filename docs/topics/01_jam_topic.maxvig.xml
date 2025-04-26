@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="_c74_vig.xsl" type="text/xsl"?>
+<vignette name="Jam Package Overview" package="jam">
+  <metadatalist>
+    <metadata name="author">Jan Mech</metadata>
+    <metadata name="tag">DMX</metadata>
+    <metadata name="tag">ILDA</metadata>
+    <metadata name="tag">lighting</metadata>
+    <metadata name="tag">laser</metadata>
+  </metadatalist>
+
+
+  <h1>Jam Package</h1>
+  <p>
+		The Jam package is a collection of objects focused on working with DMX and ILDA devices.
+	</p>
+
+
+	<h2>Max Objects for DMX</h2>
+	<p>
+		The package included s two objects to control DMX devices using the ENTTEC DMX USB PRO interface. 
+	</p>
+  <ul>
+    <li><openfilelink filename="jam.dmxusbpro.maxhelp">jam.dmxusbpro</openfilelink> -  Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists.</li>
+    <li><openfilelink filename="jam.dmxusbpro~.maxhelp">jam.dmxusbpro~</openfilelink> -  Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with signals.</li>
+  </ul>
+
+
+  <h2>Max Object For Working With Laser Projectors</h2>
+  <p>
+		In addition thge package contains a set of object to laser control laser projectors (equipped with an ILDA interface) and to work with ILDA files (laser animations).
+	</p>
+  <ul>
+    <li><openfilelink filename="jam.helios.maxhelp">jam.helios</openfilelink> -Connect to a Helios ILDA DAC</li>
+    <li><openfilelink filename="jam.ilda.compose.maxhelp">jam.ilda.compose</openfilelink> - Create and mofify ILDA files for laser animation.</li>
+    <li><openfilelink filename="jam.ilda.dict.maxhelp">jam.ilda.dict</openfilelink> - Create a dictionary from an ILDA file with file information.</li>
+    <li><openfilelink filename="jam.ilda.file.maxhelp">jam.ilda.file</openfilelink> - Load an ILDA file (laser animation file) from disk.</li>
+    <li><openfilelink filename="jam.jit.gl.ilda.sketch.maxhelp">jam.jit.gl.ilda.sketch</openfilelink> - Render frames from an ILDA file to an Open GL context.</li>
+  </ul>
+  <cr/>
+
+
+  <h2>Example Patches</h2>
+  <cr/>
+  <!--
+  <ul>
+      <li><openfilelink filename="link.clocksource-example.maxpat">link.clocksource-example</openfilelink> - How to use Link as a clocksource for the transport object.</li>
+      <li><openfilelink filename="link-visuals.maxpat">link-visuals</openfilelink> - A visual generator sync'd to a Link session.</li>
+      <li><openfilelink filename="link-groove~.maxpat">link-groove~</openfilelink> - An audio loop player sync'd to a Link session.</li>
+  </ul>
+  <cr/>
+-->
+
+
+  <seealsolist>
+		<!-- <seealso name="timing_events_topic" module="topics" type="vignette" />	-->
+    <!-- 
+		<seealso name="link.beat" />
+		<seealso name="link.phasor~" />
+		<seealso name="ddg.v2arp" />
+		<seealso name="ddg.v2gate" />
+		<seealso name="ddg.v2mono" />
+		<seealso name="transport" />
+  -->
+  </seealsolist>
+
+</vignette>
