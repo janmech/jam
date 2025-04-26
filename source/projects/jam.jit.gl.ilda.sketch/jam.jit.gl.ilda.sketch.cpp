@@ -408,7 +408,7 @@ public:
     attribute<bool> overrideopacity {
         this, "overrideopacity", false,
         title {"Override Opacity"},
-        description {"Override color opacity values when rendering a frame and use the value from the 'opacity' attribute instead.<br/><b>Note</b>: 'blend_enable' must be set to 1 for this to take effect."},
+        description {"Override color opacity values when rendering a frame and use the value from the <m>opacity</m> attribute instead.<br/><b>Note</b>: <m>blend_enable</m> must be set to 1 for this to take effect."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;

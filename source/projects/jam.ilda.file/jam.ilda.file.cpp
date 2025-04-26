@@ -125,11 +125,10 @@ public:
     
     ~ildafile() {}
     
-    MIN_DESCRIPTION     { "Connect to the Helios ILDA DAC" };
-    
-    MIN_TAGS            { "utilities" };
+    MIN_DESCRIPTION     { "Load a ILDA file (laser animation file) from disk. A loaded file can be used - among others - to control a ILDA capable laser projectot via a HELIOS Laser DAC using the [jam.helios] object, editied with [jam.ilda.compose] or rendered to jitter context using [jam.ilda.jit.gl.sketch]" };
+    MIN_TAGS            { "ILDA, laser controll" };
     MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.helios"};
+    MIN_RELATED         { "jam.ilda.compose, jam.ilda.dict, jam.jit.gl.ilda.sketch, jam.helios"};
     
     inlet<> input_1    { this, "(anything) Control Messages", "anything" };
     outlet<> o_file_reference   { this, "ilda file reference"  };

@@ -99,13 +99,12 @@ public:
     
     dict d_ilda_file = dict(symbol(true));
     
-    MIN_DESCRIPTION     { "Parse ILDA files to dictionary." };
-    MIN_TAGS            { "ILDA, laser tools, utilities" };
+    MIN_DESCRIPTION     { "Parse ILDA files structure to dictionary." };
+    MIN_TAGS            { "ILDA, laser controll, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.compose"};
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
-    
     outlet<> outlet_dict      { this, "ILDA file content information as dictionary" };
     
     
