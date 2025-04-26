@@ -39,6 +39,10 @@ namespace jam::ilda {
         return this->_data_records;
     };
     
+    int IldaFrame::getDataRecordCount() {
+        return static_cast<int>(this->_data_records.size());
+    };
+    
     void IldaFrame::setDataRecords(std::vector<IldaDataRecord> dr) {
         this->_data_records = dr;
     };

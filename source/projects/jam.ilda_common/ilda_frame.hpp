@@ -21,6 +21,7 @@ namespace jam::ilda {
         ~IldaFrame(){};
         
         void setHeader(IldaHeader header);
+        
         IldaHeader& getHeader();
         
         void pushRecord(IldaDataRecord data_record);
@@ -29,6 +30,8 @@ namespace jam::ilda {
         
         /// get  the data records vector
         std::vector<IldaDataRecord> getDataRecords();
+        
+        int getDataRecordCount();
         
         void setDataRecords(std::vector<IldaDataRecord> dr);
         

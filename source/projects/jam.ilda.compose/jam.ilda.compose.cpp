@@ -322,6 +322,7 @@ protected:
             this->_ilda_frames[i].getHeader().setFrameNumber(i);
             this->_ilda_frames[i].getHeader().setCompanyName(this->_company_name);
             this->_ilda_frames[i].getHeader().setFrameName(this->_makeFrameName(static_cast<int>(i)));
+            this->_ilda_frames[i].getHeader().setDataRecordCount(this->_ilda_frames[i].getDataRecordCount());
         }
     }
     

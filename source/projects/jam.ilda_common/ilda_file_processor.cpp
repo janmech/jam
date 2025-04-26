@@ -67,10 +67,23 @@ namespace jam::ilda {
         for(size_t i = 0; i < frames.size(); i++) {
             IldaFrame f = frames[i];
             IldaHeader h = f.getHeader();
+            
+            // make sure that data record count is set correctly
+            h.setDataRecordCount(f.getDataRecordCount());
+            
             this->_parseHeaderToChar(f.getHeader(), file_bytes);
             f.reset();
             IldaDataRecord dr;
             RecordFormat format = h.getFormatCode();
+            auto data_records = f.getDataRecords();
+            // Make sure that last point flag is set correctly.
+            for(size_t i = 0; i < data_records.size(); i++) {
+                bool last_point = (i == data_records.size() - 1);
+                data_records[i].setLastPoint(last_point);
+            }
+            
+            f.setDataRecords(data_records);
+            
             while (f.getNext(&dr)) {
                 // Currently the only Record Formats we save is FORMAT_4 and FORMAT_5 - created by jam.ilda.compose. Hence the other formats are not implemented at the moment.
                 switch (format) {
@@ -153,6 +166,7 @@ namespace jam::ilda {
         
             // header bytes 29 – 30: frames in sequence
         u16Value = static_cast<uint16_t>(h.getFramesInSequence());
+        this->_uint16tToChar(u16Value, u16Bytes);
         file_bytes.push_back(u16Bytes[0]);
         file_bytes.push_back(u16Bytes[1]);
         
