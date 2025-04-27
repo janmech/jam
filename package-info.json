@@ -1,24 +1,29 @@
 {
-	"author" : "Cycling '74",
-	"description" : "Lightweight reference implementation of a package built using the Min-API.",
-	"homepatcher" : "C++ Object Development Kit.maxpat",
-	"max_version_min" : "8.0", "max_version_max" : "none",
 	"name" : "jam",
+	"displayname" : "Jam",
+	"version" : "2.0-alpha",
+	"author" : "Jan Mech",
+	"authors" : [],
+	"description" : "A collection of oblects to control DMX and ILDA capable devices",
+	"tags" : [ "DMX", "ILDA", "laser", "lighting"],
+	"website" : "https://janmech.net",
+	"extends" : "",
+	"extensible" : 0,
+	"homepatcher" : "jam_overview.maxpat",
+	"max_version_min" : "8.0", "max_version_max" : "none",
 	"os" : {
 		"macintosh" : {
 			"platform" : [ "x64", "aarch64" ],
-			"min_version" : "none"
-		},
-		"windows" : {
-			"platform" : [ "x64" ],
-			"min_version" : "none"
+			"min_version" : "10.15"
 		}
 	},
 	"package_extra" : {
-		"reverse_domain" : "com.cycling74",
-		"copyright" : "Copyright (c) 2018 Cycling '74"
+		"reverse_domain" : "net.janmech",
+		"copyright" : "Copyright (c) 2025 Jan Mech - The MIT Lisence"
 	},
-	"tags" : [ ],
-	"version" : "1.0.0",
-	"website" : "http://www.github.com/Cycling74/min-devkit"
+	"filelist" : 	{
+		"externals" : [ "jam.dmxusbpro.mxo", "jam.dmxusbpro~.mxo", "jam.helios.mxo", "jam.ilda.file.mxo", "jam.ilda.jit.gl.sketch.mxo", "jam.ilda.compose.mxo"],
+		"extentions": ["jam.dmxusbpro.manager.mxo", "jam.ilda.manager.mxo"],
+		"docs" : ["jam.dmxusbpro.maxref.xml", "jam.dmxusbpro~.maxref.xml", "jam.helios.maxref.maxref.xml", "jam.ilda.file.maxref.xml", "jam.ilda.jit.gl.sketch.maxref.xml", "jam.ilda.compose.maxref.xml", "topics/01_jam_topic.maxvig.xml", "topics/02_jam_ilda_topic.maxvig.xml" ]
+	}
 }

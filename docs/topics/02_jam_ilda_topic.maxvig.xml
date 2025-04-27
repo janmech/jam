@@ -41,7 +41,7 @@ As it is an analog interface it does not allow to address various laser projecto
 
 <h2>The ILDA File Format</h2>
 <p>
-  An ILDA file (or .ild file) is a binary file that describes the movement an colors to control a laser projector. 
+  An ILDA file (or .ild file) is a binary file that describes the movements an colors of the laser projector's beam. 
 </p>
 <p>
 It consists of a sequences of so-called frames or sections. One frame can either contain information about an ‘image’ - meaning I instructions for the laser projector how to move, or a definition of a color pallet - a list of color values associated with color indices.
@@ -92,7 +92,7 @@ It consists of a sequences of so-called frames or sections. One frame can either
 </p>
 <h2>Jam Package: ILDA Formats Handling</h2>
 <p>
-  Object in the Jam Package that deal with ILDA files will ignore frames/sections descring color pallets (FORMAT 2).
+  Objects in the Jam Package that deal with ILDA files will ignore frames/sections describing color pallets (FORMAT 2).
 </p>
 
   <h3><o>jam.ilda.file</o> and <o>jam.jit.gl.ilda.sketch</o></h3>
