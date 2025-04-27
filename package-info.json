@@ -24,6 +24,7 @@
 	"filelist" : 	{
 		"externals" : [ "jam.dmxusbpro.mxo", "jam.dmxusbpro~.mxo", "jam.helios.mxo", "jam.ilda.file.mxo", "jam.ilda.jit.gl.sketch.mxo", "jam.ilda.compose.mxo"],
 		"extentions": ["jam.dmxusbpro.manager.mxo", "jam.ilda.manager.mxo"],
+		"help" : [ "jam.dmxusbpro.maxhelp", "jam.dmxusbpro~.maxhelp", "jam.ilda.file.maxhelp", "jam.ilda.dict.maxhelp" ],
 		"docs" : ["jam.dmxusbpro.maxref.xml", "jam.dmxusbpro~.maxref.xml", "jam.helios.maxref.maxref.xml", "jam.ilda.file.maxref.xml", "jam.ilda.jit.gl.sketch.maxref.xml", "jam.ilda.compose.maxref.xml", "topics/01_jam_topic.maxvig.xml", "topics/02_jam_ilda_topic.maxvig.xml" ]
 	}
 }

@@ -290,7 +290,7 @@ public:
     MIN_DESCRIPTION     { "Render frames from an ILDA file to an Open GL context." };
     MIN_TAGS            { "ILDA, laser tools, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.ilda.file"};
+    MIN_RELATED         { "jam.ilda.file, jam.ilda.compose, jam.ilda.dict, jam.helios"};
     
     inlet<> input_1             { this, "(anything) Control Messages", "anything" };
     inlet<> input_2             { this, "(dictionary) Set the custom color pallet", "dictionary" };

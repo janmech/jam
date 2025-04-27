@@ -102,7 +102,7 @@ public:
     MIN_DESCRIPTION     { "Create a dictionary from an ILDA file with file information - such as file name number of frames and information about each frame.<br/><br/>For more information about the ILDA file structure open the <i>Jam Package Overview</i> in the documentation browser and read the topic about <i>ILDA Files</i>" };
     MIN_TAGS            { "ILDA, laser controll, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.compose"};
+    MIN_RELATED         { "jam.ilda.file,jam.ilda.compose,jam.jit.gl.ilda.sketch,jam.helios"};
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
     outlet<> outlet_dict      { this, "ILDA file content information as dictionary" };
