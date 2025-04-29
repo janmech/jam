@@ -605,7 +605,7 @@ public:
                 atoms cleaned_args;
                 jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "");
                 std::string name = static_cast<std::string>(cleaned_args[0]);
-                this->_formatIldaString(name, 3);
+                this->_formatIldaString(name, 5);
                 this->_frame_name_prefix = name;
                 this->_updateFrameHeaders();
                 this->_updateFrameHeaders();
@@ -638,11 +638,11 @@ public:
     };
     
     attribute<number> lineheight {
-        this, "lineheight", 1.2,
+        this, "lineheight", 1.,
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
-                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 1.2);
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 1.);
                 number lineheight = cleaned_args[0];
                 cleaned_args[0] = std::clamp(lineheight, 0.1, 5.);
                 return cleaned_args;
@@ -679,7 +679,7 @@ public:
                 atoms cleaned_args;
                 jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 20.);
                 cleaned_args[0] = std::clamp(static_cast<number>(cleaned_args[0]), 10., 1000.);
-                this->_font_size = cleaned_args[0];
+                this->_font_size = (number)cleaned_args[0] / 20.;
                 return cleaned_args;
             }
         },
@@ -1272,10 +1272,10 @@ public:
             if(args.size() > 0) {
                 if(args[0].type() == message_type::symbol_argument) {
                     if(args[0] == "up") {
-                        this->_pen_pos.y += std::clamp(this->_ttfFileProcessor.getLineHeight(), -1., 1.) * this->lineheight;
+                        this->_pen_pos.y += std::clamp(this->_ttfFileProcessor.getLineHeight(this->_font_size), -1., 1.) * this->lineheight;
                     }
                     if(args[0] == "down") {
-                        this->_pen_pos.y -= std::clamp(this->_ttfFileProcessor.getLineHeight(), -1., 1.) * this->lineheight;
+                        this->_pen_pos.y -= std::clamp(this->_ttfFileProcessor.getLineHeight(this->_font_size), -1., 1.) * this->lineheight;
                     }
                     
                 }
@@ -1309,7 +1309,7 @@ public:
                  in_string,
                  this->_pen_pos,
                  this->_kerning,
-                 this->_font_size / 20.,
+                 this->_font_size,
                  this->textalign
             );
             if (this->_ilda_frames.size() == 0) {
