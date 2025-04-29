@@ -120,7 +120,7 @@ protected:
     number _font_size = 20;
     
         /// FIFO queue for messages to be sent to outlets
-    fifo<queued_message_t> _to_max_queue { 1000 };
+    fifo<queued_message_t> _to_max_queue { 10000 };
     
         /// Mutex lock for outlet message thread safty
     std::mutex _enqueue_msg_lock;
@@ -433,11 +433,11 @@ protected:
     }
     
     void _addDataPointsToEditDataSet(VecDataPoints points) {
-        for(auto it = points.begin(); it < points.end(); it++) {
-            bool is_first = (it == points.begin());
+        for(size_t i = 0; i < points.size(); i++) {
+            bool is_first = (i == 0);
             DataPoint dp;
-            dp.x = it->x;
-            dp.y = it->y;
+            dp.x = points[i].x;
+            dp.y = points[i].y;
             dp.r = (is_first) ? 0. : this->_color.r;
             dp.g = (is_first) ? 0. : this->_color.g;
             dp.b = (is_first) ? 0. : this->_color.b;
@@ -558,16 +558,16 @@ public:
     
     ~ildacompose() {};
     
-    MIN_DESCRIPTION     { "Create and mofify ILDA files for laser animation." };
+    MIN_DESCRIPTION     { "Create and mofify ILDA files for laser animation. jam.ilda.compose can create ilda files for laser animation by drawing or writing into frames, save them to disk and make them accessible to other jam.ilda.* objects" };
     MIN_TAGS            { "ILDA, laser tools, utilities" };
     MIN_AUTHOR          { "Jan Mech" };
-    MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.compose"};
+    MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.sketch, jam.ilda.dict, jam.helios"};
 //    MIN_FLAGS           {behavior_flags::nobox};
     
     inlet<> input_1             { this, "ILDA file reference", "anything" };
     outlet<> o_file_reference   { this, "ilda file reference"  };
     outlet<> o_font_faces       { this, "Pobulate a umenu with availeble fonts"  };
-    outlet<> o_edit_frame       { this, "Frame cureently selected for editing", "int"};
+    outlet<> o_edit_frame       { this, "Frame currently selected for editing", "int"};
     outlet<> o_framecount       { this, "Number of frames created", "int"};
     outlet<> o_file_result      { this, "file opration success/failure notification", "list" };
     

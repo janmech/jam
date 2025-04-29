@@ -116,8 +116,6 @@ namespace jam::compose {
     }
     
     void DataSet::_processDataPoints() {
-        static std::mutex points_precessing_lock;
-        points_precessing_lock.lock();
             // apply scaling
             // apply rotation
         number cos_a      = std::cos(this->_rotation_rad);
@@ -150,7 +148,6 @@ namespace jam::compose {
             
                 // add the processed point
             this->_points_processed.push_back(pp);
-            points_precessing_lock.unlock();
             
         }
     };
