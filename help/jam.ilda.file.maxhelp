@@ -32,7 +32,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 100.0, 126.0, 842.0, 691.0 ],
+						"rect" : [ 0.0, 26.0, 842.0, 691.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 2,
 						"title" : "Frame Rendering",
@@ -686,7 +686,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 842.0, 691.0 ],
+						"rect" : [ 100.0, 126.0, 842.0, 691.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
