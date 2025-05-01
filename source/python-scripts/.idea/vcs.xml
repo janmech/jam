@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../min-api" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../min-api/include/readerwriterqueue" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../min-api/max-sdk-base" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../min-api/test/mock" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../min-lib" vcs="Git" />
+  </component>
+</project>

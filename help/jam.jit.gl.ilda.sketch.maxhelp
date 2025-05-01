@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 98.0, 119.0, 1049.0, 637.0 ],
+		"rect" : [ 98.0, 100.0, 1049.0, 637.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"showontab" : 1,
 		"boxes" : [ 			{
@@ -95,7 +95,6 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 423.0, 251.0, 94.0, 39.0 ],
-									"presentation_linecount" : 2,
 									"text" : "wrap around frame count"
 								}
 
@@ -171,7 +170,6 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 342.0, 152.0, 130.0, 39.0 ],
-									"presentation_linecount" : 2,
 									"text" : "Start metro to cycle through frames"
 								}
 
@@ -200,7 +198,6 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 75.0, 495.0, 100.0, 54.0 ],
-									"presentation_linecount" : 2,
 									"text" : "Sart the render context"
 								}
 
@@ -239,8 +236,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 63.0, 588.0, 152.0, 22.0 ],
-									"text" : "visible $1, floating $1, $1"
+									"patching_rect" : [ 63.0, 588.0, 215.0, 22.0 ],
+									"text" : "visible $1, floating $1, size 330 210, $1"
 								}
 
 							}
@@ -258,6 +255,10 @@
 							}
 , 							{
 								"box" : 								{
+									"frozen_object_attributes" : 									{
+										"size" : [ 640, 480 ]
+									}
+,
 									"id" : "obj-16",
 									"maxclass" : "newobj",
 									"numinlets" : 1,
@@ -593,7 +594,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 98.0, 145.0, 1049.0, 581.0 ],
+						"rect" : [ 98.0, 126.0, 1049.0, 581.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 5.0, 5.0 ],
 						"showontab" : 1,
@@ -602,12 +603,10 @@
 									"bubble" : 1,
 									"fontname" : "Lato Light",
 									"id" : "obj-48",
-									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 615.0, 358.5, 150.0, 42.0 ],
-									"presentation_linecount" : 2,
+									"patching_rect" : [ 611.0, 363.0, 237.0, 26.0 ],
 									"prototypename" : "Lato Light",
 									"text" : "Set the monochrome color"
 								}
@@ -636,7 +635,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 452.0, 368.0, 150.0, 23.0 ]
+									"patching_rect" : [ 452.0, 364.0, 150.0, 23.0 ]
 								}
 
 							}
@@ -663,7 +662,6 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 328.0, 321.0, 110.0, 57.0 ],
-									"presentation_linecount" : 2,
 									"text" : "Select a frame to render. Starts at 0"
 								}
 
@@ -707,7 +705,6 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 792.0, 430.0, 100.0, 57.0 ],
-									"presentation_linecount" : 2,
 									"text" : "Sart the render context"
 								}
 
@@ -792,7 +789,6 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 251.0, 176.0, 128.0, 41.0 ],
-									"presentation_linecount" : 2,
 									"text" : "Load an ILDA file"
 								}
 
@@ -1047,8 +1043,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 780.0, 523.0, 152.0, 23.0 ],
-									"text" : "visible $1, floating $1, $1"
+									"patching_rect" : [ 780.0, 523.0, 233.0, 23.0 ],
+									"text" : "visible $1, floating $1, size 330 210, $1"
 								}
 
 							}

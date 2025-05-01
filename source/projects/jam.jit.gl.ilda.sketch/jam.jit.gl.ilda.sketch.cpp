@@ -507,7 +507,7 @@ public:
     attribute<fvec> sketch_anchor {
         this, "anchor", {0., 0., 0.},
         title {"Anchor"},
-        description {"The anchor position in local space (default = 0. 0. 0.). Allows for offsetting the local 3D origin around which transforms are applied."},
+        description {"&#91;OB3D&#93; The anchor position in local space (default = 0&#46; 0&#46; 0&#46;). Allows for offsetting the local 3D origin around which transforms are applied."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
@@ -526,7 +526,7 @@ public:
     attribute<bool> sketch_antialias {
         this, "antialias", false,
         title {"Antialias"},
-        description {"Antialiasing flag (default = 0) On some hardware, the blend_enable attribute must also be enabled for antialiasing to work."},
+        description {"&#91;OB3D&#93; Antialiasing flag (default = 0) On some hardware, the blend_enable attribute must also be enabled for antialiasing to work."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
@@ -543,7 +543,7 @@ public:
     attribute<bool> sketch_auto_material {
         this, "auto_material", true,
         title {"Auto Material"},
-        description {"Automatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object."},
+        description {"&#91;OB3D&#93; Automatic material attributes flag (default = 1) When the flag is set, and lighting is enabled for the object."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
@@ -560,7 +560,7 @@ public:
     attribute<bool> sketch_automatic {
         this, "automatic", true,
         title {"Automatic"},
-        description {"Automatic rendering flag (default = 1) When the flag is set, rendering occurs when the associated jit.gl.render object receives a bang message."},
+        description {"&#91;OB3D&#93; Automatic rendering flag (default = 1) When the flag is set, rendering occurs when the associated jit.gl.render object receives a bang message."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
@@ -577,7 +577,7 @@ public:
     attribute<bool> sketch_axes {
         this, "axes", false,
         title {"Axes"},
-        description {"x/y/z axis rendering off/on (default = 0)"},
+        description {"&#91;OB3D&#93; x/y/z axis rendering off/on (default = 0)"},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
@@ -601,7 +601,7 @@ public:
             return cleaned_args;
         }},
         title {"Drawto"},
-        description {"The named drawing context in which to draw (default = none) A named drawing context is a named instance of a jit.window, jit.pwindow, or jit.matrix object that has an instance of the jit.gl.render object associated with it."},
+        description {"&#91;OB3D&#93; The named drawing context in which to draw (default = none) A named drawing context is a named instance of a jit.window, jit.pwindow, or jit.matrix object that has an instance of the jit.gl.render object associated with it."},
         category {"OB3D"}
     };
     
@@ -614,7 +614,7 @@ public:
             typedmess(this->_getSketchObject(),symbol("blend_enable"),1,sketch_atoms);
             return cleaned_args;
         }},
-        title {"Blend Enable"},
+        title {"&#91;OB3D&#93; Blend Enable"},
         description {"Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects."},
         category {"OB3D"}
     };
@@ -629,7 +629,7 @@ public:
             return cleaned_args;
         }},
         title {"Position"},
-        description {"The 3D origin in the form x y z (default = 0. 0. 0.)"},
+        description {"&#91;OB3D&#93; The 3D origin in the form x y z (default = 0. 0. 0.)"},
         category {"OB3D"}
     };
     
@@ -643,7 +643,7 @@ public:
             return cleaned_args;
         }},
         title {"Scale"},
-        description {"The 3D scaling factor in the form x y z (default = 1. 1. 1.)"},
+        description {"&#91;OB3D&#93; The 3D scaling factor in the form x y z (default = 1. 1. 1.)"},
         category {"OB3D"}
     };
     
@@ -657,7 +657,7 @@ public:
             return cleaned_args;
         }},
         title {"Rotate"},
-        description {"The angle of rotation and the xyz vector about which the rotation is performed in the form rotation-angle x y z (default = 0. 0. 0. 1.)"},
+        description {"&#91;OB3D&#93; The angle of rotation and the xyz vector about which the rotation is performed in the form rotation-angle x y z (default = 0. 0. 0. 1.)"},
         category {"OB3D"}
     };
     
@@ -680,7 +680,7 @@ public:
             return cleaned_args;
         }},
         title {"Blend"},
-        description {"The named blending mode. The possible values are:<br/>add = blend_mode 1 1<br/>multiply = blend_mode 2 1<br/>screen = blend_mode 4 1<br/>exclusion = blend_mode 4 5<br/>colorblend = blend_mode 3 4<br/>alphablend = blend_mode 6 7<br/>coloradd = blend_mode 3 1<br/>alphaadd = blend_mode 6 1<br/>"},
+        description {"&#91;OB3D&#93; The named blending mode. The possible values are:<br/>add = blend_mode 1 1<br/>multiply = blend_mode 2 1<br/>screen = blend_mode 4 1<br/>exclusion = blend_mode 4 5<br/>colorblend = blend_mode 3 4<br/>alphablend = blend_mode 6 7<br/>coloradd = blend_mode 3 1<br/>alphaadd = blend_mode 6 1<br/>"},
         range {"add", "multiply", "screen", "exclusion", "colorblend", "colorblend", "alphablend", "coloradd", "coloradd", "alphaadd"},
         category {"OB3D"}
     };
@@ -688,7 +688,7 @@ public:
     attribute<ivec> sketch_blend_mode {
         this, "blend_mode", {6, 7},
         title {"Blend Mode"},
-        description {"The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode. The supported modes are:<br/>     0 = zero<br/>     1 = one<br/>     2 = destination color<br/>     3 = source color<br/>     4 = one minus destination color<br/>     5 = one minus source color<br/>     6 = source alpha<br/>     7 = one minus source alpha<br/>     8 = destination alpha<br/>     9 = one minus destination alpha<br/>     10 = source alpha saturate"},
+        description {"&#91;OB3D&#93; The source and destination planes associated with the blend mode (default = 6 7) Blend modes are specified in the form src_blend_mode dst_blend_mode. The supported modes are:<br/>     0 = zero<br/>     1 = one<br/>     2 = destination color<br/>     3 = source color<br/>     4 = one minus destination color<br/>     5 = one minus source color<br/>     6 = source alpha<br/>     7 = one minus source alpha<br/>     8 = destination alpha<br/>     9 = one minus destination alpha<br/>     10 = source alpha saturate"},
         setter { MIN_FUNCTION {
             
             atoms cleaned_args;
@@ -726,7 +726,7 @@ public:
             return cleaned_args;
         }},
         title {"Lightning Enable"},
-        description {"Lighting enabled flag (default = 0) When the flag is set, lighting is calculated."},
+        description {"&#91;OB3D&#93; Lighting enabled flag (default = 0) When the flag is set, lighting is calculated."},
         category {"OB3D"}
     };
     
@@ -737,7 +737,7 @@ public:
     attribute<cull_face_options> sketch_cull_face {
         this, "cull_face", cull_face_options::off,cull_face_options_range,
         title {"Cull Face"},
-        description {"Face culling mode (default = 0 (no culling))<br/> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces"},
+        description {"&#91;OB3D&#93;Face culling mode (default = 0 (no culling))<br/> 0 = no culling<br/>1 = cull back face<br/>2 = cull front faces"},
         setter { MIN_FUNCTION {
             atoms cleaned_args;
             jam::checkAndFillAttrArgs<cull_face_options>(args, &cleaned_args, 1, cull_face_options::off);
@@ -758,7 +758,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 00"},
-        description {"Custom Color for color index 0"},
+        description {"Custom Pallet Color for color index 0"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -772,7 +772,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 01"},
-        description {"Custom Color for color index 1"},
+        description {"Custom Pallet Color for color index 1"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -786,7 +786,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 02"},
-        description {"Custom Color for color index 2"},
+        description {"Custom Pallet Color for color index 2"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -800,7 +800,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 03"},
-        description {"Custom Color for color index 3"},
+        description {"Custom Pallet Color for color index 3"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -814,7 +814,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 04"},
-        description {"Custom Color for color index 4"},
+        description {"Custom Pallet Color for color index 4"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -828,7 +828,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 05"},
-        description {"Custom Color for color index 5"},
+        description {"Custom Pallet Color for color index 5"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -842,7 +842,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 06"},
-        description {"Custom Color for color index 6"},
+        description {"Custom Pallet Color for color index 6"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -856,7 +856,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 07"},
-        description {"Custom Color for color index 7"},
+        description {"Custom Pallet Color for color index 7"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -870,7 +870,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 08"},
-        description {"Custom Color for color index 8"},
+        description {"Custom Pallet Color for color index 8"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -884,7 +884,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 09"},
-        description {"Custom Color for color index 9"},
+        description {"Custom Pallet Color for color index 9"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -898,7 +898,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 10"},
-        description {"Custom Color for color index 10"},
+        description {"Custom Pallet Color for color index 10"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -912,7 +912,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 11"},
-        description {"Custom Color for color index 11"},
+        description {"Custom Pallet Color for color index 11"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -926,7 +926,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 12"},
-        description {"Custom Color for color index 12"},
+        description {"Custom Pallet Color for color index 12"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -940,7 +940,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 13"},
-        description {"Custom Color for color index 13"},
+        description {"Custom Pallet Color for color index 13"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -954,7 +954,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 14"},
-        description {"Custom Color for color index 14"},
+        description {"Custom Pallet Color for color index 14"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -968,7 +968,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 15"},
-        description {"Custom Color for color index 15"},
+        description {"Custom Pallet Color for color index 15"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -982,7 +982,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 16"},
-        description {"Custom Color for color index 16"},
+        description {"Custom Pallet Color for color index 16"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -996,7 +996,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 17"},
-        description {"Custom Color for color index 17"},
+        description {"Custom Pallet Color for color index 17"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1010,7 +1010,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 18"},
-        description {"Custom Color for color index 18"},
+        description {"Custom Pallet Color for color index 18"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1024,7 +1024,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 19"},
-        description {"Custom Color for color index 19"},
+        description {"Custom Pallet Color for color index 19"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1038,7 +1038,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 20"},
-        description {"Custom Color for color index 20"},
+        description {"Custom Pallet Color for color index 20"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1052,7 +1052,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 21"},
-        description {"Custom Color for color index 21"},
+        description {"Custom Pallet Color for color index 21"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1066,7 +1066,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 22"},
-        description {"Custom Color for color index 22"},
+        description {"Custom Pallet Color for color index 22"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1080,7 +1080,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 23"},
-        description {"Custom Color for color index 23"},
+        description {"Custom Pallet Color for color index 23"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1094,7 +1094,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 24"},
-        description {"Custom Color for color index 24"},
+        description {"Custom Pallet Color for color index 24"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1108,7 +1108,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 25"},
-        description {"Custom Color for color index 25"},
+        description {"Custom Pallet Color for color index 25"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1122,7 +1122,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 26"},
-        description {"Custom Color for color index 26"},
+        description {"Custom Pallet Color for color index 26"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1136,7 +1136,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 27"},
-        description {"Custom Color for color index 27"},
+        description {"Custom Pallet Color for color index 27"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1150,7 +1150,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 28"},
-        description {"Custom Color for color index 28"},
+        description {"Custom Pallet Color for color index 28"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1164,7 +1164,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 29"},
-        description {"Custom Color for color index 29"},
+        description {"Custom Pallet Color for color index 29"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1178,7 +1178,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 30"},
-        description {"Custom Color for color index 30"},
+        description {"Custom Pallet Color for color index 30"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1192,7 +1192,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 31"},
-        description {"Custom Color for color index 31"},
+        description {"Custom Pallet Color for color index 31"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1206,7 +1206,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 32"},
-        description {"Custom Color for color index 32"},
+        description {"Custom Pallet Color for color index 32"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1220,7 +1220,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 33"},
-        description {"Custom Color for color index 33"},
+        description {"Custom Pallet Color for color index 33"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1234,7 +1234,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 34"},
-        description {"Custom Color for color index 34"},
+        description {"Custom Pallet Color for color index 34"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1248,7 +1248,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 35"},
-        description {"Custom Color for color index 35"},
+        description {"Custom Pallet Color for color index 35"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1262,7 +1262,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 36"},
-        description {"Custom Color for color index 36"},
+        description {"Custom Pallet Color for color index 36"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1276,7 +1276,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 37"},
-        description {"Custom Color for color index 37"},
+        description {"Custom Pallet Color for color index 37"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1290,7 +1290,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 38"},
-        description {"Custom Color for color index 38"},
+        description {"Custom Pallet Color for color index 38"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1304,7 +1304,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 39"},
-        description {"Custom Color for color index 39"},
+        description {"Custom Pallet Color for color index 39"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1318,7 +1318,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 40"},
-        description {"Custom Color for color index 40"},
+        description {"Custom Pallet Color for color index 40"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1332,7 +1332,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 41"},
-        description {"Custom Color for color index 34"},
+        description {"Custom Pallet Color for color index 34"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1346,7 +1346,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 42"},
-        description {"Custom Color for color index 42"},
+        description {"Custom Pallet Color for color index 42"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1360,7 +1360,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 43"},
-        description {"Custom Color for color index 43"},
+        description {"Custom Pallet Color for color index 43"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1374,7 +1374,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 44"},
-        description {"Custom Color for color index 44"},
+        description {"Custom Pallet Color for color index 44"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1388,7 +1388,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 45"},
-        description {"Custom Color for color index 45"},
+        description {"Custom Pallet Color for color index 45"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1402,7 +1402,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 46"},
-        description {"Custom Color for color index 46"},
+        description {"Custom Pallet Color for color index 46"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1416,7 +1416,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 47"},
-        description {"Custom Color for color index 47"},
+        description {"Custom Pallet Color for color index 47"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1430,7 +1430,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 48"},
-        description {"Custom Color for color index 48"},
+        description {"Custom Pallet Color for color index 48"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1444,7 +1444,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 49"},
-        description {"Custom Color for color index 49"},
+        description {"Custom Pallet Color for color index 49"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1458,7 +1458,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 50"},
-        description {"Custom Color for color index 50"},
+        description {"Custom Pallet Color for color index 50"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1472,7 +1472,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 51"},
-        description {"Custom Color for color index 54"},
+        description {"Custom Pallet Color for color index 54"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1486,7 +1486,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 52"},
-        description {"Custom Color for color index 52"},
+        description {"Custom Pallet Color for color index 52"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1500,7 +1500,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 53"},
-        description {"Custom Color for color index 53"},
+        description {"Custom Pallet Color for color index 53"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1514,7 +1514,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 54"},
-        description {"Custom Color for color index 54"},
+        description {"Custom Pallet Color for color index 54"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1528,7 +1528,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 55"},
-        description {"Custom Color for color index 55"},
+        description {"Custom Pallet Color for color index 55"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1542,7 +1542,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 56"},
-        description {"Custom Color for color index 56"},
+        description {"Custom Pallet Color for color index 56"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1556,7 +1556,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 57"},
-        description {"Custom Color for color index 57"},
+        description {"Custom Pallet Color for color index 57"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1570,7 +1570,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 58"},
-        description {"Custom Color for color index 45"},
+        description {"Custom Pallet Color for color index 45"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1584,7 +1584,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 59"},
-        description {"Custom Color for color index 59"},
+        description {"Custom Pallet Color for color index 59"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1598,7 +1598,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 60"},
-        description {"Custom Color for color index 60"},
+        description {"Custom Pallet Color for color index 60"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1612,7 +1612,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 61"},
-        description {"Custom Color for color index 64"},
+        description {"Custom Pallet Color for color index 64"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1626,7 +1626,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 62"},
-        description {"Custom Color for color index 62"},
+        description {"Custom Pallet Color for color index 62"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };
@@ -1640,7 +1640,7 @@ public:
             return cleaned_args;
         }},
         title {"Custom Color 63"},
-        description {"Custom Color for color index 63"},
+        description {"Custom Pallet Color for color index 63"},
         style {c74::min::style::color},
         category {"Custom Color Pallet"}
     };

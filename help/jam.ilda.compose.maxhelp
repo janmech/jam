@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 84.0, 100.0, 812.0, 682.0 ],
+		"rect" : [ 84.0, 100.0, 868.0, 682.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"showrootpatcherontab" : 0,
 		"showontab" : 0,
@@ -31,32 +31,30 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 812.0, 626.0 ],
+						"rect" : [ 84.0, 126.0, 868.0, 626.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
-									"fontface" : 1,
+									"border" : 0,
+									"fontface" : 0,
 									"fontname" : "Lato Light",
-									"id" : "obj-8",
-									"maxclass" : "comment",
+									"fontsize" : 13.0,
+									"id" : "obj-33",
+									"maxclass" : "markup",
 									"numinlets" : 1,
-									"numoutlets" : 0,
-									"patching_rect" : [ 380.0, 388.0, 374.0, 21.0 ],
-									"text" : "Frame Format Handling"
-								}
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 391.0, 376.0, 360.0, 168.0 ],
+									"saved_attribute_attributes" : 									{
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_fg_off"
+										}
 
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Lato Light",
-									"id" : "obj-7",
-									"linecount" : 8,
-									"maxclass" : "comment",
-									"numinlets" : 1,
-									"numoutlets" : 0,
-									"patching_rect" : [ 380.0, 408.0, 375.0, 122.0 ],
-									"text" : "jam.ilda.compose always uses the FORMAT 5  (2D Coordinates with True Color). Imported 3D frane will be flattened to 2D, and indexed colors will be converted to true colors (RGB colors) using the ILDA standard pallet. \n\nFor mor information about ILDA file formats and color handling, please refer to the 'ILDA Files and ILDA Interface' topic in the documentation browser."
+									}
+,
+									"text" : "<b>Frame Format Handling</b><br/><br/>\n<b>jam.ilda.compose</b> always uses the FORMAT 5  (2D Coordinates with True Color). Imported 3D frane will be flattened to 2D, and indexed colors will be converted to true colors (RGB colors) using the ILDA standard pallet. <br/><br/>\n\nFor mor information about <b>ILDA file formats</b> and color handling, please refer to the <b>ILDA Files and ILDA Interface</b> topic in the documentation browser.\n",
+									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 								}
 
 							}
@@ -233,10 +231,34 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 812.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"border" : 0,
+									"fontface" : 0,
+									"fontname" : "Lato Light",
+									"fontsize" : 13.0,
+									"id" : "obj-33",
+									"maxclass" : "markup",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 13.0, 107.0, 743.0, 90.0 ],
+									"saved_attribute_attributes" : 									{
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_fg_off"
+										}
+
+									}
+,
+									"text" : "ILDA files contain a <i>Company Name</i> and a <i>Frame Name</i> in every frame header. <br/>\nThese are meta data with no functional value. The <i>Company Name</i> allows to name a creator of the file. You can set your own <i>Company Name</i> using the companyname attribute.\n<br/><br/>\n<b>jam.ilda.compose</b> uses the frame index as <i>Frame Name</i>. Using the frameprefix you and add a custom prefix to the frame name.\n",
+									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"bubble" : 1,
 									"fontname" : "Lato Light",
@@ -245,7 +267,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 642.0, 216.0, 163.0, 54.0 ],
+									"patching_rect" : [ 548.0, 227.0, 163.0, 54.0 ],
 									"text" : "Set your own Company Name and Frame Name prefix"
 								}
 
@@ -259,21 +281,8 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 279.527984619140625, 209.5, 93.0, 39.0 ],
+									"patching_rect" : [ 186.0, 221.0, 93.0, 39.0 ],
 									"text" : "create some frames"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Lato Light",
-									"id" : "obj-13",
-									"linecount" : 6,
-									"maxclass" : "comment",
-									"numinlets" : 1,
-									"numoutlets" : 0,
-									"patching_rect" : [ 10.0, 113.0, 503.0, 93.0 ],
-									"text" : "ILDA files contain a 'Company Name' and a 'Frame Name' in every frame header. \nThese are meta data with no functional value. The 'Company Name' allows to name a creator of the file. You can set your own 'Company Name' using the companyname attribute.\n\njam.ilda.compose uses the frame index as 'Frame Name'. Using the frameprefix you and add a custom prefix to the frame name."
 								}
 
 							}
@@ -284,7 +293,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 104.0, 269.0, 35.0, 22.0 ],
+									"patching_rect" : [ 10.0, 280.0, 35.0, 22.0 ],
 									"text" : "clear"
 								}
 
@@ -773,7 +782,7 @@
  ]
 									}
 ,
-									"patching_rect" : [ 248.0, 255.0, 107.0, 22.0 ],
+									"patching_rect" : [ 154.0, 266.0, 107.0, 22.0 ],
 									"text" : "p make_animation"
 								}
 
@@ -786,7 +795,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "bang" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 248.0, 216.0, 24.0, 24.0 ]
+									"patching_rect" : [ 154.0, 227.0, 24.0, 24.0 ]
 								}
 
 							}
@@ -797,7 +806,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 154.0, 232.0, 42.0, 22.0 ],
+									"patching_rect" : [ 60.0, 243.0, 42.0, 22.0 ],
 									"text" : "export"
 								}
 
@@ -811,7 +820,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 436.0, 248.0, 190.0, 22.0 ]
+									"patching_rect" : [ 342.0, 259.0, 190.0, 22.0 ]
 								}
 
 							}
@@ -824,7 +833,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 436.0, 217.0, 190.0, 22.0 ]
+									"patching_rect" : [ 342.0, 228.0, 190.0, 22.0 ]
 								}
 
 							}
@@ -834,7 +843,7 @@
 									"maxclass" : "dict.view",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 154.0, 376.0, 319.0, 221.0 ]
+									"patching_rect" : [ 60.0, 387.0, 319.0, 221.0 ]
 								}
 
 							}
@@ -845,7 +854,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 154.0, 340.0, 72.0, 22.0 ],
+									"patching_rect" : [ 60.0, 351.0, 72.0, 22.0 ],
 									"text" : "jam.ilda.dict"
 								}
 
@@ -857,7 +866,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 5,
 									"outlettype" : [ "", "", "int", "int", "list" ],
-									"patching_rect" : [ 154.0, 308.0, 102.0, 22.0 ],
+									"patching_rect" : [ 60.0, 319.0, 102.0, 22.0 ],
 									"text" : "jam.ilda.compose"
 								}
 
@@ -923,7 +932,7 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-1", 0 ],
-									"midpoints" : [ 445.5, 300.1484375, 163.5, 300.1484375 ],
+									"midpoints" : [ 351.5, 311.1484375, 69.5, 311.1484375 ],
 									"source" : [ "obj-4", 0 ]
 								}
 
@@ -931,7 +940,7 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-1", 0 ],
-									"midpoints" : [ 445.5, 299.71484375, 163.5, 299.71484375 ],
+									"midpoints" : [ 351.5, 310.71484375, 69.5, 310.71484375 ],
 									"source" : [ "obj-5", 0 ]
 								}
 
@@ -946,7 +955,7 @@
 , 							{
 								"patchline" : 								{
 									"destination" : [ "obj-1", 0 ],
-									"midpoints" : [ 257.5, 301.234375, 163.5, 301.234375 ],
+									"midpoints" : [ 163.5, 312.234375, 69.5, 312.234375 ],
 									"source" : [ "obj-8", 0 ]
 								}
 
@@ -976,7 +985,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 84.0, 126.0, 812.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -2152,7 +2161,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 812.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -3072,7 +3081,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 812.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -3830,7 +3839,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 812.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -4127,7 +4136,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 812.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 5.0, 5.0 ],
 						"showontab" : 1,
@@ -4808,7 +4817,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 812.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [  ],

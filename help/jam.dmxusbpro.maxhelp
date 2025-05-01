@@ -13,8 +13,8 @@
 		"openrect" : [ 100.0, 100.0, 842.0, 747.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"devicewidth" : 842.0,
-		"showontab" : 1,
-		"showrootpatcherontab": 0,
+		"showrootpatcherontab" : 0,
+		"showontab" : 0,
 		"boxes" : [ 			{
 				"box" : 				{
 					"fontname" : "Arial",
@@ -53,7 +53,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 842.0, 691.0 ],
+						"rect" : [ 100.0, 126.0, 852.0, 691.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
@@ -120,7 +120,7 @@
 								"box" : 								{
 									"border" : 0,
 									"fontface" : 0,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-19",
 									"maxclass" : "markup",
@@ -128,21 +128,21 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 592.0, 367.0, 218.0, 57.0 ],
-									"text" : "<b>Note:</b> Receive mode will be disabled when sending a list with DMX values ore the <i>deviceserial</i> message."
+									"text" : "<b>Note:</b> Receive mode will be disabled when sending a list with DMX values or the <i>deviceserial</i> message."
 								}
 
 							}
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-41",
 									"linecount" : 3,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 294.0, 219.0, 185.0, 54.0 ],
+									"patching_rect" : [ 294.0, 219.0, 185.0, 57.0 ],
 									"text" : "Send a list of\nDMX channel/DMX value pairs"
 								}
 
@@ -234,14 +234,14 @@
 								"box" : 								{
 									"bubble" : 1,
 									"bubblepoint" : 0.3,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-31",
 									"linecount" : 4,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 567.0, 505.0, 241.0, 69.0 ],
+									"patching_rect" : [ 567.0, 505.0, 241.0, 73.0 ],
 									"text" : "If on, all discovered serial devices will me enabled in umenu and more verbose messages will be printed to the Max console,"
 								}
 
@@ -249,14 +249,14 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-29",
 									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 567.0, 459.0, 243.0, 40.0 ],
+									"patching_rect" : [ 567.0, 459.0, 240.0, 42.0 ],
 									"text" : "Continue sending DMX data after the connection has been closed."
 								}
 
@@ -264,13 +264,13 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-28",
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 349.0, 411.0, 221.0, 25.0 ],
+									"patching_rect" : [ 349.0, 411.0, 216.0, 26.0 ],
 									"text" : "Close the device connection."
 								}
 
@@ -278,13 +278,13 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-27",
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 364.0, 369.0, 221.0, 25.0 ],
+									"patching_rect" : [ 364.0, 369.0, 215.0, 26.0 ],
 									"text" : "Set the device to receive mode."
 								}
 
@@ -292,13 +292,13 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-26",
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 389.0, 326.0, 241.0, 25.0 ],
+									"patching_rect" : [ 389.0, 326.0, 233.0, 26.0 ],
 									"text" : "Read serial number from the device."
 								}
 
@@ -306,13 +306,13 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-18",
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 403.0, 284.0, 241.0, 25.0 ],
+									"patching_rect" : [ 403.0, 284.0, 236.0, 26.0 ],
 									"text" : "Read configuration from the device"
 								}
 
@@ -371,14 +371,14 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-9",
 									"linecount" : 4,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 88.0, 136.0, 391.0, 69.0 ],
+									"patching_rect" : [ 88.0, 136.0, 381.0, 73.0 ],
 									"text" : "Get a lst of connected devices and populate a umenu.\n\n(By default only dvices following the ENTTEC USB DMX Pro naming convention will we enabled.)"
 								}
 
@@ -766,7 +766,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 842.0, 691.0 ],
+						"rect" : [ 0.0, 26.0, 852.0, 691.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [  ],
