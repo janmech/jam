@@ -37,6 +37,18 @@
 						"showontab" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
+									"id" : "obj-6",
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 85.0, 240.0, 45.0, 23.0 ],
+									"text" : "import"
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"bubble" : 1,
 									"fontname" : "Lato Light",
 									"id" : "obj-15",
@@ -222,6 +234,13 @@
 							}
 , 							{
 								"patchline" : 								{
+									"destination" : [ "obj-1", 0 ],
+									"source" : [ "obj-6", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"destination" : [ "obj-10", 0 ],
 									"source" : [ "obj-9", 0 ]
 								}
@@ -243,7 +262,7 @@
 , 			{
 				"box" : 				{
 					"border" : 0,
-					"filename" : "jam.helpname.js",
+					"filename" : "helpname.js",
 					"id" : "obj-4",
 					"ignoreclick" : 1,
 					"jsarguments" : [ "jam.ilda.dict" ],
@@ -289,14 +308,13 @@
  ],
 		"lines" : [  ],
 		"dependency_cache" : [ 			{
-				"name" : "jam.helpdetails.js",
-				"bootpath" : "~/Documents/Workspace/Xcode/jam/javascript",
-				"patcherrelativepath" : "../javascript",
+				"name" : "helpname.js",
+				"bootpath" : "C74:/help/resources",
 				"type" : "TEXT",
 				"implicit" : 1
 			}
 , 			{
-				"name" : "jam.helpname.js",
+				"name" : "jam.helpdetails.js",
 				"bootpath" : "~/Documents/Workspace/Xcode/jam/javascript",
 				"patcherrelativepath" : "../javascript",
 				"type" : "TEXT",

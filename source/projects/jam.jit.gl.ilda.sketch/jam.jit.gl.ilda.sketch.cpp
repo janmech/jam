@@ -614,8 +614,8 @@ public:
             typedmess(this->_getSketchObject(),symbol("blend_enable"),1,sketch_atoms);
             return cleaned_args;
         }},
-        title {"&#91;OB3D&#93; Blend Enable"},
-        description {"Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects."},
+        title {"Blend Enable"},
+        description {"&#91;OB3D&#93; Blending flag (default = 0) When the flag is set, blending is enabled for all rendered objects."},
         category {"OB3D"}
     };
     
