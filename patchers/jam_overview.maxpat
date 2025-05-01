@@ -4,7 +4,7 @@
 		"appversion" : 		{
 			"major" : 9,
 			"minor" : 0,
-			"revision" : 6,
+			"revision" : 5,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
@@ -22,6 +22,26 @@
 		"title" : "jam Overview",
 		"boxes" : [ 			{
 				"box" : 				{
+					"angle" : 270.0,
+					"border" : 1,
+					"bordercolor" : [ 1.0, 1.0, 1.0, 1.0 ],
+					"grad1" : [ 0.172137149796092, 0.172137100044002, 0.172137113045018, 0.0 ],
+					"grad2" : [ 0.172137149796092, 0.172137100044002, 0.172137113045018, 0.0 ],
+					"id" : "obj-14",
+					"maxclass" : "panel",
+					"mode" : 1,
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 488.0, 361.0, 128.0, 128.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 223.0, 369.0, 229.0, 40.0 ],
+					"proportion" : 0.5,
+					"rounded" : 0
+				}
+
+			}
+, 			{
+				"box" : 				{
 					"id" : "obj-12",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
@@ -29,7 +49,7 @@
 					"outlettype" : [ "dictionary", "" ],
 					"patching_rect" : [ 303.0, 274.0, 113.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 303.0, 274.0, 113.0, 22.0 ],
+					"presentation_rect" : [ 303.0, 285.0, 113.0, 22.0 ],
 					"text" : "jam.jit.gl.ilda.sketch"
 				}
 
@@ -43,7 +63,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 218.0, 274.0, 72.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 218.0, 274.0, 72.0, 22.0 ],
+					"presentation_rect" : [ 218.0, 285.0, 72.0, 22.0 ],
 					"text" : "jam.ilda.dict"
 				}
 
@@ -57,7 +77,7 @@
 					"outlettype" : [ "", "", "int", "int", "list" ],
 					"patching_rect" : [ 105.0, 274.0, 102.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 105.0, 274.0, 102.0, 22.0 ],
+					"presentation_rect" : [ 102.0, 285.0, 102.0, 22.0 ],
 					"text" : "jam.ilda.compose"
 				}
 
@@ -71,7 +91,7 @@
 					"outlettype" : [ "", "list" ],
 					"patching_rect" : [ 24.0, 274.0, 69.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 24.0, 274.0, 69.0, 22.0 ],
+					"presentation_rect" : [ 19.0, 285.0, 69.0, 22.0 ],
 					"text" : "jam.ilda.file"
 				}
 
@@ -85,7 +105,7 @@
 					"outlettype" : [ "message", "int", "" ],
 					"patching_rect" : [ 24.0, 196.0, 63.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 24.0, 201.0, 63.0, 22.0 ],
+					"presentation_rect" : [ 19.0, 212.0, 63.0, 22.0 ],
 					"text" : "jam.helios"
 				}
 
@@ -99,7 +119,7 @@
 					"outlettype" : [ "list", "int", "", "anything" ],
 					"patching_rect" : [ 159.0, 105.0, 98.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 155.0, 132.0, 98.0, 22.0 ],
+					"presentation_rect" : [ 135.0, 143.0, 98.0, 22.0 ],
 					"text" : "jam.dmxusbpro~"
 				}
 
@@ -113,13 +133,15 @@
 					"outlettype" : [ "list", "int", "", "" ],
 					"patching_rect" : [ 24.0, 105.0, 91.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 28.0, 132.0, 91.0, 22.0 ],
+					"presentation_rect" : [ 19.0, 143.0, 91.0, 22.0 ],
 					"text" : "jam.dmxusbpro"
 				}
 
 			}
 , 			{
 				"box" : 				{
+					"bgcolor" : [ 0.125490196078431, 0.125490196078431, 0.125490196078431, 0.0 ],
+					"fontname" : "Lato Light",
 					"fontsize" : 24.0,
 					"id" : "obj-2",
 					"maxclass" : "textbutton",
@@ -129,21 +151,22 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 145.0, 561.0, 240.0, 45.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 172.0, 363.0, 240.0, 45.0 ],
+					"presentation_rect" : [ 214.0, 364.0, 240.0, 45.0 ],
 					"text" : "jam Documentation"
 				}
 
 			}
 , 			{
 				"box" : 				{
+					"fontname" : "Lato Light",
 					"fontsize" : 18.0,
 					"id" : "obj-3",
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 41.0, 476.0, 170.0, 27.0 ],
+					"patching_rect" : [ 41.0, 476.0, 167.0, 28.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 207.0, 328.0, 170.0, 27.0 ],
+					"presentation_rect" : [ 249.0, 329.0, 167.0, 28.0 ],
 					"text" : "Click to get started"
 				}
 
@@ -266,7 +289,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 232.0, 174.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 19.0, 242.0, 174.0, 23.0 ],
+					"presentation_rect" : [ 15.0, 253.0, 174.0, 23.0 ],
 					"text" : "ILDA File Objects"
 				}
 
@@ -311,7 +334,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 164.0, 174.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 19.0, 169.0, 174.0, 23.0 ],
+					"presentation_rect" : [ 15.0, 180.0, 174.0, 23.0 ],
 					"text" : "ILDA Interface Objects"
 				}
 
@@ -384,7 +407,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 65.0, 174.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 15.0, 103.0, 174.0, 23.0 ],
+					"presentation_rect" : [ 15.0, 114.0, 174.0, 23.0 ],
 					"text" : "DMX Interface Objects"
 				}
 
@@ -396,6 +419,7 @@
 					"fontname" : "Lato Light",
 					"fontsize" : 16.0,
 					"id" : "obj-1",
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
 					"linkunderline" : 0,
 					"maxclass" : "markup",
 					"numinlets" : 1,
@@ -403,15 +427,19 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 27.0, 12.0, 712.0, 47.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 82.0, 26.0, 481.0, 73.0 ],
+					"presentation_rect" : [ 82.0, 26.0, 556.0, 73.0 ],
 					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+,
 						"textcolor" : 						{
 							"expression" : "themecolor.live_control_fg"
 						}
 
 					}
 ,
-					"text" : "The jam package is a collections of externals for working to interface with a ENTTEC DMX USB Pro DMX controller and to work with show laser projectors that have an ILDA interface.",
+					"text" : "The jam package is a collections of externals for working with DMX devices via an ENTTEC DMX USB Pro DMX interface and with show laser projectors that have an ILDA interface via an Helios ILDA DAC.",
 					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 				}
 
@@ -513,6 +541,7 @@
 
 			}
  ],
+		"originid" : "pat-42",
 		"dependency_cache" : [ 			{
 				"name" : "icon.png",
 				"bootpath" : "~/Documents/Workspace/Xcode/jam",
