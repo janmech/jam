@@ -24,13 +24,13 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 306.0, 280.0, 126.0, 22.0 ],
+					"patching_rect" : [ 306.0, 280.0, 143.0, 22.0 ],
 					"saved_object_attributes" : 					{
-						"filename" : "helpstarter.js",
+						"filename" : "jam.helpstarter.js",
 						"parameter_enable" : 0
 					}
 ,
-					"text" : "js helpstarter.js serial"
+					"text" : "js jam.helpstarter.js serial"
 				}
 
 			}
@@ -53,7 +53,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 173.0, 198.0, 882.0, 682.0 ],
+						"rect" : [ 173.0, 126.0, 882.0, 712.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
@@ -950,7 +950,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 882.0, 682.0 ],
+						"rect" : [ 0.0, 26.0, 882.0, 712.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [  ],
@@ -972,17 +972,18 @@
 				"implicit" : 1
 			}
 , 			{
-				"name" : "helpstarter.js",
-				"bootpath" : "C74:/help/resources",
-				"type" : "TEXT",
-				"implicit" : 1
-			}
-, 			{
 				"name" : "jam.dmxusbpro~.mxo",
 				"type" : "iLaX"
 			}
 , 			{
 				"name" : "jam.helpdetails.js",
+				"bootpath" : "~/Documents/Workspace/Xcode/jam/javascript",
+				"patcherrelativepath" : "../javascript",
+				"type" : "TEXT",
+				"implicit" : 1
+			}
+, 			{
+				"name" : "jam.helpstarter.js",
 				"bootpath" : "~/Documents/Workspace/Xcode/jam/javascript",
 				"patcherrelativepath" : "../javascript",
 				"type" : "TEXT",

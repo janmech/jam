@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 98.0, 100.0, 869.0, 802.0 ],
+		"rect" : [ 98.0, 100.0, 859.0, 674.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"showrootpatcherontab" : 0,
 		"showontab" : 0,
@@ -31,11 +31,55 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 98.0, 126.0, 869.0, 746.0 ],
+						"rect" : [ 98.0, 126.0, 859.0, 648.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 5.0, 5.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"border" : 0,
+									"fontface" : 0,
+									"fontname" : "Lato Light",
+									"fontsize" : 13.0,
+									"id" : "obj-11",
+									"linkbold" : 1,
+									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+									"maxclass" : "markup",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 113.0, 131.0, 193.0, 24.0 ],
+									"saved_attribute_attributes" : 									{
+										"linkcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+,
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+
+									}
+,
+									"text" : ": <a href=\"02_jam_ilda_topic.maxvig.xml\">ILDA Files and ILDA Interface</a>",
+									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"hidden" : 1,
+									"id" : "obj-7",
+									"linecount" : 2,
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 493.0, 177.0, 105.0, 38.0 ],
+									"text" : ";\rmax opendoc $1"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"id" : "obj-6",
 									"maxclass" : "message",
@@ -70,7 +114,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 458.0, 513.0, 246.0, 57.0 ],
+									"patching_rect" : [ 445.0, 426.0, 246.0, 57.0 ],
 									"text" : "The dictionary contains  information about the sections/frames inside an ILDA file"
 								}
 
@@ -105,7 +149,7 @@
 									"maxclass" : "dict.view",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 138.0, 444.0, 299.0, 187.0 ]
+									"patching_rect" : [ 138.0, 415.0, 285.0, 91.0 ]
 								}
 
 							}
@@ -220,6 +264,14 @@
 							}
 , 							{
 								"patchline" : 								{
+									"destination" : [ "obj-7", 0 ],
+									"hidden" : 1,
+									"source" : [ "obj-11", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"destination" : [ "obj-1", 0 ],
 									"source" : [ "obj-4", 0 ]
 								}
@@ -292,7 +344,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 869.0, 746.0 ],
+						"rect" : [ 0.0, 26.0, 859.0, 648.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [  ],

@@ -32,10 +32,10 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 842.0, 691.0 ],
+						"rect" : [ 0.0, 26.0, 842.0, 721.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 2,
-						"title" : "Frame Rendering",
+						"title" : "rendering",
 						"boxes" : [ 							{
 								"box" : 								{
 									"border" : 0,
@@ -68,12 +68,13 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
+									"fontname" : "Lato Light",
 									"id" : "obj-35",
 									"linecount" : 3,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 537.0, 362.5, 142.0, 51.0 ],
+									"patching_rect" : [ 537.0, 362.5, 135.0, 54.0 ],
 									"text" : "Frame indices range  from 0  to framecount-1"
 								}
 
@@ -86,7 +87,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 474.5, 246.0, 24.0, 24.0 ]
+									"patching_rect" : [ 474.5, 239.0, 24.0, 24.0 ]
 								}
 
 							}
@@ -97,7 +98,7 @@
 									"numinlets" : 5,
 									"numoutlets" : 4,
 									"outlettype" : [ "int", "", "", "int" ],
-									"patching_rect" : [ 474.5, 312.0, 61.0, 22.0 ],
+									"patching_rect" : [ 474.5, 305.0, 61.0, 22.0 ],
 									"text" : "counter"
 								}
 
@@ -109,7 +110,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "int" ],
-									"patching_rect" : [ 542.5, 312.0, 29.5, 22.0 ],
+									"patching_rect" : [ 542.5, 305.0, 29.5, 22.0 ],
 									"text" : "- 1"
 								}
 
@@ -121,7 +122,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "int" ],
-									"patching_rect" : [ 474.5, 340.0, 87.0, 22.0 ],
+									"patching_rect" : [ 474.5, 333.0, 87.0, 22.0 ],
 									"text" : "% 200"
 								}
 
@@ -133,7 +134,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "bang" ],
-									"patching_rect" : [ 474.5, 284.0, 63.0, 22.0 ],
+									"patching_rect" : [ 474.5, 277.0, 63.0, 22.0 ],
 									"text" : "qmetro 40"
 								}
 
@@ -191,12 +192,13 @@
 									"bubble" : 1,
 									"bubblepoint" : 1.0,
 									"bubbleside" : 2,
+									"fontname" : "Lato Light",
 									"id" : "obj-2",
 									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 0,
 									"numoutlets" : 0,
-									"patching_rect" : [ 130.5, 136.0, 153.0, 52.0 ],
+									"patching_rect" : [ 130.5, 136.0, 150.0, 54.0 ],
 									"suppressinlet" : 1,
 									"text" : "Load an ILDA file into memory"
 								}
@@ -230,12 +232,13 @@
 								"box" : 								{
 									"bubble" : 1,
 									"bubbleside" : 3,
+									"fontname" : "Lato Light",
 									"id" : "obj-37",
 									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 42.0, 404.5, 129.0, 37.0 ],
+									"patching_rect" : [ 42.0, 404.5, 128.0, 39.0 ],
 									"text" : "Get the numer of frames in the file"
 								}
 
@@ -256,12 +259,13 @@
 								"box" : 								{
 									"bubble" : 1,
 									"bubbleside" : 3,
+									"fontname" : "Lato Light",
 									"id" : "obj-34",
 									"linecount" : 4,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 42.0, 303.5, 133.0, 64.0 ],
+									"patching_rect" : [ 42.0, 303.5, 127.0, 68.0 ],
 									"text" : "When passing an ILDA file reference jam.jit.gl.ilda.sketch will refer to this file"
 								}
 
@@ -270,12 +274,13 @@
 								"box" : 								{
 									"bubble" : 1,
 									"bubblepoint" : 1.0,
+									"fontname" : "Lato Light",
 									"id" : "obj-32",
 									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 507.0, 220.0, 132.0, 37.0 ],
+									"patching_rect" : [ 506.5, 213.0, 130.0, 39.0 ],
 									"text" : "Start metro to cycle through frames"
 								}
 
@@ -347,8 +352,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 23.5, 613.0, 141.0, 22.0 ],
-									"text" : "visible $1, floating $1, $1"
+									"patching_rect" : [ 23.5, 613.0, 215.0, 22.0 ],
+									"text" : "visible $1, floating $1, size 330 210, $1"
 								}
 
 							}
@@ -414,7 +419,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 25.5, 545.0, 20.0, 20.0 ],
+									"patching_rect" : [ 182.0, 556.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -442,7 +447,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 496.0, 200.0, 20.0, 20.0 ],
+									"patching_rect" : [ 616.5, 191.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -470,7 +475,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 134.0, 112.0, 20.0, 20.0 ],
+									"patching_rect" : [ 258.5, 114.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -686,21 +691,51 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 100.0, 126.0, 842.0, 691.0 ],
+						"rect" : [ 100.0, 126.0, 842.0, 721.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
-									"fontname" : "Lato Light",
+									"hidden" : 1,
 									"id" : "obj-8",
-									"linecount" : 5,
-									"maxclass" : "comment",
-									"numinlets" : 0,
-									"numoutlets" : 0,
-									"patching_rect" : [ 367.0, 498.0, 411.0, 84.0 ],
-									"suppressinlet" : 1,
-									"text" : "Passing an ILDA file reference to jam.ilda.dict creates a dictionary summarizing the file structure.\n\nFor more information about ILDA files please refere to 'ILDA Files and ILDA Interface' topic in the documentation browser."
+									"linecount" : 2,
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 377.0, 611.0, 105.0, 38.0 ],
+									"text" : ";\rmax opendoc $1"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"border" : 0,
+									"fontface" : 0,
+									"fontname" : "Lato Light",
+									"fontsize" : 13.0,
+									"id" : "obj-3",
+									"linkbold" : 1,
+									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+									"maxclass" : "markup",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 371.0, 494.0, 408.0, 92.0 ],
+									"saved_attribute_attributes" : 									{
+										"linkcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+,
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+
+									}
+,
+									"text" : "Passing an ILDA file reference to jam.ilda.dict creates a dictionary summarizing the file structure.<br/><br/>\n\nFor more information about ILDA files please refere to <a href=\"02_jam_ilda_topic.maxvig.xml\">ILDA Files and ILDA Interface</a> topic in the documentation browser.",
+									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 								}
 
 							}
@@ -876,7 +911,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 183.0, 195.0, 20.0, 20.0 ],
+									"patching_rect" : [ 176.0, 195.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -918,6 +953,14 @@
 								"patchline" : 								{
 									"destination" : [ "obj-1", 0 ],
 									"source" : [ "obj-17", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-8", 0 ],
+									"hidden" : 1,
+									"source" : [ "obj-3", 0 ]
 								}
 
 							}
@@ -983,7 +1026,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 842.0, 691.0 ],
+						"rect" : [ 0.0, 26.0, 842.0, 721.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [  ],

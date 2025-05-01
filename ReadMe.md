@@ -1,7 +1,16 @@
 # jam - Max Package
-The jam package consists of two externals for [Cycling'74 Max](https://cycling74.com) for connecting to and controlling ENTTEC DMX USB Pro devices. `jam.dmxusbpro` and `jam.dmxusbpro~`. The former allows sending DMX data to and receiving them from a connectect interface using Max messages. The latter allows to send DMX data via audio signals.
+The jam package is a collections of externals for [Cycling'74 Max](https://cycling74.com) for working to interface with a ENTTEC DMX USB Pro DMX controller and to work with shoe laser projectors that have an ILDA interface.
 
-The project was born out of curiosity, wanting to learn how to write Max externals. I chose to create the DMX USB Pro objects, because the formerly wide spread external by nullmedium ([http://www.nullmedium.de/dev/dmxusbpro/](http://www.nullmedium.de/dev/dmxusbpro/)) is end of life since a while and there are frequently people on the Max Forum looking for a replacement. 
+List of externals:
+
+* `jam.dmxusbpro`- Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists.
+* `jam.dmxusbpro~` - Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with signals.
+* `jam.helios` - Connect to a Helios ILDA DAC
+* `jam.ilda.compose` - Create and mofify ILDA files for laser animation.
+* `jam.ilda.dict` - Create a dictionary from an ILDA file with file information
+* `jam.ilda.file` - Load an ILDA file (laser animation file) from disk.
+* `jam.jit.gl.ilda.sketch` - Render frames from an ILDA file to an Open GL context.
+
 
 
 

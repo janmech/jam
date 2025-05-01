@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 84.0, 100.0, 868.0, 682.0 ],
+		"rect" : [ 84.0, 100.0, 887.0, 628.0 ],
 		"gridsize" : [ 15.0, 15.0 ],
 		"showrootpatcherontab" : 0,
 		"showontab" : 0,
@@ -31,29 +31,49 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"hidden" : 1,
+									"id" : "obj-7",
+									"linecount" : 2,
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 391.0, 558.0, 97.0, 35.0 ],
+									"text" : ";\rmax opendoc $1"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"border" : 0,
 									"fontface" : 0,
 									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-33",
+									"linkbold" : 1,
+									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
 									"maxclass" : "markup",
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 391.0, 376.0, 360.0, 168.0 ],
 									"saved_attribute_attributes" : 									{
+										"linkcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+,
 										"textcolor" : 										{
 											"expression" : "themecolor.live_control_fg_off"
 										}
 
 									}
 ,
-									"text" : "<b>Frame Format Handling</b><br/><br/>\n<b>jam.ilda.compose</b> always uses the FORMAT 5  (2D Coordinates with True Color). Imported 3D frane will be flattened to 2D, and indexed colors will be converted to true colors (RGB colors) using the ILDA standard pallet. <br/><br/>\n\nFor mor information about <b>ILDA file formats</b> and color handling, please refer to the <b>ILDA Files and ILDA Interface</b> topic in the documentation browser.\n",
+									"text" : "<b>Frame Format Handling</b><br/><br/>\n<b>jam.ilda.compose</b> always uses the FORMAT 5  (2D Coordinates with True Color). Imported 3D frane will be flattened to 2D, and indexed colors will be converted to true colors (RGB colors) using the ILDA standard pallet. <br/><br/>\n\nFor mor information about <b>ILDA file formats</b> and color handling, please refer to the <a href=\"02_jam_ilda_topic.maxvig.xml\">ILDA Files and ILDA Interface</a> topic in the documentation browser.\n",
 									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 								}
 
@@ -62,12 +82,12 @@
 								"box" : 								{
 									"fontname" : "Lato Light",
 									"id" : "obj-2",
-									"linecount" : 3,
+									"linecount" : 2,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 9.0, 109.0, 374.0, 50.0 ],
-									"text" : "You can import any ILDA file loaded with jam.ilda.file by sending the file reference. Frames are copied to jam.ilda.compose. and inserted after the last frame."
+									"patching_rect" : [ 9.0, 109.0, 680.0, 35.0 ],
+									"text" : "You can import any ILDA file loaded with jam.ilda.file by sending the file reference. Frames are copied to jam.ilda.compose and inserted after the last frame."
 								}
 
 							}
@@ -187,6 +207,14 @@
 							}
 , 							{
 								"patchline" : 								{
+									"destination" : [ "obj-7", 0 ],
+									"hidden" : 1,
+									"source" : [ "obj-33", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
 									"destination" : [ "obj-1", 0 ],
 									"source" : [ "obj-4", 0 ]
 								}
@@ -231,7 +259,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 84.0, 126.0, 868.0, 626.0 ],
+						"rect" : [ 84.0, 126.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -843,7 +871,7 @@
 									"maxclass" : "dict.view",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 60.0, 387.0, 319.0, 221.0 ]
+									"patching_rect" : [ 60.0, 398.0, 273.0, 128.0 ]
 								}
 
 							}
@@ -985,7 +1013,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -997,7 +1025,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 154.0, 263.5, 120.0, 25.0 ],
-									"text" : "Save fikle to disk"
+									"text" : "Save file to disk"
 								}
 
 							}
@@ -1156,8 +1184,8 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 442.5, 274.0, 94.0, 39.0 ],
-									"text" : "wrap around frame count"
+									"patching_rect" : [ 442.5, 274.0, 97.0, 39.0 ],
+									"text" : "Wrap around frame count"
 								}
 
 							}
@@ -1171,7 +1199,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 42.0, 338.0, 95.0, 25.0 ],
-									"text" : "frame count"
+									"text" : "Frame count"
 								}
 
 							}
@@ -2161,17 +2189,41 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"arrows" : 1,
+									"id" : "obj-39",
+									"justification" : 4,
+									"maxclass" : "live.line",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 311.0, 213.0, 20.0, 24.0 ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"arrows" : 2,
+									"id" : "obj-34",
+									"justification" : 3,
+									"maxclass" : "live.line",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 340.0, 213.0, 20.0, 24.0 ]
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"id" : "obj-32",
 									"maxclass" : "newobj",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 278.0, 349.0, 73.0, 22.0 ],
+									"patching_rect" : [ 278.0, 344.0, 73.0, 22.0 ],
 									"text" : "pak 1. 1."
 								}
 
@@ -2240,7 +2292,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 325.0, 231.0, 20.0, 20.0 ],
+									"patching_rect" : [ 325.0, 191.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -2267,7 +2319,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 70.0, 237.0, 20.0, 20.0 ],
+									"patching_rect" : [ 136.0, 238.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -2345,7 +2397,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 340.0, 473.5, 20.0, 20.0 ],
+									"patching_rect" : [ 669.0, 471.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -2362,13 +2414,12 @@
 , 							{
 								"box" : 								{
 									"bubble" : 1,
-									"bubbleside" : 3,
 									"fontname" : "Lato Light",
 									"id" : "obj-46",
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 337.5, 495.5, 155.0, 25.0 ],
+									"patching_rect" : [ 534.0, 495.5, 155.0, 25.0 ],
 									"text" : "Start the render context"
 								}
 
@@ -2413,7 +2464,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 567.0, 333.0, 238.0, 25.0 ],
-									"text" : "copies the frame at index 0 to index 3"
+									"text" : "Copies the frame at index 0 to index 3"
 								}
 
 							}
@@ -2427,7 +2478,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 566.0, 274.0, 292.0, 54.0 ],
-									"text" : "duplicatesthe  frame at index 0, \nif no argumenti s provided the currently selected edit-frame is duplicated"
+									"text" : "Duplicatesthe  frame at index 0, \nif no argumenti s provided the currently selected edit-frame is duplicated"
 								}
 
 							}
@@ -2441,7 +2492,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 0,
 									"patching_rect" : [ 566.0, 214.0, 292.0, 54.0 ],
-									"text" : "removes the frame at index 0, \nif no argumenti s provided the currently selected edit-frame is removes"
+									"text" : "Removes the frame at index 0, \nif no argumenti s provided the currently selected edit-frame is removes"
 								}
 
 							}
@@ -2453,8 +2504,8 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 566.0, 186.0, 154.0, 25.0 ],
-									"text" : "appends an empty frame"
+									"patching_rect" : [ 566.0, 186.0, 164.0, 25.0 ],
+									"text" : "Appends an empty frame"
 								}
 
 							}
@@ -2466,8 +2517,8 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 566.0, 155.0, 154.0, 25.0 ],
-									"text" : "reverses the frame order"
+									"patching_rect" : [ 566.0, 155.0, 164.0, 25.0 ],
+									"text" : "Reverses the frame order"
 								}
 
 							}
@@ -3081,7 +3132,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -3169,7 +3220,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 310.5, 145.0, 20.0, 20.0 ],
+									"patching_rect" : [ 356.5, 147.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -3222,7 +3273,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 159.5, 179.0, 20.0, 20.0 ],
+									"patching_rect" : [ 229.0, 183.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -3263,7 +3314,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 483.0, 472.0, 20.0, 20.0 ],
+									"patching_rect" : [ 599.0, 474.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -3304,7 +3355,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 66.0, 357.0, 20.0, 20.0 ],
+									"patching_rect" : [ 148.0, 406.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -3331,7 +3382,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 87.0, 115.0, 20.0, 20.0 ],
+									"patching_rect" : [ 194.0, 115.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -3466,12 +3517,13 @@
 , 							{
 								"box" : 								{
 									"id" : "obj-14",
+									"linecount" : 2,
 									"maxclass" : "message",
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 285.0, 423.0, 142.0, 22.0 ],
-									"text" : "\"Helvetica Neue Bold\" 1"
+									"patching_rect" : [ 285.0, 423.0, 144.0, 35.0 ],
+									"text" : "\"Helvetica Light Oblique\" 1"
 								}
 
 							}
@@ -3839,7 +3891,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -4136,7 +4188,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 5.0, 5.0 ],
 						"showontab" : 1,
@@ -4242,7 +4294,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 518.0, 213.0, 20.0, 20.0 ],
+									"patching_rect" : [ 565.5, 212.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -4326,7 +4378,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 267.0, 193.0, 20.0, 20.0 ],
+									"patching_rect" : [ 325.0, 193.5, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -4369,7 +4421,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 81.0, 153.0, 20.0, 20.0 ],
+									"patching_rect" : [ 163.0, 153.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -4412,7 +4464,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 436.0, 367.0, 20.0, 20.0 ],
+									"patching_rect" : [ 518.0, 366.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -4817,7 +4869,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 868.0, 626.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [  ],

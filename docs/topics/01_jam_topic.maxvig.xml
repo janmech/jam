@@ -39,10 +39,10 @@
   </ul>
   <cr/>
 
-
+<!--
   <h2>Example Patches</h2>
   <cr/>
-  <!--
+
   <ul>
       <li><openfilelink filename="link.clocksource-example.maxpat">link.clocksource-example</openfilelink> - How to use Link as a clocksource for the transport object.</li>
       <li><openfilelink filename="link-visuals.maxpat">link-visuals</openfilelink> - A visual generator sync'd to a Link session.</li>
