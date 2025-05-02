@@ -109,15 +109,8 @@ It consists of a sequences of so-called frames or sections. One frame can either
     will always create ILDA files using <b>FORMAT 5</b> frames (2D Coordinates with True Color).<br/>
   Frames imported from an ILDA file will be converted to FORMAT 5 (flattened to 2D and indexed colors will be converted to true colors using the ILDA standard pallet).
 </p>
-<seealsolist>
-	<!-- <seealso name="timing_events_topic" module="topics" type="vignette" />	-->
-  <!-- 
-	<seealso name="link.beat" />
-	<seealso name="link.phasor~" />
-	<seealso name="ddg.v2arp" />
-	<seealso name="ddg.v2gate" />
-	<seealso name="ddg.v2mono" />
-	<seealso name="transport" />
--->
-</seealsolist>
+  <seealsolist>
+    <seealso name="03_jam_color_palette" module="guides" type="vignette" />
+    <seealso name="jam.jit.gl.ilda.sketch" />
+  </seealsolist>
 </vignette>

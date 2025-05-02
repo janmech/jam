@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="_c74_vig.xsl" type="text/xsl"?>
+<vignette name="Standard Color Palette" package="jam">
+  <metadatalist>
+    <metadata name="author">Jan Mech</metadata>
+    <metadata name="tag">DMX</metadata>
+    <metadata name="tag">ILDA</metadata>
+    <metadata name="tag">lighting</metadata>
+    <metadata name="tag">laser</metadata>
+  </metadatalist>
+
+
+  <h1>Color Palette</h1>
+  <p>These are theindexed colors used as standard palette</p>
+  <table>
+    <tr>
+      <th>Color Index</th>
+      <th>RGB</th>
+      <th>Color Swatch</th>
+    </tr>
+    <tr>
+      <td>00</td>
+      <td>float: <b>1.000, 0.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 0, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_00.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>01</td>
+      <td>float: <b>1.000, 0.063, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 16, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_01.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>02</td>
+      <td>float: <b>1.000, 0.125, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 32, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_02.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>03</td>
+      <td>float: <b>1.000, 0.188, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 47, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_03.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>04</td>
+      <td>float: <b>1.000, 0.251, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 63, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_04.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>05</td>
+      <td>float: <b>1.000, 0.314, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 80, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_05.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>06</td>
+      <td>float: <b>1.000, 0.376, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 96, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_06.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>07</td>
+      <td>float: <b>1.000, 0.439, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 112, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_07.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>08</td>
+      <td>float: <b>1.000, 0.502, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 127, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_08.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>09</td>
+      <td>float: <b>1.000, 0.565, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 144, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_09.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>float: <b>1.000, 0.627, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 160, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_10.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>float: <b>1.000, 0.690, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 176, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_11.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>float: <b>1.000, 0.753, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 192, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_12.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>float: <b>1.000, 0.816, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 208, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_13.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>float: <b>1.000, 0.878, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 224, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_14.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>float: <b>1.000, 0.941, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 240, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_15.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>float: <b>1.000, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_16.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>float: <b>0.878, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>224, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_17.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>float: <b>0.753, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>192, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_18.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>float: <b>0.627, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>160, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_19.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>float: <b>0.502, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>127, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_20.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>21</td>
+      <td>float: <b>0.376, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>96, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_21.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>float: <b>0.251, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>63, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_22.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>23</td>
+      <td>float: <b>0.125, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>32, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_23.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>float: <b>0.000, 1.000, 0.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 0</b></td>
+      <td>
+        <img src="images/swatches/color_index_24.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>float: <b>0.000, 1.000, 0.141</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 36</b></td>
+      <td>
+        <img src="images/swatches/color_index_25.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>26</td>
+      <td>float: <b>0.000, 1.000, 0.286</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 73</b></td>
+      <td>
+        <img src="images/swatches/color_index_26.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>float: <b>0.000, 1.000, 0.427</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 109</b></td>
+      <td>
+        <img src="images/swatches/color_index_27.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>float: <b>0.000, 1.000, 0.573</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 146</b></td>
+      <td>
+        <img src="images/swatches/color_index_28.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>29</td>
+      <td>float: <b>0.000, 1.000, 0.714</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 182</b></td>
+      <td>
+        <img src="images/swatches/color_index_29.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>float: <b>0.000, 1.000, 0.859</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 219</b></td>
+      <td>
+        <img src="images/swatches/color_index_30.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>float: <b>0.000, 1.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 255, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_31.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>float: <b>0.000, 0.890, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 227, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_32.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>float: <b>0.000, 0.776, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 198, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_33.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>float: <b>0.000, 0.667, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 170, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_34.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>35</td>
+      <td>float: <b>0.000, 0.557, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 142, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_35.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>36</td>
+      <td>float: <b>0.000, 0.443, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 113, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_36.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>37</td>
+      <td>float: <b>0.000, 0.333, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 85, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_37.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>38</td>
+      <td>float: <b>0.000, 0.220, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 56, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_38.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>39</td>
+      <td>float: <b>0.000, 0.110, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 28, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_39.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>40</td>
+      <td>float: <b>0.000, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>0, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_40.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>41</td>
+      <td>float: <b>0.125, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>32, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_41.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>42</td>
+      <td>float: <b>0.251, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>63, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_42.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>43</td>
+      <td>float: <b>0.376, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>96, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_43.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>44</td>
+      <td>float: <b>0.502, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>127, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_44.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>45</td>
+      <td>float: <b>0.627, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>160, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_45.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>46</td>
+      <td>float: <b>0.753, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>192, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_46.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>47</td>
+      <td>float: <b>0.878, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>224, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_47.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>48</td>
+      <td>float: <b>1.000, 0.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 0, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_48.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>49</td>
+      <td>float: <b>1.000, 0.125, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 32, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_49.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>50</td>
+      <td>float: <b>1.000, 0.251, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 63, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_50.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>51</td>
+      <td>float: <b>1.000, 0.376, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 96, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_51.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>52</td>
+      <td>float: <b>1.000, 0.502, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 127, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_52.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>53</td>
+      <td>float: <b>1.000, 0.627, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 160, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_53.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>54</td>
+      <td>float: <b>1.000, 0.753, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 192, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_54.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>55</td>
+      <td>float: <b>1.000, 0.878, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 224, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_55.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>56</td>
+      <td>float: <b>1.000, 1.000, 1.000</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 255, 255</b></td>
+      <td>
+        <img src="images/swatches/color_index_56.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>57</td>
+      <td>float: <b>1.000, 0.878, 0.878</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 224, 224</b></td>
+      <td>
+        <img src="images/swatches/color_index_57.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>58</td>
+      <td>float: <b>1.000, 0.753, 0.753</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 192, 192</b></td>
+      <td>
+        <img src="images/swatches/color_index_58.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>59</td>
+      <td>float: <b>1.000, 0.627, 0.627</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 160, 160</b></td>
+      <td>
+        <img src="images/swatches/color_index_59.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>60</td>
+      <td>float: <b>1.000, 0.502, 0.502</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 127, 127</b></td>
+      <td>
+        <img src="images/swatches/color_index_60.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>61</td>
+      <td>float: <b>1.000, 0.376, 0.376</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 96, 96</b></td>
+      <td>
+        <img src="images/swatches/color_index_61.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>62</td>
+      <td>float: <b>1.000, 0.251, 0.251</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 63, 63</b></td>
+      <td>
+        <img src="images/swatches/color_index_62.png" />
+      </td>
+    </tr>
+    <tr>
+      <td>63</td>
+      <td>float: <b>1.000, 0.125, 0.125</b><br />int &#160;&#160;&#160;&#160;&#160;<b>255, 32, 32</b></td>
+      <td>
+        <img src="images/swatches/color_index_63.png" />
+      </td>
+    </tr>
+  </table>
+  <seealsolist>
+    <seealso name="02_jam_ilda_topic" module="topics" type="vignette" />
+    <seealso name="jam.jit.gl.ilda.sketch" />
+  </seealsolist>
+</vignette>
