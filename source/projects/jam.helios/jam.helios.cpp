@@ -27,25 +27,23 @@ class helios : public object<helios>
 {
     
 protected:
-    typedef struct QuededMessage
-    {
-    outlet<>* out;
-    atoms msg_atoms;
-    void set(outlet<>* o, atoms ma)
-    {
-    this->out = o;
-    this->setAtoms(ma);
-    }
-    void setAtoms(atoms ma)
-    {
-    this->msg_atoms.clear();
-    this->msg_atoms = ma;
-    }
-    void send(helios* me)
-    {
-    me->_enqueue_msg_to_max(*this);
-    me->deliverer_to_max.delay(0);
-    }
+    typedef struct QuededMessage {
+        outlet<>* out;
+        atoms msg_atoms;
+        void set(outlet<>* o, atoms ma) {
+            this->out = o;
+            this->setAtoms(ma);
+        }
+        
+        void setAtoms(atoms ma) {
+            this->msg_atoms.clear();
+            this->msg_atoms = ma;
+        }
+        
+        void send(helios* me) {
+            me->_enqueue_msg_to_max(*this);
+            me->deliverer_to_max.delay(0);
+        }
     } queued_message_t;
     
     std::thread _device_scan_thread;
@@ -53,34 +51,30 @@ protected:
     std::mutex _enqueue_msg_lock;
     jam::helios::DeviceManager& _deviceManager = jam::helios::DeviceManager::get();
     
-    void _enqueue_msg_to_max(const queued_message_t& msg_to_max)
-    {
-    _enqueue_msg_lock.lock();
-    this->_to_max_queue_2.try_enqueue(msg_to_max);
-    _enqueue_msg_lock.unlock();
+    void _enqueue_msg_to_max(const queued_message_t& msg_to_max) {
+        _enqueue_msg_lock.lock();
+        this->_to_max_queue_2.try_enqueue(msg_to_max);
+        _enqueue_msg_lock.unlock();
     }
     
-    bool _dequeue_msg_to_max(queued_message_t& msg_data)
-    {
-    _enqueue_msg_lock.lock();
-    bool result = this->_to_max_queue_2.try_dequeue(msg_data);
-    _enqueue_msg_lock.unlock();
-    return result;
+    bool _dequeue_msg_to_max(queued_message_t& msg_data) {
+        _enqueue_msg_lock.lock();
+        bool result = this->_to_max_queue_2.try_dequeue(msg_data);
+        _enqueue_msg_lock.unlock();
+        return result;
     }
     
 public:
-    helios(const atoms& args = {})
-    {
-    if (!dummy()) {
-        this->_deviceManager.addObjInstance(this->maxobj());
-    }
+    helios(const atoms& args = {}) {
+        if (!dummy()) {
+            this->_deviceManager.addObjInstance(this->maxobj());
+        }
     }
     
-    ~helios()
-    {
-    if (!dummy()) {
-        this->_deviceManager.removeObjInstance(this->maxobj());
-    }
+    ~helios() {
+        if (!dummy()) {
+            this->_deviceManager.removeObjInstance(this->maxobj());
+        }
     }
     
     MIN_DESCRIPTION { "Connect to a Helios ILDA DAC" };
@@ -100,7 +94,7 @@ public:
         description{ "If set to 1 (default) other jam.helios object will be notified if an  device scan has been exectued. The new result will update all umenus connected to the leftmost outlet." }
     };
     
-    attribute<int, threadsafe::no, limit::clamp> samplerate{
+    attribute<int, threadsafe::no, limit::clamp> samplerate {
         this,
         "samplerate",
         30000,
@@ -109,19 +103,19 @@ public:
         range{ 1000, 100000 },
     };
     
-    attribute<bool> invert_x{
+    attribute<bool> invert_x {
         this, "invert_x", false,
         title{ "Invert X" },
         description{ "Invert the output of the X-axis (horizontally)" }
     };
     
-    attribute<bool> invert_y{
+    attribute<bool> invert_y {
         this, "invert_y", false,
         title{ "Invert Y" },
         description{ "Invert the output of the Y-axis (vertically)" }
     };
     
-    message<> menu{
+    message<> menu {
         
         this, "menu", "Get list of connected devices and build menu from it.",
         MIN_FUNCTION{
@@ -154,10 +148,9 @@ public:
             }
             return {};
         }
-    }
-    ;
+    };
     
-    message<> devicescan{
+    message<> devicescan {
         this, "devicescan", "Scan for connected Helios DACs.",
         MIN_FUNCTION{
             this->close();
@@ -193,10 +186,9 @@ public:
             
             return {};
         }
-    }
-    ;
+    };
     
-    message<> deviceinfo{
+    message<> deviceinfo {
         this, "deviceinfo", "Print infomation about Helios DAC devices to the Max console.",
         MIN_FUNCTION{
             std::vector<jam::helios::device_info_t>* devs = this->_deviceManager.getOpenDevices();
@@ -213,10 +205,9 @@ public:
             }
             return {};
         }
-    }
-    ;
+    };
     
-    message<> open{
+    message<> open {
         this, "open", "Open connetion to a Helios DAC",
         MIN_FUNCTION{
             if (args.size() == 0){
@@ -276,10 +267,9 @@ public:
             msg.send(this);
             return {};
         }
-    }
-    ;
+    };
     
-    message<> close{
+    message<> close {
         this, "close", "Close connetion to Helios DAC",
         MIN_FUNCTION{
             this->_deviceManager.detachDeviceFromInstance(this->maxobj());
@@ -290,10 +280,9 @@ public:
             msg.send(this);
             return {};
         }
-    }
-    ;
+    };
     
-    message<> shutter{
+    message<> shutter {
         this, "shutter", "Open/Close the shutter. <p><b>Argument:</b><br /> shutter_state [int]</p>",
         MIN_FUNCTION{
             if (args.size() < 1){
@@ -310,7 +299,7 @@ public:
         }
     };
     
-    timer<> deliverer_to_max{
+    timer<> deliverer_to_max {
         this, MIN_FUNCTION{
             queued_message_t queue_msg;
             

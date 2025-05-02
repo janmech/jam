@@ -37,6 +37,21 @@
 						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
+									"bubble" : 1,
+									"fontname" : "Lato Light",
+									"id" : "obj-2",
+									"linecount" : 2,
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 290.0, 465.0, 139.0, 39.0 ],
+									"prototypename" : "Lato Light",
+									"text" : "Custom Color Palette as dictionary"
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"id" : "obj-22",
 									"maxclass" : "dict.view",
 									"numinlets" : 1,
