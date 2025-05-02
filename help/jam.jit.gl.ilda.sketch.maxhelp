@@ -31,9 +31,10 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 864.0, 659.0 ],
+						"rect" : [ 74.0, 126.0, 864.0, 659.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
+						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"id" : "obj-22",
@@ -74,7 +75,7 @@
 , 							{
 								"box" : 								{
 									"data" : 									{
-										"colorpallet" : 										{
+										"colorpalette" : 										{
 											"0" : [ 1.0, 0.0, 0.0, 1.0 ],
 											"1" : [ 1.0, 0.062745101749897, 0.0, 1.0 ],
 											"2" : [ 1.0, 0.125490203499794, 0.0, 1.0 ],
@@ -148,7 +149,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 5,
 									"outlettype" : [ "dictionary", "", "", "", "" ],
-									"patching_rect" : [ 273.0, 279.0, 144.0, 22.0 ],
+									"patching_rect" : [ 273.0, 279.0, 151.0, 22.0 ],
 									"saved_object_attributes" : 									{
 										"embed" : 1,
 										"legacy" : 0,
@@ -156,7 +157,7 @@
 										"parameter_mappable" : 0
 									}
 ,
-									"text" : "dict my_pallet @embed 1"
+									"text" : "dict my_palette @embed 1"
 								}
 
 							}
@@ -168,7 +169,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 530.0, 251.0, 214.0, 25.0 ],
+									"patching_rect" : [ 541.0, 251.5, 214.0, 25.0 ],
 									"prototypename" : "Lato Light",
 									"text" : "Export custom colors as dictionary"
 								}
@@ -181,8 +182,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 459.0, 253.0, 71.0, 22.0 ],
-									"text" : "exportpallet"
+									"patching_rect" : [ 459.0, 253.0, 78.0, 22.0 ],
+									"text" : "exportpalette"
 								}
 
 							}
@@ -194,9 +195,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 530.0, 210.0, 247.0, 25.0 ],
+									"patching_rect" : [ 534.0, 212.0, 247.0, 25.0 ],
 									"prototypename" : "Lato Light",
-									"text" : "Reset custom colors to default pallet"
+									"text" : "Reset custom colors to default palette"
 								}
 
 							}
@@ -235,8 +236,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 459.0, 213.0, 64.0, 22.0 ],
-									"text" : "resetpallet"
+									"patching_rect" : [ 459.0, 213.0, 71.0, 22.0 ],
+									"text" : "resetpalette"
 								}
 
 							}
@@ -287,9 +288,9 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 691.0, 51.0, 150.0, 25.0 ],
+									"patching_rect" : [ 691.0, 51.0, 166.0, 25.0 ],
 									"prototypename" : "Lato Light",
-									"text" : "Use custom color pallet"
+									"text" : "Use custom color palette"
 								}
 
 							}
@@ -323,7 +324,7 @@
 							}
 , 							{
 								"box" : 								{
-									"attr" : "custompallet",
+									"attr" : "custompalette",
 									"id" : "obj-26",
 									"maxclass" : "attrui",
 									"numinlets" : 1,
@@ -789,19 +790,24 @@
 									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-1",
+									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
 									"maxclass" : "markup",
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 13.0, 110.0, 420.0, 38.0 ],
 									"saved_attribute_attributes" : 									{
+										"linkcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+,
 										"textcolor" : 										{
 											"expression" : "themecolor.live_control_fg"
 										}
 
 									}
 ,
-									"text" : "Fore frames that specify color by index (rather than RGB values), <b>jam.jit.gl.ilda.sketch</b> uses the standard ILDA Color Pallet.<bbr/>",
+									"text" : "For frames that specify color by index (rather than RGB values), <b>jam.jit.gl.ilda.sketch</b> uses the standard ILDA Color Palette.",
 									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 								}
 
@@ -1003,8 +1009,8 @@
  ]
 					}
 ,
-					"patching_rect" : [ 172.0, 193.0, 91.0, 22.0 ],
-					"text" : "p \"color pallets\"",
+					"patching_rect" : [ 172.0, 193.0, 98.0, 22.0 ],
+					"text" : "p \"color palettes\"",
 					"varname" : "render options[1]"
 				}
 
@@ -1026,7 +1032,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 74.0, 126.0, 864.0, 659.0 ],
+						"rect" : [ 0.0, 26.0, 864.0, 659.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -2850,8 +2856,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 245.0, 457.0, 155.0, 23.0 ],
-									"text" : "framecount 101"
+									"patching_rect" : [ 245.0, 457.0, 155.0, 23.0 ]
 								}
 
 							}

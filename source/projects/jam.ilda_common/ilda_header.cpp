@@ -95,11 +95,11 @@ namespace jam::ilda {
     };
     
     bool IldaHeader::getIsColorPallet() {
-        return this->is_color_pallet;
+        return this->is_color_palette;
     };
     
-    void IldaHeader::setIsColorPallet(bool is_color_pallet) {
-        this->is_color_pallet = is_color_pallet;
+    void IldaHeader::setIsColorPallet(bool is_color_palette) {
+        this->is_color_palette = is_color_palette;
     };
     
 }

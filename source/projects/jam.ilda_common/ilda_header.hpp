@@ -22,7 +22,7 @@ namespace jam::ilda {
         IldaHeader(
                RecordFormat format_code, std::string frame_name = "", std::string company_name = "",
                size_t record_count = 0, size_t frame_number = 0, size_t frames_in_sequence = 0,
-               size_t projector_number = 0, bool is_color_pallet = false
+               size_t projector_number = 0, bool is_color_palette = false
                ){
             // We are using the setters here instead of init list to ensure correct value ranges
             this->setFormatCode(format_code);
@@ -32,7 +32,7 @@ namespace jam::ilda {
             this->setFrameNumber(frame_number);
             this->setFramesInSequence(frames_in_sequence);
             this->setProjectorNumber(projector_number);
-            this->setIsColorPallet(is_color_pallet);
+            this->setIsColorPallet(is_color_palette);
             
             
         };
@@ -64,7 +64,7 @@ namespace jam::ilda {
         void setProjectorNumber(size_t projector_number);
         
         bool getIsColorPallet();
-        void setIsColorPallet(bool is_color_pallet);
+        void setIsColorPallet(bool is_color_palette);
         
         
     protected:
@@ -75,7 +75,7 @@ namespace jam::ilda {
         size_t frame_number = 0;
         size_t frames_in_sequence = 0;
         size_t projector_number = 0;
-        bool is_color_pallet = false;
+        bool is_color_palette = false;
         
     };
 };

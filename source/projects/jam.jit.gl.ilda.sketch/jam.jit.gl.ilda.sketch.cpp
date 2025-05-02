@@ -42,7 +42,7 @@ private:
     
     std::vector<jam::ilda::IldaFrame> _frames;
     
-    float _custom_color_pallet[256] = {
+    float _custom_color_palette[256] = {
         1.0 , 0.0 , 0.0 , 1.0 , 1.0 , 0.0627451 , 0.0 , 1.0 , 1.0 , 0.1254902 , 0.0 , 1.0 , 1.0 , 0.18823529 , 0.0 , 1.0 , 1.0 , 0.25098039 , 0.0 , 1.0 , 1.0 , 0.31372549 , 0.0 , 1.0 , 1.0 , 0.37647059 , 0.0 , 1.0 , 1.0 , 0.43921569 , 0.0 , 1.0 , 1.0 , 0.50196078 , 0.0 , 1.0 , 1.0 , 0.56470588 , 0.0 , 1.0 , 1.0 , 0.62745098 , 0.0 , 1.0 , 1.0 , 0.69019608 , 0.0 , 1.0 , 1.0 , 0.75294118 , 0.0 , 1.0 , 1.0 , 0.81568627 , 0.0 , 1.0 , 1.0 , 0.87843137 , 0.0 , 1.0 , 1.0 , 0.94117647 , 0.0 , 1.0 , 1.0 , 1.0 , 0.0 , 1.0 , 0.87843137 , 1.0 , 0.0 , 1.0 , 0.75294118 , 1.0 , 0.0 , 1.0 , 0.62745098 , 1.0 , 0.0 , 1.0 , 0.50196078 , 1.0 , 0.0 , 1.0 , 0.37647059 , 1.0 , 0.0 , 1.0 , 0.25098039 , 1.0 , 0.0 , 1.0 , 0.1254902 , 1.0 , 0.0 , 1.0 , 0.0 , 1.0 , 0.0 , 1.0 , 0.0 , 1.0 , 0.14117647 , 1.0 , 0.0 , 1.0 , 0.28627451 , 1.0 , 0.0 , 1.0 , 0.42745098 , 1.0 , 0.0 , 1.0 , 0.57254902 , 1.0 , 0.0 , 1.0 , 0.71372549 , 1.0 , 0.0 , 1.0 , 0.85882353 , 1.0 , 0.0 , 1.0 , 1.0 , 1.0 , 0.0 , 0.89019608 , 1.0 , 1.0 , 0.0 , 0.77647059 , 1.0 , 1.0 , 0.0 , 0.66666667 , 1.0 , 1.0 , 0.0 , 0.55686275 , 1.0 , 1.0 , 0.0 , 0.44313725 , 1.0 , 1.0 , 0.0 , 0.33333333 , 1.0 , 1.0 , 0.0 , 0.21960784 , 1.0 , 1.0 , 0.0 , 0.10980392 , 1.0 , 1.0 , 0.0 , 0.0 , 1.0 , 1.0 , 0.1254902 , 0.0 , 1.0 , 1.0 , 0.25098039 , 0.0 , 1.0 , 1.0 , 0.37647059 , 0.0 , 1.0 , 1.0 , 0.50196078 , 0.0 , 1.0 , 1.0 , 0.62745098 , 0.0 , 1.0 , 1.0 , 0.75294118 , 0.0 , 1.0 , 1.0 , 0.87843137 , 0.0 , 1.0 , 1.0 , 1.0 , 0.0 , 1.0 , 1.0 , 1.0 , 0.1254902 , 1.0 , 1.0 , 1.0 , 0.25098039 , 1.0 , 1.0 , 1.0 , 0.37647059 , 1.0 , 1.0 , 1.0 , 0.50196078 , 1.0 , 1.0 , 1.0 , 0.62745098 , 1.0 , 1.0 , 1.0 , 0.75294118 , 1.0 , 1.0 , 1.0 , 0.87843137 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 1.0 , 0.87843137 , 0.87843137 , 1.0 , 1.0 , 0.75294118 , 0.75294118 , 1.0 , 1.0 , 0.62745098 , 0.62745098 , 1.0 , 1.0 , 0.50196078 , 0.50196078 , 1.0 , 1.0 , 0.37647059 , 0.37647059 , 1.0 , 1.0 , 0.25098039 , 0.25098039 , 1.0 , 1.0 , 0.1254902 , 0.1254902 , 1.0 ,     };
     
     int _last_frame_index = 0;
@@ -129,7 +129,7 @@ protected:
     
     bool _force_2d = false;
     
-    bool _use_custompallet = false;
+    bool _use_custompalette = false;
     
     bool _override_opacity = false;
     
@@ -139,21 +139,21 @@ protected:
     
     void _setCustomColorByIndex(size_t color_index, number r, number g, number b, number a) {
         int offset = (int)color_index * 4;
-        this->_custom_color_pallet[offset]   = r;
-        this->_custom_color_pallet[offset+1] = g;
-        this->_custom_color_pallet[offset+2] = b;
-        this->_custom_color_pallet[offset+3] = a;
+        this->_custom_color_palette[offset]   = r;
+        this->_custom_color_palette[offset+1] = g;
+        this->_custom_color_palette[offset+2] = b;
+        this->_custom_color_palette[offset+3] = a;
     };
     
     fvec _getCustomColorByIndex(size_t color_index) {
         color_index = (color_index > 63) ? 63 : color_index;
         fvec color_vector;
         size_t offset = color_index * 4;
-        color_vector.push_back(this->_custom_color_pallet[offset]);
-        color_vector.push_back(this->_custom_color_pallet[offset+1]);
-        color_vector.push_back(this->_custom_color_pallet[offset+2]);
+        color_vector.push_back(this->_custom_color_palette[offset]);
+        color_vector.push_back(this->_custom_color_palette[offset+1]);
+        color_vector.push_back(this->_custom_color_palette[offset+2]);
         if(!this->_override_opacity) {
-            color_vector.push_back(this->_custom_color_pallet[offset+3]);
+            color_vector.push_back(this->_custom_color_palette[offset+3]);
         } else {
             color_vector.push_back(this->opacity);
         }
@@ -293,9 +293,9 @@ public:
     MIN_RELATED         { "jam.ilda.file, jam.ilda.compose, jam.ilda.dict, jam.helios, jit.gl.sketch"};
     
     inlet<> input_1             { this, "(anything) Control Messages", "anything" };
-    inlet<> input_2             { this, "(dictionary) Set the custom color pallet", "dictionary" };
+    inlet<> input_2             { this, "(dictionary) Set the custom color palette", "dictionary" };
     
-    outlet<> outlet_dict      { this, "Dictionary describing custom color pallet", "dictionary" };
+    outlet<> outlet_dict      { this, "Dictionary describing custom color palette", "dictionary" };
     outlet<> output_dumpout     { this, "Framecount of currently loaded ILDA file." };
 
     
@@ -386,15 +386,15 @@ public:
         category {"Drawing"}
     };
     
-    attribute<bool> custompallet {
-        this, "custompallet", false,
+    attribute<bool> custompalette {
+        this, "custompalette", false,
         title {"Use Custom Color Pallet"},
-        description {"Use custom color pallet for frames with indexed colors."},
+        description {"Use custom color palette for frames with indexed colors."},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
                 jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
-                this->_use_custompallet = (bool)cleaned_args[0];
+                this->_use_custompalette = (bool)cleaned_args[0];
                 if(this->initialized()) {
                     this->bang();
                 }
@@ -1711,7 +1711,7 @@ public:
             int format_code = frame.getHeader().getFormatCode();
             
             if(format_code == jam::ilda::RecordFormat::FORMAT_2) {
-                cwarn << "Frame " << frame_index << " contains a color pallet. Not rendering." << endl;
+                cwarn << "Frame " << frame_index << " contains a color palette. Not rendering." << endl;
                 return {};
             }
             
@@ -1752,7 +1752,7 @@ public:
                     } else {
                         if(is_indexed_color) { // use indexed color
                             size_t color_index = data_record.getColorIndex();
-                            fvec color_values = (this->_use_custompallet) ? this->_getCustomColorByIndex(color_index) : jam::ilda::Colors::getFloatColorByIndex(color_index, opacity);
+                            fvec color_values = (this->_use_custompalette) ? this->_getCustomColorByIndex(color_index) : jam::ilda::Colors::getFloatColorByIndex(color_index, opacity);
                             args_color_values[0] = atom(color_values[0]);
                             args_color_values[1] = atom(color_values[1]);
                             args_color_values[2] = atom(color_values[2]);
@@ -1816,13 +1816,13 @@ public:
         }
     };
     
-    message<> exportpallet {
-        this, "exportpallet", "Export the custom color pallet as dictionary",
+    message<> exportpalette {
+        this, "exportpalette", "Export the custom color palette as dictionary",
         MIN_FUNCTION {
             
             this->d_inner.clear();
             this->d_outer.clear();
-            this->d_outer["colorpallet"] = d_inner;
+            this->d_outer["colorpalette"] = d_inner;
             c74::max::t_object* ro = (c74::max::t_object*)d_inner;
             c74::max::t_dictionary* maxdict = (c74::max::t_dictionary*)ro;
             for(size_t color_index = 0; color_index < 64; color_index++) {
@@ -1846,8 +1846,8 @@ public:
         }
     };
     
-    message<> resetpallet {
-        this, "resetpallet", "Reset the custom color pallet to the ILDA default pallet colors",
+    message<> resetpalette {
+        this, "resetpalette", "Reset the custom color palette to the ILDA default palette colors",
         MIN_FUNCTION {
             auto attrs = this->attributes();
             atoms color_vals_atoms;
@@ -1890,14 +1890,14 @@ public:
             dict d {args[0]};
             
             try {
-                d.at("colorpallet");
+                d.at("colorpalette");
             } catch (std::runtime_error) {
                 cerr << "dictionary not well formatted. Please refere to the documentaion." << endl;
                 return {};
             }
             
-                // Turn the atom_reference from d["colorpallet"] into an atom
-            c74::min::symbol key {"colorpallet"};
+                // Turn the atom_reference from d["colorpalette"] into an atom
+            c74::min::symbol key {"colorpalette"};
             auto subdictatom = c74::min::atom(d[key].begin());
             
                 // Create an unregistered subdict from the atom

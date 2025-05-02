@@ -333,7 +333,7 @@ protected:
             jam::ilda::IldaHeader h = frames[i].getHeader();
             jam::ilda::RecordFormat rec_format = h.getFormatCode();
             
-            if(rec_format == jam::ilda::RecordFormat::FORMAT_2) { // we ignore color pallet frames
+            if(rec_format == jam::ilda::RecordFormat::FORMAT_2) { // we ignore color palette frames
                 continue;
             }
             h.setFormatCode(jam::ilda::RecordFormat::FORMAT_4); // 2D True Color

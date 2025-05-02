@@ -33,7 +33,7 @@ namespace jam::ilda {
         while(true) {
             IldaFrame frame;
             ParseResult result = this->_extractFrame(frame, &byte_index);
-            // We not parsing color pallet frames
+            // We not parsing color palette frames
             if(result == ParseResult::IS_PALLET_FRAME) {
                 continue;
             } else if (result == ParseResult::SUCCESS) {
@@ -284,7 +284,7 @@ namespace jam::ilda {
                     record_parse_result = this->_parseCharToDataRecord_Format1(data_record, record_buffer);
                     break;
                 case RecordFormat::FORMAT_2 :
-                    // We are not parsing color pallets fort now: abort;
+                    // We are not parsing color palettess fort now: abort;
                     return ParseResult::IS_PALLET_FRAME;
 //                    record_parse_result = this->_parseCharToDataRecord_Format2(data_record, record_buffer);
                     break;
