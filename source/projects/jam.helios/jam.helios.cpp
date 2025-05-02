@@ -83,8 +83,8 @@ public:
     }
     }
     
-    MIN_DESCRIPTION{ "Connect to a Helios ILDA DAC" };
-    MIN_TAGS{ "utilities" };
+    MIN_DESCRIPTION { "Connect to a Helios ILDA DAC" };
+    MIN_TAGS { "laser control" };
     MIN_AUTHOR{ "Jan Mech" };
     MIN_RELATED{ "jam.dmxusbpro~, jam.dmxusbpro" };
     

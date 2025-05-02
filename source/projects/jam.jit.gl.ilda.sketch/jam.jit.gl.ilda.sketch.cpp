@@ -288,7 +288,7 @@ public:
     
     
     MIN_DESCRIPTION     { "Render frames from an ILDA file to an Open GL context. jam.jit.gl.ilda.sketch receives an ILDA file reference from a <o>jam.ilda.file</o> object and draws the frames to a Jitter GL context." };
-    MIN_TAGS            { "ILDA, laser tools, utilities" };
+    MIN_TAGS            { "ILDA" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file, jam.ilda.compose, jam.ilda.dict, jam.helios, jit.gl.sketch"};
     

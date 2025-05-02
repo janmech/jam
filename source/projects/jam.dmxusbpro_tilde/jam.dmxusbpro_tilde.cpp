@@ -351,7 +351,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
 
         MIN_DESCRIPTION     { "Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with signals. <br/> The recommended firmware version is 1.44" };
 
-        MIN_TAGS            { "utilities" };
+        MIN_TAGS            { "DMX control" };
         MIN_AUTHOR          { "Jan Mech" };
         MIN_RELATED         { "jam.dmxusbpro, serial" };
 

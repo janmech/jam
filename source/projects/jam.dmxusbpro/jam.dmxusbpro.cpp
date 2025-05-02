@@ -365,7 +365,7 @@ class dmxusbpro : public object<dmxusbpro>
 
         MIN_DESCRIPTION     { "Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists. <br/><i>The recommended firmware version is 1.44</i>" };
 
-        MIN_TAGS            { "utilities" };
+        MIN_TAGS            { "DMX control" };
         MIN_AUTHOR          { "Jan Mech" };
         MIN_RELATED         { "jam.dmxusbpro~, serial"};
 

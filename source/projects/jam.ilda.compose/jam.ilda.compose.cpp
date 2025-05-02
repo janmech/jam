@@ -559,7 +559,7 @@ public:
     ~ildacompose() {};
     
     MIN_DESCRIPTION     { "Create and modify ILDA files for laser animation. jam.ilda.compose can create ilda files for laser animation by drawing or writing into frames, save them to disk and make them accessible to other jam.ilda.* objects" };
-    MIN_TAGS            { "ILDA, laser tools, utilities" };
+    MIN_TAGS            { "ILDA" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.sketch, jam.ilda.dict, jam.helios"};
 //    MIN_FLAGS           {behavior_flags::nobox};

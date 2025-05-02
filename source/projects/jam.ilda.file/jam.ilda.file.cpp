@@ -129,7 +129,7 @@ public:
     ~ildafile() {}
     
     MIN_DESCRIPTION     { "Load an ILDA file (laser animation file) from disk.<br/><br/>A loaded file can be used - among others - to control a ILDA capable laser projector via a HELIOS Laser DAC using the [jam.helios] object, editied with [jam.ilda.compose] or rendered to jitter context using [jam.ilda.jit.gl.sketch]" };
-    MIN_TAGS            { "ILDA, laser controll" };
+    MIN_TAGS            { "ILDA" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.compose, jam.ilda.dict, jam.jit.gl.ilda.sketch, jam.helios"};
     
