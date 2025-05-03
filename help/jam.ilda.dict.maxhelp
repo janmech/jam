@@ -41,6 +41,36 @@
 									"fontface" : 0,
 									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
+									"id" : "obj-18",
+									"linkbold" : 1,
+									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+									"maxclass" : "markup",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 290.0, 355.0, 189.0, 41.0 ],
+									"saved_attribute_attributes" : 									{
+										"linkcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+,
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+
+									}
+,
+									"text" : "Read more about <a href=\"03_ilda_file_references.maxvig.xml\">ILDA file references</a>",
+									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"border" : 0,
+									"fontface" : 0,
+									"fontname" : "Lato Light",
+									"fontsize" : 13.0,
 									"id" : "obj-11",
 									"linkbold" : 1,
 									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
@@ -96,12 +126,12 @@
 									"bubble" : 1,
 									"fontname" : "Lato Light",
 									"id" : "obj-15",
-									"linecount" : 2,
+									"linecount" : 4,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 243.0, 335.0, 185.0, 42.0 ],
-									"text" : "The file reference is passed to jam.ilda.dict"
+									"patching_rect" : [ 269.0, 316.0, 185.0, 88.0 ],
+									"text" : "The file reference is passed to jam.ilda.dict\n\n\n"
 								}
 
 							}
@@ -267,6 +297,14 @@
 									"destination" : [ "obj-7", 0 ],
 									"hidden" : 1,
 									"source" : [ "obj-11", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-7", 0 ],
+									"hidden" : 1,
+									"source" : [ "obj-18", 0 ]
 								}
 
 							}

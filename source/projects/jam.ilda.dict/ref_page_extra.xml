@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<c74objectextra name="jam.ilda.dict">
+     <methodlist>
+        <method name="ilda">
+            <arglist>
+                <arg name="file-reference" optional="0" type="symbol" id="0"/>
+            </arglist>
+        </method>
+     </methodlist>
+</c74objectextra>

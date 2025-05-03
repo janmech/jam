@@ -13,6 +13,9 @@
   <p>The jam package objects store ILDA files in its own global data structure.</p>
   <p>Working with ILDA files is somehow similar to working with other global data structures in Max, for example <link type="userguide" name="dictionaries">dictionaries</link>, <link type="userguide" name="arrays">arrays</link> or <link type="userguide" name="strings">strings</link>: ILDA files have names and can be passed between objects with messages like <m>ilda ild001485688762</m>.</p>
   <p>
+    The jam package contains several objects that can acces ILDA files in vaious ways. For example <o>jam.ilda.dict</o>, <o>jam.ilda.compose</o> or <o>jam.jit.gl.ilda.sketch</o>
+  </p>
+  <p>
     <img src="images/ilda_file_reference.png" />
   </p>
   <seealsolist>

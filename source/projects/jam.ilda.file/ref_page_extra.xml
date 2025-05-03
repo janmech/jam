@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<c74objectextra name="jam.ilda.file">
+     <methodlist>
+        <method name="import">
+            <arglist>
+                <arg name="filename" optional="1" type="symbol" id="0"/>
+            </arglist>
+        </method>
+     </methodlist>
+</c74objectextra>

@@ -1,80 +1,128 @@
 <?xml version='1.0' encoding='utf-8'?>
 <c74objectextra name="jam.ilda.compose">
     <methodlist>
-        
+        <method name="text">
+            <arglist>
+                <arg name="text-string" optional="0" type="symbol" id="0"/>
+            </arglist>
+        </method>
+        <method name="svg">
+            <arglist>
+                <arg name="filename" optional="0" type="symbol" id="0"/>
+            </arglist>
+        </method>
+        <method name="rotateframe">
+            <arglist>
+                <arg name="rotation-angle" optional="0" type="float" id="0" units="degree"/>
+                <arg name="rotation-anker-x" optional="1" type="float" id="1"/>
+                <arg name="rotation-anker-y" optional="1" type="float" id="2"/>
+            </arglist>
+        </method>
+        <method name="removeframe">
+            <arglist>
+                <arg name="frame-index" optional="1" type="int" id="0"/>
+            </arglist>
+        </method>
+        <method name="rect">
+            <arglist>
+                <arg name="top-left-x" optional="0" type="float" id="0"/>
+                <arg name="top-left-y" optional="0" type="float" id="1"/>
+                <arg name="bottom-right-x" optional="0" type="float" id="2"/>
+                <arg name="bottom-right-y" optional="0" type="float" id="3"/>
+                <arg name="corner-roundness" optional="1" type="float" id="4"/>
+                 <arg name="corner-line-segments" optional="1" type="float" id="0"/>
+            </arglist>
+        </method>
+        <method name="pen">
+            <arglist>
+                <arg name="x" optional="1" type="float" id="0"/>
+                <arg name="y" optional="1" type="float" id="1"/>
+            </arglist>
+        </method>
+        <method name="export">
+            <arglist>
+                <arg name="filename" optional="1" type="symbol" id="0"/>
+            </arglist>
+        </method>
+        <method name="moveto">
+            <arglist>
+                <arg name="x" optional="0" type="float" id="0"/>
+                <arg name="y" optional="0" type="float" id="1"/>
+            </arglist>
+        </method>
         <method name="copyframe">
             <arglist>
-                <arg name="source-index" optional="1" type="int"/>
-                <arg name="destination-index" optional="1" type="int"/>
+                <arg name="source-index" optional="1" type="int" id="0"/>
+                <arg name="destination-index" optional="1" type="int" id="1"/>
             </arglist>
         </method>
         <method name="seteditframe">
             <arglist>
-                <arg name="frame-index" optional="1" type="int"/>
+                <arg name="frame-index" optional="1" type="int" id="0"/>
             </arglist>
         </method>
         <method name="ilda">
             <arglist>
-                <arg name="file-reference" optional="0" type="symbol"/>
+                <arg name="file-reference" optional="0" type="symbol" id="0"/>
             </arglist>
         </method>
         <method name="font">
             <arglist>
-                <arg name="font-name" optional="0" type="symbol"/>
+                <arg name="font-name" optional="0" type="symbol" id="0"/>
             </arglist>
         </method>
         <method name="line">
             <arglist>
-                <arg name="start-x" optional="0" type="float"/>
-                <arg name="start-y" optional="0" type="float"/>
-                <arg name="end-x" optional="0" type="float"/>
-                <arg name="end-y" optional="0" type="float"/>
+                <arg name="start-x" optional="0" type="float" id="0"/>
+                <arg name="start-y" optional="0" type="float" id="1"/>
+                <arg name="end-x" optional="0" type="float" id="2"/>
+                <arg name="end-y" optional="0" type="float" id="3"/>
             </arglist>
         </method>
         <method name="drawcolor">
             <arglist>
-                <arg name="red" optional="0" type="float"/>
-                <arg name="green" optional="0" type="float"/>
-                <arg name="blue" optional="0" type="float"/>
+                <arg name="red" optional="0" type="float" id="0"/>
+                <arg name="green" optional="0" type="float" id="1"/>
+                <arg name="blue" optional="0" type="float" id="2"/>
             </arglist>
         </method>
         <method name="duplicateframe">
             <arglist>
-                <arg name="frame-index" optional="1" type="int"/>
+                <arg name="frame-index" optional="1" type="int" id="0"/>
             </arglist>
         </method>
         <method name="ellipse">
             <arglist>
-                <arg name="center-x" optional="0" type="float"/>
-                <arg name="center-y" optional="0" type="float"/>
-                <arg name="radius-x" optional="0" type="float"/>
-                <arg name="radius-y" optional="0" type="float"/>
-                <arg name="start-angle" optional="1" type="float" units="degree"/>
-                <arg name="end-angle" optional="1" type="float" units="degree"/>
-                <arg name="line-segments" optional="1" type="int"/>
+                <arg name="center-x" optional="0" type="float" id="0"/>
+                <arg name="center-y" optional="0" type="float" id="1"/>
+                <arg name="radius-x" optional="0" type="float" id="2"/>
+                <arg name="radius-y" optional="0" type="float" id="3"/>
+                <arg name="start-angle" optional="1" type="float" units="degree" id="4"/>
+                <arg name="end-angle" optional="1" type="float" units="degree" id="5"/>
+                <arg name="line-segments" optional="1" type="int" id="6"/>
             </arglist>
         </method>
         <method name="circle">
             <arglist>
-                <arg name="center-x" optional="0" type="float"/>
-                <arg name="center-y" optional="0" type="float"/>
-                <arg name="radius" optional="0" type="float"/>
-                <arg name="start-angle" optional="0" type="float" units="degree"/>
-                <arg name="end-angle" optional="0" type="float" units="degree"/>
-                <arg name="line-segments" optional="1" type="int"/>
+                <arg name="center-x" optional="0" type="float" id="0"/>
+                <arg name="center-y" optional="0" type="float" id="1"/>
+                <arg name="radius" optional="0" type="float" id="2"/>
+                <arg name="start-angle" optional="0" type="float" units="degree" id="3"/>
+                <arg name="end-angle" optional="0" type="float" units="degree" id="4"/>
+                <arg name="line-segments" optional="1" type="int" id="5"/>
             </arglist>
         </method>
         <method name="bezier">
             <arglist>
-                <arg name="start-x" optional="0" type="float"/>
-                <arg name="start-y" optional="0" type="float"/>
-                <arg name="control-point1-x" optional="0" type="float"/>
-                <arg name="control-point1-y" optional="0" type="float"/>
-                <arg name="control-point2-x" optional="0" type="float"/>
-                <arg name="control-point2-y" optional="0" type="float"/>
-                <arg name="end-x" optional="0" type="float"/>
-                <arg name="end-y" optional="0" type="float"/>
-                <arg name="line-segments" optional="1" type="int"/>
+                <arg name="start-x" optional="0" type="float" id="0"/>
+                <arg name="start-y" optional="0" type="float" id="1"/>
+                <arg name="control-point1-x" optional="0" type="float" id="2"/>
+                <arg name="control-point1-y" optional="0" type="float" id="3"/>
+                <arg name="control-point2-x" optional="0" type="float" id="4"/>
+                <arg name="control-point2-y" optional="0" type="float" id="5"/>
+                <arg name="end-x" optional="0" type="float" id="6"/>
+                <arg name="end-y" optional="0" type="float" id="7"/>
+                <arg name="line-segments" optional="1" type="int" id="8"/>
             </arglist>
         </method>
     </methodlist>

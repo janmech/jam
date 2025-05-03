@@ -1,5 +1,17 @@
 <?xml version='1.0' encoding='utf-8'?>
-<c74objectextra name="jjam.jit.gl.ilda.sketch">
+<c74objectextra name="jam.jit.gl.ilda.sketch">
+     <methodlist>
+        <method name="ilda">
+            <arglist>
+                <arg name="file-reference" optional="0" type="symbol" id="0"/>
+            </arglist>
+        </method>
+        <method name="frame">
+            <arglist>
+                <arg name="frame-index" optional="0" type="int" id="0"/>
+            </arglist>
+        </method>
+     </methodlist>
     <discussion>
         <o>jam.jit.gl.ilda.sketch</o>
         uses a <o>jit.gl.sketch</o> object internally to

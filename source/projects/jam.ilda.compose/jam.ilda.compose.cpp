@@ -751,7 +751,7 @@ public:
     };
     
     message<threadsafe::no> geteditframe {
-        this, "geteditframe", "Outputs the currenlty selected frame for editing to the third outlet.",
+        this, "geteditframe", "Outputs the currenlty selected frame for editing out of the third outlet.",
         MIN_FUNCTION {
             atoms msg_atoms;
             queued_message_t msg;
@@ -773,7 +773,7 @@ public:
     };
     
     message<threadsafe::no> removeframe {
-        this, "removeframe", "Remove frame a frame. If no argument is provided the currently set edit frame is removed. If one argument [frame index] is present, the frame at  [frame index] will be duplicated.",
+        this, "removeframe", "Remove frame a frame. If no argument is provided the currently set edit frame is removed. If one argument [frame index] is present, the frame at [frame index] will be removed.",
         MIN_FUNCTION {
             if(this->_ilda_frames.size() == 0) {
                 return {};
@@ -922,7 +922,7 @@ public:
     };
     
     message<threadsafe::no> svg {
-        this, "svg", "Parse a SVG file into the current edit frame.<br/><b>Note:</b> This feature is experimental at best. SVG files are more complex that simple line-segment graphics that use ILDA files. The result may vary a lot depending on the source file.",
+        this, "svg", "Parse a SVG file into the current edit frame. <br/><br/><b>Note:</b> This feature is experimental at best. SVG files are more complex than simple line-segment graphics that use ILDA files. The result may vary a lot depending on the source file.",
         MIN_FUNCTION {
             if(this->_getSvgParsingState()) {
                 cwarn << "file loading already in progress" << endl;
@@ -1159,7 +1159,7 @@ public:
     };
     
     message<threadsafe::no> getfonts {
-        this, "getfonts", "Get a list of fonts.<br/>Outputs a list of available fonts to populate a <o>umenu</o> out of the second outlet.<br/><b>Note:</b> only system wide installed True Type Fonts (ttf) are supported.",
+        this, "getfonts", "Get a list of fonts.<br/>Populate a <o>umenu</o> connected to the second outlet with available fonts.<br/><b>Note:</b> only system wide installed True Type Fonts (ttf) are supported.",
         MIN_FUNCTION {
             atoms msg_atoms;
             queued_message_t msg;
@@ -1202,7 +1202,6 @@ public:
                     std::string font_path = this->_available_fonts[font_name].file_path;
                     short path = 0;
                     short open_result;
-//                    c74::max::t_fourcc filetype = 'TTF', outtype;
                     c74::max::t_fourcc outtype;
                     font_path.resize(c74::max::MAX_PATH_CHARS);
                     char c_font_path[c74::max::MAX_PATH_CHARS] = {0};
@@ -1265,9 +1264,8 @@ public:
         }
         
     };
-    
     message<>pen {
-        this, "pen", "Set the pen position for wryting text. <br/>Arguments:<br/><ul><li>2 floats (-1. to 1.) to set x/y pen postion</li><li>symbol 'down' to move the pen down one line</li><li>symbol 'up' to move the pen up one line</li></ul>",
+        this, "pen", "Set the pen position for wryting text. <br/>The message <m>pen</m> followed by 2 floats will set the writing position.<br/>The message <m>pen up</m> or <m>pen down</m> will move the writing position one line up or down respectively.",
         MIN_FUNCTION {
             if(args.size() > 0) {
                 if(args[0].type() == message_type::symbol_argument) {
@@ -1292,7 +1290,7 @@ public:
     };
     
     message<threadsafe::no> text {
-        this, "text", "Write a text to the current edit frame",
+        this, "text", "Write a text to the current edit frame.",
         MIN_FUNCTION {
             std::string in_string = "";
             if(args.size() < 1) {
@@ -1337,7 +1335,7 @@ public:
     };
     
     message<threadsafe::no>line {
-        this, "line", "Draw a line into a frame.Arguments: 4 floats (-1. to 1.) start_x start_y end_x end_y",
+        this, "line", "Draw a line into a frame.",
         MIN_FUNCTION {
             if(args.size() < 4) {
                 cwarn << "missing argument for message 'line'" << endl;
@@ -1462,7 +1460,7 @@ public:
     };
     
     message<threadsafe::no>rect {
-        this, "rect", "Draw a rectangle into a frame",
+        this, "rect", "Draw a rectangle into a frame.",
         MIN_FUNCTION {
                 // rect x_topleft y_topleft x_bottomright y_bottomright r g b corner-radius segment
             if(args.size() < 4) {
@@ -1569,7 +1567,7 @@ public:
     };
     
     message<threadsafe::no> reverseframes {
-        this, "reverseframes", "Reverse the order of the frames",
+        this, "reverseframes", "Reverse the order of the frames.",
         MIN_FUNCTION {
             std::reverse(this->_data_sets.begin(), this->_data_sets.end());
             std::reverse(this->_ilda_frames.begin(), this->_ilda_frames.end());
@@ -1582,7 +1580,7 @@ public:
     };
     
     message<threadsafe::no>rotateframe {
-        this, "rotateframe", "Rotate a frame. If one argument follows the message, the frame will be rotated around the center point. If three arguments are present, the sencond and third arguments specify the rotation center",
+        this, "rotateframe", "Rotate a frame. If one argument follows the message <m>rotateframe</m>, the frame will be rotated around the center point. If three argument follow the message <m>rotateframe</m>, the sencond and third arguments specify the rotation anker.",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message 'rotateframe'" << endl;
@@ -1608,7 +1606,7 @@ public:
     };
     
     message<threadsafe::no>scaleframe {
-        this, "scaleframe", "Scale a frame. If one argument follows the message x and y axis are scaled by that value. If 2 arguments are present the first argument specifies the scaling along the x-axis, the second along the y-axis.<br/>Note: All frame modifications are done destructively, meaning information lost e.g. by scaling to 0 cannot be recovered by scaling up again.",
+        this, "scaleframe", "Scale a frame. <br/>If one argument follows the message <m>scaleframe</m> x and y axis are scaled by that value.<br />If two arguments follow the message <m>scaleframe</m>, the first argument specifies the scaling along the x-axis, the second along the y-axis.",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message 'scaleframe'" << endl;

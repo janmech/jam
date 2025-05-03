@@ -691,11 +691,41 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 100.0, 126.0, 842.0, 721.0 ],
+						"rect" : [ 257.0, 227.0, 842.0, 721.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"border" : 0,
+									"fontface" : 0,
+									"fontname" : "Lato Light",
+									"fontsize" : 13.0,
+									"id" : "obj-18",
+									"linkbold" : 1,
+									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+									"maxclass" : "markup",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 99.0, 451.0, 222.0, 19.0 ],
+									"saved_attribute_attributes" : 									{
+										"linkcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+,
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+
+									}
+,
+									"text" : "Read more about <a href=\"03_ilda_file_references.maxvig.xml\">ILDA file references</a>",
+									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"hidden" : 1,
 									"id" : "obj-8",
@@ -704,7 +734,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 377.0, 611.0, 105.0, 38.0 ],
+									"patching_rect" : [ 377.0, 657.0, 105.0, 38.0 ],
 									"text" : ";\rmax opendoc $1"
 								}
 
@@ -722,7 +752,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 371.0, 494.0, 408.0, 92.0 ],
+									"patching_rect" : [ 371.0, 540.0, 408.0, 92.0 ],
 									"saved_attribute_attributes" : 									{
 										"linkcolor" : 										{
 											"expression" : "themecolor.live_control_fg"
@@ -755,20 +785,6 @@
 								"box" : 								{
 									"bubble" : 1,
 									"fontname" : "Lato Light",
-									"id" : "obj-15",
-									"maxclass" : "comment",
-									"numinlets" : 0,
-									"numoutlets" : 0,
-									"patching_rect" : [ 246.0, 351.0, 165.0, 26.0 ],
-									"suppressinlet" : 1,
-									"text" : "File reference"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"bubble" : 1,
-									"fontname" : "Lato Light",
 									"id" : "obj-13",
 									"linecount" : 2,
 									"maxclass" : "comment",
@@ -787,22 +803,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 152.0, 394.0, 153.0, 23.0 ],
-									"text" : "import cogz99.ild 1"
-								}
-
-							}
-, 							{
-								"box" : 								{
-									"fontname" : "Lato Light",
-									"id" : "obj-11",
-									"linecount" : 6,
-									"maxclass" : "comment",
-									"numinlets" : 0,
-									"numoutlets" : 0,
-									"patching_rect" : [ 275.0, 170.0, 411.0, 100.0 ],
-									"suppressinlet" : 1,
-									"text" : "ILDA files work similar to other global data structures in Max - for example dictionaries: They are loaded into memory and you can access them by a reference.\nThe jam package contains several objects that can acces ILDA files in vaious ways. For example jam.ilda.dict, jam.ilda.compose or jam.jit.gl.ilda.sketch"
+									"patching_rect" : [ 152.0, 394.0, 153.0, 23.0 ]
 								}
 
 							}
@@ -830,8 +831,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 75.0, 352.0, 153.0, 23.0 ],
-									"text" : "ilda ild001000249147"
+									"patching_rect" : [ 75.0, 352.0, 153.0, 23.0 ]
 								}
 
 							}
@@ -841,7 +841,7 @@
 									"maxclass" : "dict.view",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 59.0, 479.0, 297.0, 122.0 ]
+									"patching_rect" : [ 59.0, 525.0, 297.0, 122.0 ]
 								}
 
 							}
@@ -852,7 +852,7 @@
 									"numinlets" : 1,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 59.0, 442.0, 77.0, 23.0 ],
+									"patching_rect" : [ 59.0, 488.0, 77.0, 23.0 ],
 									"text" : "jam.ilda.dict"
 								}
 
@@ -894,6 +894,21 @@
 									"outlettype" : [ "" ],
 									"parameter_enable" : 0,
 									"patching_rect" : [ 11.0, 13.0, 675.0, 152.0 ]
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"bubble" : 1,
+									"fontname" : "Lato Light",
+									"id" : "obj-15",
+									"maxclass" : "comment",
+									"numinlets" : 0,
+									"numoutlets" : 0,
+									"patching_rect" : [ 79.0, 429.0, 299.0, 42.0 ],
+									"presentation_linecount" : 3,
+									"suppressinlet" : 1,
+									"text" : "A file reference is passed to other objects.\n"
 								}
 
 							}
@@ -953,6 +968,14 @@
 								"patchline" : 								{
 									"destination" : [ "obj-1", 0 ],
 									"source" : [ "obj-17", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-8", 0 ],
+									"hidden" : 1,
+									"source" : [ "obj-18", 0 ]
 								}
 
 							}

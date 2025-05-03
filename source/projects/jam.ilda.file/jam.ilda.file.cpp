@@ -151,7 +151,7 @@ public:
     };
     
     message<threadsafe::no>import_file {
-        this, "import", "Load an ILDA file to memory.<br/><br/>The message <m>import</m> with no arguments opens a dialog to select an ILDA file to be loaded.<br/>When followed by a symbol, [jam.ilda.file] tries to find and open the file.<br/><br/>When successful, a message <m>import file_name 1</m> will be send out through the rightmost outlet. On failiure <m>import file_name 0</m> will be send out.",
+        this, "import", "Load an ILDA file to memory.<br/><br/>The message <m>import</m> with no arguments opens a dialog to select an ILDA file to be loaded.<br/>When followed by a symbol, [jam.ilda.file] tries to find and open the file.<br/><br/>When successful, a message <m>import file_name 1</m> will be send out through the rightmost outlet. On failure <m>import file_name 0</m> will be send out.",
         MIN_FUNCTION {
             if(this->_getParsingState()) {
                 cwarn << "file loading already in progress" << endl;

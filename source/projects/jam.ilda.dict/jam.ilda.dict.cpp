@@ -123,7 +123,7 @@ public:
     };
     
     message<>ilda {
-        this, "ilda", "Reference to am ILDA file loaded by jam.ilda.file",
+        this, "ilda", "Reference to am ILDA file. <br/>A file refercence from <o>jam.ilda.file</o> or created by <o>jam.jit.gl.sketch</o>",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message ilda" << endl;

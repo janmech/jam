@@ -275,7 +275,7 @@ public:
     
     ildasketch(const atoms& args = {}) {
         if (args.size() > 0) {
-            cwarn << "Extra argumnt for oject jam.jit.gl.frame" << endl;
+            cwarn << "Extra argumnt for oject jam.jit.gl.sketch" << endl;
         }
         this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
         this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
@@ -1646,14 +1646,14 @@ public:
     };
     
     message<>bang  {
-        this, "bang", "Render last frame",
+        this, "bang", "Render last frame.",
         MIN_FUNCTION {
             return this->frame(this->_last_frame_index);
         }
     };
     
     message<>reset {
-        this, "reset", "reset",
+        this, "reset", "Clear the lines drawn to the GL context.",
         MIN_FUNCTION {
             typedmess(this->_getSketchObject(),symbol("reset"),0,0L);
             return {};
@@ -1661,7 +1661,7 @@ public:
     };
     
     message<>framecount {
-        this, "framecount", "Number of frames in the currently loaded ILDA file.",
+        this, "framecount", "Get the number of frames in the currently loaded ILDA file. <br/> A message <m>framecount [count]</m> will be send out the rightmost outlet.",
         MIN_FUNCTION {
             queued_message_t msg;
             atoms msg_atoms;
@@ -1676,7 +1676,7 @@ public:
     };
     
     message<> frame {
-        this, "frame", "render frame",
+        this, "frame", "Render a frame to a GL context. <br />The message <m>frame</m> followed by an integer [frame index] renders the frame at index to the GL context specified by the <m>drawto</m> attribute.",
         MIN_FUNCTION {
             if(this->_frames.size() == 0) {
                     //                cwarn << "no data" << endl;
@@ -1797,7 +1797,7 @@ public:
     };
     
     message<>ilda {
-        this, "ilda", "Reference to am ILDA file loaded by jam.ilda.file",
+        this, "ilda", "Reference to an ILDA file.  <br/>To render a file pass in a ilda referecence to a file loaded by <o>jam.ilda.file</o> or created by <o>jam.ilda.compose</o>.",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message ilda" << endl;
@@ -1817,7 +1817,7 @@ public:
     };
     
     message<> exportpalette {
-        this, "exportpalette", "Export the custom color palette as dictionary",
+        this, "exportpalette", "Export the custom color palette as dictionary.",
         MIN_FUNCTION {
             
             this->d_inner.clear();
@@ -1847,7 +1847,7 @@ public:
     };
     
     message<> resetpalette {
-        this, "resetpalette", "Reset the custom color palette to the ILDA default palette colors",
+        this, "resetpalette", "Reset the custom color palette to the ILDA default palette colors.",
         MIN_FUNCTION {
             auto attrs = this->attributes();
             atoms color_vals_atoms;
@@ -1878,7 +1878,7 @@ public:
     };
     
     message<> dictionary {
-        this, "dictionary", "Use a dictionary to define the pattern of bangs produced.",
+        this, "dictionary", "Set the custom color palette.",
         MIN_FUNCTION {
             if(inlet != 1) {
                 return {};
