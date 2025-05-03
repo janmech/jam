@@ -26,6 +26,6 @@
 		"extentions": ["jam.dmxusbpro.manager.mxo", "jam.ilda.manager.mxo"],
 		"help" : [ "jam.dmxusbpro.maxhelp", "jam.dmxusbpro~.maxhelp", "jam.ilda.file.maxhelp", "jam.ilda.dict.maxhelp" ],
 		"javascript" : [],
-		"docs" : ["jam.dmxusbpro.maxref.xml", "jam.dmxusbpro~.maxref.xml", "jam.helios.maxref.maxref.xml", "jam.ilda.file.maxref.xml", "jam.ilda.jit.gl.sketch.maxref.xml", "jam.ilda.compose.maxref.xml", "topics/01_jam_topic.maxvig.xml", "topics/02_jam_ilda_topic.maxvig.xml", "topics/03_jam_color_palette.maxvig.xml" ]
+		"docs" : ["jam.dmxusbpro.maxref.xml", "jam.dmxusbpro~.maxref.xml", "jam.helios.maxref.maxref.xml", "jam.ilda.file.maxref.xml", "jam.ilda.jit.gl.sketch.maxref.xml", "jam.ilda.compose.maxref.xml", "topics/01_jam_topic.maxvig.xml", "topics/02_jam_ilda_topic.maxvig.xml", "03_ilda_file_references.maxvig.xml", "topics/04_jam_color_palette.maxvig.xml" ]
 	}
 }

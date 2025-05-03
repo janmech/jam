@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml-stylesheet href="_c74_vig.xsl" type="text/xsl"?>
+<vignette name="ILDA Files References" package="jam">
+  <metadatalist>
+    <metadata name="author">Jan Mech</metadata>
+    <metadata name="tag">ILDA</metadata>
+    <metadata name="tag">lighting</metadata>
+    <metadata name="tag">laser</metadata>
+  </metadatalist>
+
+
+  <h1>ILDA Files References</h1>
+  <p>The jam package objects store ILDA files in its own global data structure.</p>
+  <p>Working with ILDA files is somehow similar to working with other global data structures in Max, for example <link type="userguide" name="dictionaries">dictionaries</link>, <link type="userguide" name="arrays">arrays</link> or <link type="userguide" name="strings">strings</link>: ILDA files have names and can be passed between objects with messages like <m>ilda ild001485688762</m>.</p>
+  <p>
+    <img src="images/ilda_file_reference.png" />
+  </p>
+  <seealsolist>
+    <seealso type="userguide" name="dictionaries" display="Dictionaries" />
+    <seealso type="userguide" name="arrays" display="Arrays" />
+    <seealso type="userguide" name="strings" display="Strings" />
+    <seealso name="02_jam_ilda_topic" module="topics" type="vignette" />
+    <seealso name="jam.ilda.file" />
+    <seealso name="jam.ilda.compose" />
+    <seealso name="jam.ilda.dict" />
+    <seealso name="jam.jit.gl.ilda.sketch" />
+  </seealsolist>
+</vignette>

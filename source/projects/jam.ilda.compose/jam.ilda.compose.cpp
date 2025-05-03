@@ -558,7 +558,7 @@ public:
     
     ~ildacompose() {};
     
-    MIN_DESCRIPTION     { "Create and modify ILDA files for laser animation. jam.ilda.compose can create ilda files for laser animation by drawing or writing into frames, save them to disk and make them accessible to other jam.ilda.* objects" };
+    MIN_DESCRIPTION     { "Create and modify ILDA files for laser animation. <br /><o>jam.ilda.compose</o> can create ilda files for laser animation by drawing or writing into frames, save them to disk and make them accessible to other jam.ilda.* objects" };
     MIN_TAGS            { "ILDA" };
     MIN_AUTHOR          { "Jan Mech" };
     MIN_RELATED         { "jam.ilda.file, jam.jit.gl.ilda.sketch, jam.ilda.dict, jam.helios"};
@@ -594,7 +594,7 @@ public:
             }
         },
         title {"Company Name"},
-        description {"Company name set in the headers of the ILDA file.<br />ILDA files contain of a sequence of 'frames'. Every frame has a header summarizing some information about the frame. This attribute sets the value of the header field 'Company Name' (max 8 ASCII characters). "},
+        description {"Set the <i>Company Name</i> in the headers of the ILDA file.<br />ILDA files contain of a sequence of <i>frames</i>. Every <i>frame</i> has a <i>header</i> summarizing some information. This attribute sets the value of the header field 'Company Name' (max 8 ASCII characters). "},
         category {"ILDA File"}
     };
     
@@ -618,7 +618,7 @@ public:
             }
         },
         title {"Frame Name Prefix"},
-        description {"Frame name prefix set in the header of the ILDA file.<br />ILDA files contain of a sequence of 'frames'. Every frame has a header summarizing some information about the frame. Every frame has a frame-name field in the header. jam.ilda.compose names frames automatically by setting the frame number as its name. This attribute sets an optioname prefix to the frame name (max 3 ASCII characters)."},
+        description {"Set a <i>Frame Name</i> prefix in the headers of the ILDA file.<br />ILDA files contain of a sequence of <i>frames</i>. Every <i>frame</i> has a <i>header</i> summarizing some information. By default <o>jam.ilda.compose</o> uses the frame index as name. This attribute sets an optional prefix to the <i>Frame Name</i> (max 4 ASCII characters)."},
         category {"ILDA File"}
     };
     
@@ -633,7 +633,7 @@ public:
             }
         },
         title {"Kerning"},
-        description{"Apply kerning to text rendering"},
+        description{"Apply kerning to text rendering.<br/>Kerning is the adjustment of space between specific pairs of characters in a font to improve visual appearance and readability."},
         category{"Text Rendering"},
     };
     
@@ -649,7 +649,7 @@ public:
             }
         },
         title { "Line Height" },
-        description { "Line height between text lines." },
+        description { "Set the hine height.<br/>This applies when using the message <m>pen up</m> or <m>pen down</m>" },
         category{"Text Rendering"},
     };
     
@@ -668,7 +668,7 @@ public:
             }
         },
         title { "Text Align" },
-        description { "Text alignment mode (default = center) Possible values: <br/><ul><li>left</li><li>center</li><li>right</li></ul>" },
+        description { "Set text alignment mode relative to the current pen position (default = center)<br/>Possible values: <br/><ul><li>left</li><li>center</li><li>right</li></ul>" },
         category{"Text Rendering"},
     };
     
@@ -684,14 +684,14 @@ public:
             }
         },
         title {"Font Size"},
-        description{"Font size for text rendering"},
+        description{"Set the font size for text rendering."},
         category{"Text Rendering"},
         visibility{visibility::show}
     };
 
     
     message<>bang  {
-        this, "bang", "Output ILDA file reference",
+        this, "bang", "Output the ILDA file reference out of the leftmost outlet.",
         MIN_FUNCTION {
             this->_updateOutlets();
             return {};
@@ -699,7 +699,7 @@ public:
     };
     
     message<threadsafe::no> clear {
-        this, "clear", "Remove all frames",
+        this, "clear", "Remove all frames.",
         MIN_FUNCTION {
             // clear raw frames
             this->_data_sets.clear();
@@ -711,7 +711,7 @@ public:
     };
     
     message<threadsafe::no> seteditframe {
-        this, "seteditframe", "Select frame to be edited",
+        this, "seteditframe", "Select frame to be edited. Starts at 0 (zero)",
         MIN_FUNCTION {
             if(args.size() == 0) {
                 cwarn << "missing argument for message 'seteditframe'" << endl;
@@ -751,7 +751,7 @@ public:
     };
     
     message<threadsafe::no> geteditframe {
-        this, "geteditframe", "Outputs the currenlty selected frame for editing to the second outlet",
+        this, "geteditframe", "Outputs the currenlty selected frame for editing to the third outlet.",
         MIN_FUNCTION {
             atoms msg_atoms;
             queued_message_t msg;
@@ -765,7 +765,7 @@ public:
     };
     
     message<threadsafe::no> appendframe {
-        this, "appendframe", "Append a new frame",
+        this, "appendframe", "Append a new (empty) frame.",
         MIN_FUNCTION {
             this->_appendEmptyFrame();
             return {};
@@ -773,7 +773,7 @@ public:
     };
     
     message<threadsafe::no> removeframe {
-        this, "removeframe", "Remove frame a frame. If no argument is provided the currently set edit frame is removed. If one argument [frame index] is present, the frame at index will be duplicated.",
+        this, "removeframe", "Remove frame a frame. If no argument is provided the currently set edit frame is removed. If one argument [frame index] is present, the frame at  [frame index] will be duplicated.",
         MIN_FUNCTION {
             if(this->_ilda_frames.size() == 0) {
                 return {};
@@ -843,7 +843,7 @@ public:
     };
     
     message<threadsafe::no> copyframe {
-        this, "copyframe", "Copy a frame. The message 'copyframe' followed by two arguments <i>source_index</i> <i>destination_index</i> copies a frame from <i>source_index</i> to <i>destination_index</i>",
+        this, "copyframe", "Copy a frame. The message <m>copyframe</m> followed by two arguments <i>source_index</i> <i>destination_index</i> copies a frame from <i>source_index</i> to <i>destination_index</i>.",
         MIN_FUNCTION {
             if(this->_ilda_frames.size() == 0) {
                 return {};
@@ -922,7 +922,7 @@ public:
     };
     
     message<threadsafe::no> svg {
-        this, "svg", "Parse a SVG file into the current edit frame.",
+        this, "svg", "Parse a SVG file into the current edit frame.<br/><b>Note:</b> This feature is experimental at best. SVG files are more complex that simple line-segment graphics that use ILDA files. The result may vary a lot depending on the source file.",
         MIN_FUNCTION {
             if(this->_getSvgParsingState()) {
                 cwarn << "file loading already in progress" << endl;
@@ -1159,7 +1159,7 @@ public:
     };
     
     message<threadsafe::no> getfonts {
-        this, "getfonts", "",
+        this, "getfonts", "Get a list of fonts.<br/>Outputs a list of available fonts to populate a <o>umenu</o> out of the second outlet.<br/><b>Note:</b> only system wide installed True Type Fonts (ttf) are supported.",
         MIN_FUNCTION {
             atoms msg_atoms;
             queued_message_t msg;
@@ -1182,7 +1182,7 @@ public:
     };
     
     message<threadsafe::no> font {
-        this, "font", "Loads a TTF font face",
+        this, "font", "Loads a TTF font face.<br/> The message <m>font</m> followed by a font name will load the font for writing text into a frame using the <m>text</m> message.",
         MIN_FUNCTION {
             if(args.size() > 0) {
                 atoms msg_atoms;
@@ -1545,7 +1545,7 @@ public:
     };
     
     message<threadsafe::no>ilda {
-        this, "ilda", "Reference to am ILDA file loaded by [jam.ilda.file]. The frames from the file will be appended. 3D frames will be flattened to 2D frames by discarting the y axis. Frames using indexed colors, they are converted to true color mode",
+        this, "ilda", "Reference to am ILDA file loaded by <o>jam.ilda.file</o>. The frames from the file will be appended.<br/><b>Note:</b>3D frames will be flattened to 2D frames by discarting the y axis. Frames using indexed colors, they are converted to true color mode",
         MIN_FUNCTION {
             if(args.size() < 1) {
                 cwarn << "missing argument for message 'ilda'" << endl;
@@ -1636,7 +1636,7 @@ public:
     };
     
     message<>drawcolor {
-      this, "drawcolor", "Set the drawing color. <br/>Arguments: 3 floats for red green and blue",
+      this, "drawcolor", "Set the drawing color.",
         MIN_FUNCTION {
             if(args.size() < 3) {
                 cwarn << "missing argumnet for message 'drawcolor'. Expected 3 floats" << endl;
@@ -1653,7 +1653,7 @@ public:
     };
     
     message<>export_file {
-        this, "export", "Write the frames to ILDA file. If no path/filename is provided, a dialog will be presented. A success/failure notification will be sent to the rightmost outlet in the form export [filename] 0/1.",
+        this, "export", "Write the frames to ILDA file. If no path/filename is provided, a dialog will be presented. A success/failure notification will be sent to the rightmost outlet in the form <m>export filename 1/0.</m>",
         MIN_FUNCTION {
             atoms msg_atoms;
             queued_message_t msg;

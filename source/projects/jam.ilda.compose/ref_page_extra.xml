@@ -1,6 +1,28 @@
 <?xml version='1.0' encoding='utf-8'?>
 <c74objectextra name="jam.ilda.compose">
     <methodlist>
+        
+        <method name="copyframe">
+            <arglist>
+                <arg name="source-index" optional="1" type="int"/>
+                <arg name="destination-index" optional="1" type="int"/>
+            </arglist>
+        </method>
+        <method name="seteditframe">
+            <arglist>
+                <arg name="frame-index" optional="1" type="int"/>
+            </arglist>
+        </method>
+        <method name="ilda">
+            <arglist>
+                <arg name="file-reference" optional="0" type="symbol"/>
+            </arglist>
+        </method>
+        <method name="font">
+            <arglist>
+                <arg name="font-name" optional="0" type="symbol"/>
+            </arglist>
+        </method>
         <method name="line">
             <arglist>
                 <arg name="start-x" optional="0" type="float"/>
@@ -25,8 +47,10 @@
             <arglist>
                 <arg name="center-x" optional="0" type="float"/>
                 <arg name="center-y" optional="0" type="float"/>
-                <arg name="start-angle" optional="0" type="float" units="degree"/>
-                <arg name="end-angle" optional="0" type="float" units="degree"/>
+                <arg name="radius-x" optional="0" type="float"/>
+                <arg name="radius-y" optional="0" type="float"/>
+                <arg name="start-angle" optional="1" type="float" units="degree"/>
+                <arg name="end-angle" optional="1" type="float" units="degree"/>
                 <arg name="line-segments" optional="1" type="int"/>
             </arglist>
         </method>
