@@ -2,8 +2,8 @@
 	"patcher" : 	{
 		"fileversion" : 1,
 		"appversion" : 		{
-			"major" : 9,
-			"minor" : 0,
+			"major" : 8,
+			"minor" : 6,
 			"revision" : 5,
 			"architecture" : "x64",
 			"modernui" : 1
@@ -11,36 +11,35 @@
 ,
 		"classnamespace" : "box",
 		"openrect" : [ 549.0, 163.0, 666.85546875, 473.0 ],
+		"bglocked" : 0,
 		"openinpresentation" : 1,
+		"default_fontsize" : 12.0,
+		"default_fontface" : 0,
+		"default_fontname" : "Arial",
+		"gridonopen" : 1,
 		"gridsize" : [ 15.0, 15.0 ],
+		"gridsnaponopen" : 1,
+		"objectsnaponopen" : 1,
+		"statusbarvisible" : 2,
+		"toolbarvisible" : 1,
 		"lefttoolbarpinned" : 2,
 		"toptoolbarpinned" : 2,
 		"righttoolbarpinned" : 2,
 		"bottomtoolbarpinned" : 2,
 		"toolbars_unpinned_last_save" : 15,
+		"tallnewobj" : 0,
+		"boxanimatetime" : 200,
+		"enablehscroll" : 1,
+		"enablevscroll" : 1,
 		"devicewidth" : 666.85546875,
+		"description" : "",
+		"digest" : "",
+		"tags" : "",
+		"style" : "",
+		"subpatcher_template" : "",
+		"assistshowspatchername" : 0,
 		"title" : "jam Overview",
 		"boxes" : [ 			{
-				"box" : 				{
-					"angle" : 270.0,
-					"border" : 1,
-					"bordercolor" : [ 1.0, 1.0, 1.0, 1.0 ],
-					"grad1" : [ 0.172137149796092, 0.172137100044002, 0.172137113045018, 0.0 ],
-					"grad2" : [ 0.172137149796092, 0.172137100044002, 0.172137113045018, 0.0 ],
-					"id" : "obj-14",
-					"maxclass" : "panel",
-					"mode" : 1,
-					"numinlets" : 1,
-					"numoutlets" : 0,
-					"patching_rect" : [ 488.0, 361.0, 128.0, 128.0 ],
-					"presentation" : 1,
-					"presentation_rect" : [ 223.0, 369.0, 229.0, 40.0 ],
-					"proportion" : 0.5,
-					"rounded" : 0
-				}
-
-			}
-, 			{
 				"box" : 				{
 					"id" : "obj-12",
 					"maxclass" : "newobj",
@@ -152,7 +151,15 @@
 					"patching_rect" : [ 145.0, 561.0, 240.0, 45.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 214.0, 364.0, 240.0, 45.0 ],
-					"text" : "jam Documentation"
+					"saved_attribute_attributes" : 					{
+						"textoncolor" : 						{
+							"expression" : "themecolor.maxwindow_bugtext"
+						}
+
+					}
+,
+					"text" : "jam Documentation",
+					"textoncolor" : [ 0.090196, 0.658824, 0.901961, 1.0 ]
 				}
 
 			}
@@ -193,7 +200,7 @@
 					"fontsize" : 13.0,
 					"id" : "obj-29",
 					"linkbold" : 1,
-					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"maxclass" : "markup",
 					"numinlets" : 1,
 					"numoutlets" : 1,
@@ -212,8 +219,7 @@
 
 					}
 ,
-					"text" : "Project on GitHub <a href=\"https://github.com/janmech/jam\">https://github.com/janmech/jam</a>",
-					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+					"text" : "Project on GitHub <a href=\"https://github.com/janmech/jam\">https://github.com/janmech/jam</a>"
 				}
 
 			}
@@ -225,7 +231,7 @@
 					"fontsize" : 13.0,
 					"id" : "obj-25",
 					"linkbold" : 1,
-					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"maxclass" : "markup",
 					"numinlets" : 1,
 					"numoutlets" : 1,
@@ -244,8 +250,7 @@
 
 					}
 ,
-					"text" : "created by <a href=\"https://janmech.net\">Jan Mech</a> © 2025 The MIT Lisense",
-					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+					"text" : "created by <a href=\"https://janmech.net\">Jan Mech</a> © 2025 The MIT Lisense"
 				}
 
 			}
@@ -257,7 +262,7 @@
 					"fontsize" : 16.0,
 					"id" : "obj-23",
 					"linkbold" : 1,
-					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"maxclass" : "markup",
 					"numinlets" : 1,
 					"numoutlets" : 1,
@@ -274,8 +279,7 @@
 
 					}
 ,
-					"text" : "\n<a href=\"jam.ilda.compose\">jam.ilda.compose</a> - Create and mofify ILDA files for laser animation<br/>\n<a href=\"jam.ilda.dict\">jam.ilda.dict</a> - Create a dictionary from an ILDA file with file information<br/>\n<a href=\"jam.ilda.file\">jam.ilda.file</a> - Load an ILDA file (laser animation file) from disk<br/>\n<a href=\"jam.jit.gl.ilda.sketch\">jam.jit.gl.ilda.sketch</a> - Render frames from an ILDA file to an Open GL context",
-					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+					"text" : "\n<a href=\"jam.ilda.compose\">jam.ilda.compose</a> - Create and mofify ILDA files for laser animation<br/>\n<a href=\"jam.ilda.dict\">jam.ilda.dict</a> - Create a dictionary from an ILDA file with file information<br/>\n<a href=\"jam.ilda.file\">jam.ilda.file</a> - Load an ILDA file (laser animation file) from disk<br/>\n<a href=\"jam.jit.gl.ilda.sketch\">jam.jit.gl.ilda.sketch</a> - Render frames from an ILDA file to an Open GL context"
 				}
 
 			}
@@ -302,7 +306,7 @@
 					"fontsize" : 16.0,
 					"id" : "obj-22",
 					"linkbold" : 1,
-					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"maxclass" : "markup",
 					"numinlets" : 1,
 					"numoutlets" : 1,
@@ -319,8 +323,7 @@
 
 					}
 ,
-					"text" : "<a href=\"jam.helios\">jam.helios</a> - Connect to a Helios ILDA DAC",
-					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+					"text" : "<a href=\"jam.helios\">jam.helios</a> - Connect to a Helios ILDA DAC"
 				}
 
 			}
@@ -375,7 +378,7 @@
 					"fontsize" : 16.0,
 					"id" : "obj-17",
 					"linkbold" : 1,
-					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"maxclass" : "markup",
 					"numinlets" : 1,
 					"numoutlets" : 1,
@@ -392,8 +395,7 @@
 
 					}
 ,
-					"text" : "<a href=\"jam.dmxusbpro\">jam.dmxusbpro</a> -Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists<br/>\n<a href=\"jam.dmxusbpro~\">jam.dmxusbpro~</a> - Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with signals<br/>",
-					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+					"text" : "<a href=\"jam.dmxusbpro\">jam.dmxusbpro</a> -Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists<br/>\n<a href=\"jam.dmxusbpro~\">jam.dmxusbpro~</a> - Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with signals<br/>"
 				}
 
 			}
@@ -419,7 +421,7 @@
 					"fontname" : "Lato Light",
 					"fontsize" : 16.0,
 					"id" : "obj-1",
-					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
 					"linkunderline" : 0,
 					"maxclass" : "markup",
 					"numinlets" : 1,
@@ -439,8 +441,7 @@
 
 					}
 ,
-					"text" : "The jam package is a collections of externals for working with DMX devices via an ENTTEC DMX USB Pro DMX interface and with show laser projectors that have an ILDA interface via an Helios ILDA DAC.",
-					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+					"text" : "The jam package is a collections of externals for working with DMX devices via an ENTTEC DMX USB Pro DMX interface and with show laser projectors that have an ILDA interface via an Helios ILDA DAC."
 				}
 
 			}
@@ -486,6 +487,26 @@
 					"presentation_rect" : [ 613.0, 440.0, 37.0, 22.0 ],
 					"text" : "v.2.0",
 					"textcolor" : [ 0.426676, 0.426663, 0.42667, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"angle" : 270.0,
+					"border" : 1,
+					"bordercolor" : [ 1.0, 1.0, 1.0, 1.0 ],
+					"grad1" : [ 0.172137149796092, 0.172137100044002, 0.172137113045018, 0.0 ],
+					"grad2" : [ 0.172137149796092, 0.172137100044002, 0.172137113045018, 0.0 ],
+					"id" : "obj-14",
+					"maxclass" : "panel",
+					"mode" : 1,
+					"numinlets" : 1,
+					"numoutlets" : 0,
+					"patching_rect" : [ 488.0, 361.0, 128.0, 128.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 223.0, 369.0, 229.0, 40.0 ],
+					"proportion" : 0.5,
+					"rounded" : 0
 				}
 
 			}
@@ -541,7 +562,6 @@
 
 			}
  ],
-		"originid" : "pat-42",
 		"dependency_cache" : [ 			{
 				"name" : "icon.png",
 				"bootpath" : "~/Documents/Workspace/Xcode/jam",

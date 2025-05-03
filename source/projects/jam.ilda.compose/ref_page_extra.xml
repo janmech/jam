@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<c74objectextra name="jam.ilda.compose">
+    <methodlist>
+        <method name="line">
+            <arglist>
+                <arg name="start-x" optional="0" type="float"/>
+                <arg name="start-y" optional="0" type="float"/>
+                <arg name="end-x" optional="0" type="float"/>
+                <arg name="end-y" optional="0" type="float"/>
+            </arglist>
+        </method>
+        <method name="drawcolor">
+            <arglist>
+                <arg name="red" optional="0" type="float"/>
+                <arg name="green" optional="0" type="float"/>
+                <arg name="blue" optional="0" type="float"/>
+            </arglist>
+        </method>
+        <method name="duplicateframe">
+            <arglist>
+                <arg name="frame-index" optional="1" type="int"/>
+            </arglist>
+        </method>
+        <method name="ellipse">
+            <arglist>
+                <arg name="center-x" optional="0" type="float"/>
+                <arg name="center-y" optional="0" type="float"/>
+                <arg name="start-angle" optional="0" type="float" units="degree"/>
+                <arg name="end-angle" optional="0" type="float" units="degree"/>
+                <arg name="line-segments" optional="1" type="int"/>
+            </arglist>
+        </method>
+        <method name="circle">
+            <arglist>
+                <arg name="center-x" optional="0" type="float"/>
+                <arg name="center-y" optional="0" type="float"/>
+                <arg name="radius" optional="0" type="float"/>
+                <arg name="start-angle" optional="0" type="float" units="degree"/>
+                <arg name="end-angle" optional="0" type="float" units="degree"/>
+                <arg name="line-segments" optional="1" type="int"/>
+            </arglist>
+        </method>
+        <method name="bezier">
+            <arglist>
+                <arg name="start-x" optional="0" type="float"/>
+                <arg name="start-y" optional="0" type="float"/>
+                <arg name="control-point1-x" optional="0" type="float"/>
+                <arg name="control-point1-y" optional="0" type="float"/>
+                <arg name="control-point2-x" optional="0" type="float"/>
+                <arg name="control-point2-y" optional="0" type="float"/>
+                <arg name="end-x" optional="0" type="float"/>
+                <arg name="end-y" optional="0" type="float"/>
+                <arg name="line-segments" optional="1" type="int"/>
+            </arglist>
+        </method>
+    </methodlist>
+    <misc name="Coordinates and Angles">
+        <entry name="Coordinates">
+            <description>
+                All coordinates are expressed in the range from -1. to 1. with 0./0. in the center.
+            </description>
+        </entry>
+        <entry name="Angles">
+            <description>
+                All angeles are expressed in degrees from2 0 to 360
+            </description>
+        </entry>
+    </misc>
+</c74objectextra>

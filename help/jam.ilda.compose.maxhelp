@@ -259,7 +259,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 84.0, 126.0, 887.0, 602.0 ],
+						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
@@ -4188,11 +4188,55 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 887.0, 602.0 ],
+						"rect" : [ 84.0, 126.0, 887.0, 602.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 5.0, 5.0 ],
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"hidden" : 1,
+									"id" : "obj-7",
+									"linecount" : 2,
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 233.0, 161.0, 105.0, 38.0 ],
+									"text" : ";\rmax opendoc $1"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"border" : 0,
+									"fontface" : 0,
+									"fontname" : "Lato Light",
+									"fontsize" : 13.0,
+									"id" : "obj-33",
+									"linkbold" : 1,
+									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+									"maxclass" : "markup",
+									"numinlets" : 1,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 13.0, 124.0, 617.0, 35.0 ],
+									"saved_attribute_attributes" : 									{
+										"linkcolor" : 										{
+											"expression" : "themecolor.live_control_fg"
+										}
+,
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_fg_off"
+										}
+
+									}
+,
+									"text" : "For mor information about <b>ILDA files</b>, please refer to the <a href=\"02_jam_ilda_topic.maxvig.xml\">ILDA Files and ILDA Interface</a> topic in the documentation browser.\n",
+									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"id" : "obj-28",
 									"maxclass" : "message",
@@ -4446,7 +4490,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 436.0, 392.0, 102.0, 57.0 ],
+									"patching_rect" : [ 412.0, 388.0, 102.0, 57.0 ],
 									"text" : "Start the render context"
 								}
 
@@ -4464,7 +4508,7 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 518.0, 366.0, 20.0, 20.0 ],
+									"patching_rect" : [ 494.0, 362.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
 									"saved_attribute_attributes" : 									{
 										"bgcolor" : 										{
@@ -4746,6 +4790,14 @@
 									"destination" : [ "obj-5", 0 ],
 									"midpoints" : [ 652.5, 320.0, 56.5, 320.0 ],
 									"source" : [ "obj-31", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-7", 0 ],
+									"hidden" : 1,
+									"source" : [ "obj-33", 0 ]
 								}
 
 							}

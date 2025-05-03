@@ -128,7 +128,15 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 592.0, 367.0, 218.0, 57.0 ],
-									"text" : "<b>Note:</b> Receive mode will be disabled when sending a list with DMX values or the <i>deviceserial</i> message."
+									"saved_attribute_attributes" : 									{
+										"textcolor" : 										{
+											"expression" : "themecolor.live_control_text_zombie"
+										}
+
+									}
+,
+									"text" : "<b>Note:</b> Receive mode will be disabled when sending a list with DMX values or the <i>deviceserial</i> message.",
+									"textcolor" : [ 0.57636836783545, 0.576368229540612, 0.576368265679262, 1.0 ]
 								}
 
 							}
@@ -142,14 +150,14 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 294.0, 219.0, 185.0, 57.0 ],
+									"patching_rect" : [ 296.0, 217.5, 185.0, 57.0 ],
 									"text" : "Send a list of\nDMX channel/DMX value pairs"
 								}
 
 							}
 , 							{
 								"box" : 								{
-									"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
+									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
 									"hint" : "",
 									"id" : "obj-42",
@@ -162,6 +170,13 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 270.0, 236.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
+									"saved_attribute_attributes" : 									{
+										"bgcolor" : 										{
+											"expression" : "themecolor.lesson_step_circle"
+										}
+
+									}
+,
 									"text" : "3",
 									"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
 								}
@@ -321,14 +336,14 @@
 								"box" : 								{
 									"bubble" : 1,
 									"bubbleside" : 3,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-17",
 									"linecount" : 3,
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 31.0, 577.0, 137.5, 54.0 ],
+									"patching_rect" : [ 31.0, 577.0, 135.0, 57.0 ],
 									"text" : "Connection status. \n1: connected\n0: disconnected"
 								}
 
@@ -337,20 +352,20 @@
 								"box" : 								{
 									"bubble" : 1,
 									"bubbleside" : 2,
-									"fontname" : "Arial",
+									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-14",
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 39.0, 324.0, 102.0, 40.0 ],
+									"patching_rect" : [ 33.5, 303.0, 99.0, 41.0 ],
 									"text" : "Open a device"
 								}
 
 							}
 , 							{
 								"box" : 								{
-									"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
+									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
 									"hint" : "",
 									"id" : "obj-15",
@@ -361,8 +376,15 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 12.0, 324.0, 20.0, 20.0 ],
+									"patching_rect" : [ 73.0, 353.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
+									"saved_attribute_attributes" : 									{
+										"bgcolor" : 										{
+											"expression" : "themecolor.lesson_step_circle"
+										}
+
+									}
+,
 									"text" : "2",
 									"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
 								}
@@ -378,14 +400,14 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 88.0, 136.0, 381.0, 73.0 ],
-									"text" : "Get a lst of connected devices and populate a umenu.\n\n(By default only dvices following the ENTTEC USB DMX Pro naming convention will we enabled.)"
+									"patching_rect" : [ 89.5, 134.5, 381.0, 73.0 ],
+									"text" : "Get a list of connected devices and populate a umenu.\n\n(By default only dvices following the ENTTEC USB DMX Pro naming convention will we enabled.)"
 								}
 
 							}
 , 							{
 								"box" : 								{
-									"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
+									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
 									"hint" : "",
 									"id" : "obj-25",
@@ -398,6 +420,13 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 65.0, 161.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
+									"saved_attribute_attributes" : 									{
+										"bgcolor" : 										{
+											"expression" : "themecolor.lesson_step_circle"
+										}
+
+									}
+,
 									"text" : "1",
 									"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
 								}

@@ -53,7 +53,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 173.0, 126.0, 882.0, 712.0 ],
+						"rect" : [ 112.0, 144.0, 882.0, 712.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
@@ -221,7 +221,7 @@
 							}
 , 							{
 								"box" : 								{
-									"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
+									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
 									"hint" : "",
 									"id" : "obj-28",
@@ -234,6 +234,13 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 497.0, 491.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
+									"saved_attribute_attributes" : 									{
+										"bgcolor" : 										{
+											"expression" : "themecolor.lesson_step_circle"
+										}
+
+									}
+,
 									"text" : "4",
 									"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
 								}
@@ -388,7 +395,7 @@
 							}
 , 							{
 								"box" : 								{
-									"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
+									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
 									"hint" : "",
 									"id" : "obj-42",
@@ -401,6 +408,13 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 553.0, 161.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
+									"saved_attribute_attributes" : 									{
+										"bgcolor" : 										{
+											"expression" : "themecolor.lesson_step_circle"
+										}
+
+									}
+,
 									"text" : "3",
 									"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
 								}
@@ -443,14 +457,14 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 56.0, 263.0, 102.0, 40.0 ],
+									"patching_rect" : [ 55.0, 244.0, 102.0, 40.0 ],
 									"text" : "Open a device"
 								}
 
 							}
 , 							{
 								"box" : 								{
-									"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
+									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
 									"hint" : "",
 									"id" : "obj-15",
@@ -461,8 +475,15 @@
 									"numoutlets" : 3,
 									"outlettype" : [ "", "", "int" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 29.0, 263.0, 20.0, 20.0 ],
+									"patching_rect" : [ 96.0, 291.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
+									"saved_attribute_attributes" : 									{
+										"bgcolor" : 										{
+											"expression" : "themecolor.lesson_step_circle"
+										}
+
+									}
+,
 									"text" : "2",
 									"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
 								}
@@ -478,14 +499,14 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 87.0, 131.0, 381.0, 73.0 ],
-									"text" : "Get a lst of connected devices and populate a umenu.\n\n(By default only dvices following the ENTTEC USB DMX Pro naming convention will we enabled.)"
+									"patching_rect" : [ 85.0, 128.5, 381.0, 73.0 ],
+									"text" : "Get a list of connected devices and populate a umenu.\n\n(By default only dvices following the ENTTEC USB DMX Pro naming convention will we enabled.)"
 								}
 
 							}
 , 							{
 								"box" : 								{
-									"bgcolor" : [ 1.0, 0.788235, 0.470588, 1.0 ],
+									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
 									"hint" : "",
 									"id" : "obj-25",
@@ -498,6 +519,13 @@
 									"parameter_enable" : 0,
 									"patching_rect" : [ 62.0, 155.0, 20.0, 20.0 ],
 									"rounded" : 60.0,
+									"saved_attribute_attributes" : 									{
+										"bgcolor" : 										{
+											"expression" : "themecolor.lesson_step_circle"
+										}
+
+									}
+,
 									"text" : "1",
 									"textcolor" : [ 0.34902, 0.34902, 0.34902, 1.0 ]
 								}

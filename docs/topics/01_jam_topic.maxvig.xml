@@ -12,13 +12,13 @@
 
   <h1>Jam Package</h1>
   <p>
-		The Jam package is a collection of objects focused on working with DMX and ILDA devices.
+		The jam package is a collection of objects focused on working with DMX and ILDA devices.
 	</p>
 
 
 	<h2>Max Objects for DMX</h2>
 	<p>
-		The package included s two objects to control DMX devices using the ENTTEC DMX USB PRO interface. 
+		The package includes two objects to control DMX devices using the ENTTEC DMX USB PRO interface. 
 	</p>
   <ul>
     <li><openfilelink filename="jam.dmxusbpro.maxhelp">jam.dmxusbpro</openfilelink> -  Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists.</li>
@@ -28,7 +28,7 @@
 
   <h2>Max Object For Working With Laser Projectors</h2>
   <p>
-		In addition thge package contains a set of object to laser control laser projectors (equipped with an ILDA interface) and to work with ILDA files (laser animations).
+		In addition the package contains a set of object to laser control laser projectors (equipped with an ILDA interface) and to work with ILDA files (laser animations).
 	</p>
   <ul>
     <li><openfilelink filename="jam.helios.maxhelp">jam.helios</openfilelink> -Connect to a Helios ILDA DAC</li>
