@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <c74objectextra name="jjam.jit.gl.ilda.sketch">
     <discussion>
-        <b>jam.jit.gl.ilda.sketch</b>
+        <o>jam.jit.gl.ilda.sketch</o>
         uses a <o>jit.gl.sketch</o> object internally to
-        render the graphics. Some of the jit.gl.sketch OB3D attributes are exposes through <b>
-        jam.jit.gl.ilda.sketch.</b>. These are marked with <b>[OB3D]</b> in the description.
+        render the graphics. Some of the <o>jit.gl.sketch</o> OB3D attributes are exposes through <o>
+        jam.jit.gl.ilda.sketch</o>. These are marked with <b>[OB3D]</b> in the description.
         <br/>
         <br/>
         <b>
@@ -12,7 +12,7 @@
         </b>
         ILDA files do not contain opacitity values because they are commands for laser
         beam movement and colors. However, for screen rendering with
-        <b>jam.jit.gl.ilda.sketch</b>
+        <o>jam.jit.gl.ilda.sketch</o>
         you can apply opacities in two different ways:
         <ul>
             <li>Globally to all lines by setting the <m>overrideopacity</m> attribute to 1 (enabled)
