@@ -31,11 +31,25 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 74.0, 126.0, 864.0, 659.0 ],
+						"rect" : [ 208.0, 289.0, 864.0, 659.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
 						"visible" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"hidden" : 1,
+									"id" : "obj-27",
+									"linecount" : 2,
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 233.0, 161.0, 105.0, 35.0 ],
+									"text" : ";\rmax opendoc $1"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"bgcolor" : [ 0.9, 0.65, 0.05, 1.0 ],
 									"fontname" : "Arial Bold",
@@ -886,6 +900,7 @@
 									"fontname" : "Lato Light",
 									"fontsize" : 13.0,
 									"id" : "obj-1",
+									"linkbold" : 1,
 									"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
 									"maxclass" : "markup",
 									"numinlets" : 1,
@@ -903,7 +918,7 @@
 
 									}
 ,
-									"text" : "For frames that specify color by index (rather than RGB values), <b>jam.jit.gl.ilda.sketch</b> uses the standard ILDA Color Palette.",
+									"text" : "For frames that specify color by index (rather than RGB values), <b>jam.jit.gl.ilda.sketch</b> uses the standard <a href=\"04_jam_color_palette.maxvig.xml\">ILDA Color Palette</a>.",
 									"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 								}
 
@@ -939,6 +954,14 @@
 							}
  ],
 						"lines" : [ 							{
+								"patchline" : 								{
+									"destination" : [ "obj-27", 0 ],
+									"hidden" : 1,
+									"source" : [ "obj-1", 0 ]
+								}
+
+							}
+, 							{
 								"patchline" : 								{
 									"destination" : [ "obj-3", 0 ],
 									"source" : [ "obj-11", 0 ]
@@ -2629,7 +2652,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 74.0, 126.0, 864.0, 659.0 ],
+						"rect" : [ 0.0, 26.0, 864.0, 659.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 5.0, 5.0 ],
 						"showontab" : 1,
