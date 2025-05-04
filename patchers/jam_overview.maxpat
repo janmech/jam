@@ -2,53 +2,496 @@
 	"patcher" : 	{
 		"fileversion" : 1,
 		"appversion" : 		{
-			"major" : 8,
-			"minor" : 6,
-			"revision" : 5,
+			"major" : 9,
+			"minor" : 0,
+			"revision" : 6,
 			"architecture" : "x64",
 			"modernui" : 1
 		}
 ,
 		"classnamespace" : "box",
 		"openrect" : [ 549.0, 163.0, 666.85546875, 473.0 ],
-		"bglocked" : 0,
 		"openinpresentation" : 1,
-		"default_fontsize" : 12.0,
-		"default_fontface" : 0,
-		"default_fontname" : "Arial",
-		"gridonopen" : 1,
 		"gridsize" : [ 15.0, 15.0 ],
-		"gridsnaponopen" : 1,
-		"objectsnaponopen" : 1,
-		"statusbarvisible" : 2,
-		"toolbarvisible" : 1,
 		"lefttoolbarpinned" : 2,
 		"toptoolbarpinned" : 2,
 		"righttoolbarpinned" : 2,
 		"bottomtoolbarpinned" : 2,
-		"toolbars_unpinned_last_save" : 15,
-		"tallnewobj" : 0,
-		"boxanimatetime" : 200,
-		"enablehscroll" : 1,
-		"enablevscroll" : 1,
+		"toolbars_unpinned_last_save" : 7,
 		"devicewidth" : 666.85546875,
-		"description" : "",
-		"digest" : "",
-		"tags" : "",
-		"style" : "",
-		"subpatcher_template" : "",
-		"assistshowspatchername" : 0,
 		"title" : "jam Overview",
 		"boxes" : [ 			{
+				"box" : 				{
+					"hidden" : 1,
+					"id" : "obj-42",
+					"linecount" : 2,
+					"maxclass" : "message",
+					"numinlets" : 2,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 415.0, 513.0, 105.0, 35.0 ],
+					"text" : ";\rmax opendoc $1"
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-39",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 322.5, 340.0, 59.0, 18.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 325.0, 283.0, 25.0, 18.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.jit.gl.ilda.sketch\">help</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-40",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 377.0, 339.0, 55.0, 20.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 354.0, 283.0, 53.0, 17.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.jit.gl.ilda.sketch.maxref.xml\">reference</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-37",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 237.5, 340.0, 33.0, 19.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 228.0, 283.0, 25.0, 18.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.ilda.dict\">help</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-38",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 265.5, 339.5, 55.0, 20.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 257.0, 283.0, 53.0, 17.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.ilda.dict.maxref.xml\">reference</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-35",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 127.5, 340.0, 33.0, 19.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 113.0, 284.0, 25.0, 18.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.ilda.compose\">help</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-36",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 162.5, 339.5, 55.0, 20.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 142.0, 284.0, 53.0, 17.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.ilda.compose.maxref.xml\">reference</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-31",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 24.0, 340.0, 33.0, 19.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 19.0, 283.0, 25.0, 18.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.ilda.file\">help</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-32",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 59.0, 339.5, 55.0, 20.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 48.0, 284.0, 53.0, 17.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.ilda.file.maxref.xml\">reference</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-33",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 24.0, 225.5, 33.0, 19.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 401.0, 172.0, 30.0, 18.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.helios\">help</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-34",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 49.0, 225.0, 55.0, 20.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 430.0, 173.0, 53.0, 17.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.helios.maxref.xml\">reference</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-27",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 159.0, 135.0, 33.0, 19.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 135.0, 170.0, 25.0, 18.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.dmxusbpro~\">help</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-28",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 202.0, 134.5, 55.0, 20.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 164.0, 170.0, 53.0, 17.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.dmxusbpro~.maxref.xml\">reference</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-15",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 24.0, 135.0, 33.0, 19.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 21.0, 170.0, 30.0, 18.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.dmxusbpro\">help</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
+				"box" : 				{
+					"border" : 0,
+					"fontface" : 0,
+					"fontname" : "Lato Light",
+					"fontsize" : 12.0,
+					"id" : "obj-16",
+					"linkbold" : 1,
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
+					"maxclass" : "markup",
+					"numinlets" : 1,
+					"numoutlets" : 1,
+					"outlettype" : [ "" ],
+					"patching_rect" : [ 60.0, 134.5, 55.0, 20.0 ],
+					"presentation" : 1,
+					"presentation_rect" : [ 50.0, 170.0, 53.0, 17.0 ],
+					"saved_attribute_attributes" : 					{
+						"linkcolor" : 						{
+							"expression" : "themecolor.live_control_fg_off"
+						}
+,
+						"textcolor" : 						{
+							"expression" : "themecolor.live_control_fg"
+						}
+
+					}
+,
+					"text" : "<a href=\"jam.dmxusbpro.maxref.xml\">reference</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
+				}
+
+			}
+, 			{
 				"box" : 				{
 					"id" : "obj-12",
 					"maxclass" : "newobj",
 					"numinlets" : 2,
 					"numoutlets" : 2,
 					"outlettype" : [ "dictionary", "" ],
-					"patching_rect" : [ 303.0, 274.0, 113.0, 22.0 ],
+					"patching_rect" : [ 322.5, 312.0, 113.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 303.0, 285.0, 113.0, 22.0 ],
+					"presentation_rect" : [ 325.0, 253.0, 113.0, 22.0 ],
 					"text" : "jam.jit.gl.ilda.sketch"
 				}
 
@@ -60,9 +503,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 218.0, 274.0, 72.0, 22.0 ],
+					"patching_rect" : [ 237.5, 312.0, 72.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 218.0, 285.0, 72.0, 22.0 ],
+					"presentation_rect" : [ 228.0, 253.0, 72.0, 22.0 ],
 					"text" : "jam.ilda.dict"
 				}
 
@@ -74,9 +517,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 5,
 					"outlettype" : [ "", "", "int", "int", "list" ],
-					"patching_rect" : [ 105.0, 274.0, 102.0, 22.0 ],
+					"patching_rect" : [ 124.5, 312.0, 102.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 102.0, 285.0, 102.0, 22.0 ],
+					"presentation_rect" : [ 113.0, 253.0, 102.0, 22.0 ],
 					"text" : "jam.ilda.compose"
 				}
 
@@ -88,9 +531,9 @@
 					"numinlets" : 1,
 					"numoutlets" : 2,
 					"outlettype" : [ "", "list" ],
-					"patching_rect" : [ 24.0, 274.0, 69.0, 22.0 ],
+					"patching_rect" : [ 24.0, 312.0, 69.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 19.0, 285.0, 69.0, 22.0 ],
+					"presentation_rect" : [ 19.0, 253.0, 69.0, 22.0 ],
 					"text" : "jam.ilda.file"
 				}
 
@@ -104,7 +547,7 @@
 					"outlettype" : [ "message", "int", "" ],
 					"patching_rect" : [ 24.0, 196.0, 63.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 19.0, 212.0, 63.0, 22.0 ],
+					"presentation_rect" : [ 399.0, 146.0, 63.0, 22.0 ],
 					"text" : "jam.helios"
 				}
 
@@ -148,9 +591,9 @@
 					"numoutlets" : 3,
 					"outlettype" : [ "", "", "int" ],
 					"parameter_enable" : 0,
-					"patching_rect" : [ 145.0, 561.0, 240.0, 45.0 ],
+					"patching_rect" : [ 41.0, 514.0, 240.0, 45.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 214.0, 364.0, 240.0, 45.0 ],
+					"presentation_rect" : [ 228.0, 350.0, 240.0, 45.0 ],
 					"saved_attribute_attributes" : 					{
 						"textoncolor" : 						{
 							"expression" : "themecolor.maxwindow_bugtext"
@@ -159,7 +602,7 @@
 					}
 ,
 					"text" : "jam Documentation",
-					"textoncolor" : [ 0.090196, 0.658824, 0.901961, 1.0 ]
+					"textoncolor" : [ 0.434559006135542, 0.670817144785582, 0.977667398367262, 1.0 ]
 				}
 
 			}
@@ -173,7 +616,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 41.0, 476.0, 167.0, 28.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 249.0, 329.0, 167.0, 28.0 ],
+					"presentation_rect" : [ 263.0, 326.0, 167.0, 28.0 ],
 					"text" : "Click to get started"
 				}
 
@@ -187,7 +630,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 15.0, 521.0, 219.0, 35.0 ],
+					"patching_rect" : [ 41.0, 579.0, 219.0, 35.0 ],
 					"text" : ";\rmax opendoc 01_jam_topic.maxvig.xml"
 				}
 
@@ -200,14 +643,14 @@
 					"fontsize" : 13.0,
 					"id" : "obj-29",
 					"linkbold" : 1,
-					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
 					"maxclass" : "markup",
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 19.0, 381.0, 262.0, 39.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 15.0, 443.0, 305.0, 22.0 ],
+					"presentation_rect" : [ 15.0, 444.0, 305.0, 22.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg"
@@ -219,7 +662,8 @@
 
 					}
 ,
-					"text" : "Project on GitHub <a href=\"https://github.com/janmech/jam\">https://github.com/janmech/jam</a>"
+					"text" : "Project on GitHub <a href=\"https://github.com/janmech/jam\">https://github.com/janmech/jam</a>",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 				}
 
 			}
@@ -231,14 +675,14 @@
 					"fontsize" : 13.0,
 					"id" : "obj-25",
 					"linkbold" : 1,
-					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
 					"maxclass" : "markup",
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 395.0, 442.0, 267.0, 34.0 ],
+					"patching_rect" : [ 324.0, 647.0, 267.0, 34.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 348.0, 443.0, 290.0, 22.0 ],
+					"presentation_rect" : [ 348.0, 444.0, 290.0, 22.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg"
@@ -250,36 +694,8 @@
 
 					}
 ,
-					"text" : "created by <a href=\"https://janmech.net\">Jan Mech</a> © 2025 The MIT Lisense"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"border" : 0,
-					"fontface" : 0,
-					"fontname" : "Lato Light",
-					"fontsize" : 16.0,
-					"id" : "obj-23",
-					"linkbold" : 1,
-					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"maxclass" : "markup",
-					"numinlets" : 1,
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 814.0, 119.0, 185.0, 50.0 ],
-					"saved_attribute_attributes" : 					{
-						"linkcolor" : 						{
-							"expression" : "themecolor.live_control_fg"
-						}
-,
-						"textcolor" : 						{
-							"expression" : "themecolor.live_control_fg"
-						}
-
-					}
-,
-					"text" : "\n<a href=\"jam.ilda.compose\">jam.ilda.compose</a> - Create and mofify ILDA files for laser animation<br/>\n<a href=\"jam.ilda.dict\">jam.ilda.dict</a> - Create a dictionary from an ILDA file with file information<br/>\n<a href=\"jam.ilda.file\">jam.ilda.file</a> - Load an ILDA file (laser animation file) from disk<br/>\n<a href=\"jam.jit.gl.ilda.sketch\">jam.jit.gl.ilda.sketch</a> - Render frames from an ILDA file to an Open GL context"
+					"text" : "created by <a href=\"https://janmech.net\">Jan Mech</a> © 2025 The MIT Lisense",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 				}
 
 			}
@@ -291,39 +707,10 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 24.0, 232.0, 174.0, 23.0 ],
+					"patching_rect" : [ 24.0, 270.0, 174.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 15.0, 253.0, 174.0, 23.0 ],
+					"presentation_rect" : [ 15.0, 221.0, 174.0, 23.0 ],
 					"text" : "ILDA File Objects"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"border" : 0,
-					"fontface" : 0,
-					"fontname" : "Lato Light",
-					"fontsize" : 16.0,
-					"id" : "obj-22",
-					"linkbold" : 1,
-					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"maxclass" : "markup",
-					"numinlets" : 1,
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 814.0, 95.0, 146.0, 17.0 ],
-					"saved_attribute_attributes" : 					{
-						"linkcolor" : 						{
-							"expression" : "themecolor.live_control_fg"
-						}
-,
-						"textcolor" : 						{
-							"expression" : "themecolor.live_control_fg"
-						}
-
-					}
-,
-					"text" : "<a href=\"jam.helios\">jam.helios</a> - Connect to a Helios ILDA DAC"
 				}
 
 			}
@@ -337,7 +724,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 164.0, 174.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 15.0, 180.0, 174.0, 23.0 ],
+					"presentation_rect" : [ 395.0, 114.0, 174.0, 23.0 ],
 					"text" : "ILDA Interface Objects"
 				}
 
@@ -351,7 +738,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "jit_matrix" ],
-					"patching_rect" : [ 631.0, 325.0, 100.0, 100.0 ],
+					"patching_rect" : [ 769.0, 312.0, 100.0, 100.0 ],
 					"pic" : "Macintosh HD:/Users/janmech/Documents/Workspace/Xcode/jam/icon.png",
 					"presentation" : 1,
 					"presentation_rect" : [ 15.0, 26.0, 58.0, 58.0 ]
@@ -365,37 +752,8 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 824.0, 205.0, 79.0, 22.0 ],
+					"patching_rect" : [ 322.5, 479.0, 79.0, 22.0 ],
 					"text" : "prepend help"
-				}
-
-			}
-, 			{
-				"box" : 				{
-					"border" : 0,
-					"fontface" : 0,
-					"fontname" : "Lato Light",
-					"fontsize" : 16.0,
-					"id" : "obj-17",
-					"linkbold" : 1,
-					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
-					"maxclass" : "markup",
-					"numinlets" : 1,
-					"numoutlets" : 1,
-					"outlettype" : [ "" ],
-					"patching_rect" : [ 814.0, 47.0, 226.0, 41.0 ],
-					"saved_attribute_attributes" : 					{
-						"linkcolor" : 						{
-							"expression" : "themecolor.live_control_fg"
-						}
-,
-						"textcolor" : 						{
-							"expression" : "themecolor.live_control_fg"
-						}
-
-					}
-,
-					"text" : "<a href=\"jam.dmxusbpro\">jam.dmxusbpro</a> -Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists<br/>\n<a href=\"jam.dmxusbpro~\">jam.dmxusbpro~</a> - Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with signals<br/>"
 				}
 
 			}
@@ -421,7 +779,7 @@
 					"fontname" : "Lato Light",
 					"fontsize" : 16.0,
 					"id" : "obj-1",
-					"linkcolor" : [ 0.0, 0.0, 0.0, 1.0 ],
+					"linkcolor" : [ 0.85, 0.85, 0.85, 1.0 ],
 					"linkunderline" : 0,
 					"maxclass" : "markup",
 					"numinlets" : 1,
@@ -441,7 +799,8 @@
 
 					}
 ,
-					"text" : "The jam package is a collections of externals for working with DMX devices via an ENTTEC DMX USB Pro DMX interface and with show laser projectors that have an ILDA interface via an Helios ILDA DAC."
+					"text" : "The jam package is a collections of externals for working with DMX devices via an ENTTEC DMX USB Pro DMX interface and with show laser projectors that have an ILDA interface via an Helios ILDA DAC.",
+					"textcolor" : [ 0.85, 0.85, 0.85, 1.0 ]
 				}
 
 			}
@@ -453,7 +812,7 @@
 					"numinlets" : 1,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 824.0, 239.0, 53.0, 22.0 ],
+					"patching_rect" : [ 322.5, 513.0, 53.0, 22.0 ],
 					"text" : "pcontrol"
 				}
 
@@ -469,7 +828,7 @@
 					"numinlets" : 2,
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
-					"patching_rect" : [ 395.0, 486.0, 139.0, 38.0 ],
+					"patching_rect" : [ 324.0, 691.0, 139.0, 38.0 ],
 					"text" : ";\rmax launchbrowser $1"
 				}
 
@@ -482,7 +841,7 @@
 					"maxclass" : "comment",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 399.0, 398.0, 219.0, 22.0 ],
+					"patching_rect" : [ 328.0, 603.0, 219.0, 22.0 ],
 					"presentation" : 1,
 					"presentation_rect" : [ 613.0, 440.0, 37.0, 22.0 ],
 					"text" : "v.2.0",
@@ -502,9 +861,9 @@
 					"mode" : 1,
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 488.0, 361.0, 128.0, 128.0 ],
+					"patching_rect" : [ 40.0, 514.0, 241.0, 51.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 223.0, 369.0, 229.0, 40.0 ],
+					"presentation_rect" : [ 237.0, 355.0, 229.0, 40.0 ],
 					"proportion" : 0.5,
 					"rounded" : 0
 				}
@@ -514,7 +873,14 @@
 		"lines" : [ 			{
 				"patchline" : 				{
 					"destination" : [ "obj-18", 0 ],
-					"source" : [ "obj-17", 0 ]
+					"source" : [ "obj-15", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-42", 0 ],
+					"source" : [ "obj-16", 0 ]
 				}
 
 			}
@@ -535,20 +901,6 @@
 			}
 , 			{
 				"patchline" : 				{
-					"destination" : [ "obj-18", 0 ],
-					"source" : [ "obj-22", 0 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
-					"destination" : [ "obj-18", 0 ],
-					"source" : [ "obj-23", 0 ]
-				}
-
-			}
-, 			{
-				"patchline" : 				{
 					"destination" : [ "obj-26", 0 ],
 					"source" : [ "obj-25", 0 ]
 				}
@@ -556,8 +908,92 @@
 			}
 , 			{
 				"patchline" : 				{
+					"destination" : [ "obj-18", 0 ],
+					"source" : [ "obj-27", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-42", 0 ],
+					"source" : [ "obj-28", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
 					"destination" : [ "obj-26", 0 ],
 					"source" : [ "obj-29", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-18", 0 ],
+					"source" : [ "obj-31", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-42", 0 ],
+					"source" : [ "obj-32", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-18", 0 ],
+					"source" : [ "obj-33", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-42", 0 ],
+					"source" : [ "obj-34", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-18", 0 ],
+					"source" : [ "obj-35", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-42", 0 ],
+					"source" : [ "obj-36", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-18", 0 ],
+					"source" : [ "obj-37", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-42", 0 ],
+					"source" : [ "obj-38", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-18", 0 ],
+					"source" : [ "obj-39", 0 ]
+				}
+
+			}
+, 			{
+				"patchline" : 				{
+					"destination" : [ "obj-42", 0 ],
+					"source" : [ "obj-40", 0 ]
 				}
 
 			}
