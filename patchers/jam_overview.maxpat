@@ -593,7 +593,7 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 41.0, 514.0, 240.0, 45.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 228.0, 337.0, 240.0, 45.0 ],
+					"presentation_rect" : [ 179.0, 337.0, 240.0, 45.0 ],
 					"saved_attribute_attributes" : 					{
 						"textoncolor" : 						{
 							"expression" : "themecolor.maxwindow_bugtext"
@@ -616,7 +616,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 41.0, 476.0, 167.0, 28.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 263.0, 313.0, 167.0, 28.0 ],
+					"presentation_rect" : [ 214.0, 313.0, 167.0, 28.0 ],
 					"text" : "Click to get started"
 				}
 
@@ -863,7 +863,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 40.0, 514.0, 241.0, 51.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 237.0, 342.0, 229.0, 40.0 ],
+					"presentation_rect" : [ 188.0, 342.0, 229.0, 40.0 ],
 					"proportion" : 0.5,
 					"rounded" : 0
 				}
