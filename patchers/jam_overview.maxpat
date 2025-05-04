@@ -17,7 +17,7 @@
 		"toptoolbarpinned" : 2,
 		"righttoolbarpinned" : 2,
 		"bottomtoolbarpinned" : 2,
-		"toolbars_unpinned_last_save" : 7,
+		"toolbars_unpinned_last_save" : 15,
 		"devicewidth" : 666.85546875,
 		"title" : "jam Overview",
 		"boxes" : [ 			{
@@ -49,7 +49,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 322.5, 340.0, 59.0, 18.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 283.0, 25.0, 18.0 ],
+					"presentation_rect" : [ 325.0, 267.0, 25.0, 18.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -81,7 +81,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 377.0, 339.0, 55.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 354.0, 283.0, 53.0, 17.0 ],
+					"presentation_rect" : [ 354.0, 267.0, 53.0, 17.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -113,7 +113,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 237.5, 340.0, 33.0, 19.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 228.0, 283.0, 25.0, 18.0 ],
+					"presentation_rect" : [ 228.0, 267.0, 25.0, 18.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -145,7 +145,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 265.5, 339.5, 55.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 257.0, 283.0, 53.0, 17.0 ],
+					"presentation_rect" : [ 257.0, 267.0, 53.0, 17.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -177,7 +177,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 127.5, 340.0, 33.0, 19.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 113.0, 284.0, 25.0, 18.0 ],
+					"presentation_rect" : [ 113.0, 268.0, 25.0, 18.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -209,7 +209,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 162.5, 339.5, 55.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 142.0, 284.0, 53.0, 17.0 ],
+					"presentation_rect" : [ 142.0, 268.0, 53.0, 17.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -241,7 +241,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 24.0, 340.0, 33.0, 19.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 19.0, 283.0, 25.0, 18.0 ],
+					"presentation_rect" : [ 19.0, 267.0, 25.0, 18.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -273,7 +273,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 59.0, 339.5, 55.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 48.0, 284.0, 53.0, 17.0 ],
+					"presentation_rect" : [ 48.0, 268.0, 53.0, 17.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -305,7 +305,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 24.0, 225.5, 33.0, 19.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 401.0, 172.0, 30.0, 18.0 ],
+					"presentation_rect" : [ 331.0, 172.0, 30.0, 18.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -337,7 +337,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 49.0, 225.0, 55.0, 20.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 430.0, 173.0, 53.0, 17.0 ],
+					"presentation_rect" : [ 360.0, 173.0, 53.0, 17.0 ],
 					"saved_attribute_attributes" : 					{
 						"linkcolor" : 						{
 							"expression" : "themecolor.live_control_fg_off"
@@ -491,7 +491,7 @@
 					"outlettype" : [ "dictionary", "" ],
 					"patching_rect" : [ 322.5, 312.0, 113.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 325.0, 253.0, 113.0, 22.0 ],
+					"presentation_rect" : [ 325.0, 237.0, 113.0, 22.0 ],
 					"text" : "jam.jit.gl.ilda.sketch"
 				}
 
@@ -505,7 +505,7 @@
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 237.5, 312.0, 72.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 228.0, 253.0, 72.0, 22.0 ],
+					"presentation_rect" : [ 228.0, 237.0, 72.0, 22.0 ],
 					"text" : "jam.ilda.dict"
 				}
 
@@ -519,7 +519,7 @@
 					"outlettype" : [ "", "", "int", "int", "list" ],
 					"patching_rect" : [ 124.5, 312.0, 102.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 113.0, 253.0, 102.0, 22.0 ],
+					"presentation_rect" : [ 113.0, 237.0, 102.0, 22.0 ],
 					"text" : "jam.ilda.compose"
 				}
 
@@ -533,7 +533,7 @@
 					"outlettype" : [ "", "list" ],
 					"patching_rect" : [ 24.0, 312.0, 69.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 19.0, 253.0, 69.0, 22.0 ],
+					"presentation_rect" : [ 19.0, 237.0, 69.0, 22.0 ],
 					"text" : "jam.ilda.file"
 				}
 
@@ -547,7 +547,7 @@
 					"outlettype" : [ "message", "int", "" ],
 					"patching_rect" : [ 24.0, 196.0, 63.0, 22.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 399.0, 146.0, 63.0, 22.0 ],
+					"presentation_rect" : [ 329.0, 146.0, 63.0, 22.0 ],
 					"text" : "jam.helios"
 				}
 
@@ -593,7 +593,7 @@
 					"parameter_enable" : 0,
 					"patching_rect" : [ 41.0, 514.0, 240.0, 45.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 228.0, 350.0, 240.0, 45.0 ],
+					"presentation_rect" : [ 228.0, 337.0, 240.0, 45.0 ],
 					"saved_attribute_attributes" : 					{
 						"textoncolor" : 						{
 							"expression" : "themecolor.maxwindow_bugtext"
@@ -616,7 +616,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 41.0, 476.0, 167.0, 28.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 263.0, 326.0, 167.0, 28.0 ],
+					"presentation_rect" : [ 263.0, 313.0, 167.0, 28.0 ],
 					"text" : "Click to get started"
 				}
 
@@ -709,7 +709,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 270.0, 174.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 15.0, 221.0, 174.0, 23.0 ],
+					"presentation_rect" : [ 15.0, 205.0, 174.0, 23.0 ],
 					"text" : "ILDA File Objects"
 				}
 
@@ -724,7 +724,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 24.0, 164.0, 174.0, 23.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 395.0, 114.0, 174.0, 23.0 ],
+					"presentation_rect" : [ 325.0, 114.0, 174.0, 23.0 ],
 					"text" : "ILDA Interface Objects"
 				}
 
@@ -863,7 +863,7 @@
 					"numoutlets" : 0,
 					"patching_rect" : [ 40.0, 514.0, 241.0, 51.0 ],
 					"presentation" : 1,
-					"presentation_rect" : [ 237.0, 355.0, 229.0, 40.0 ],
+					"presentation_rect" : [ 237.0, 342.0, 229.0, 40.0 ],
 					"proportion" : 0.5,
 					"rounded" : 0
 				}
