@@ -89,9 +89,9 @@ public:
     outlet<> outlet_dumpout{ this, "dumpout" };
     
     attribute<bool> notifyothers{
-        this, "notifyothers", true,
+        this, "notifyothers", false,
         title{ "Notify others" },
-        description{ "If set to 1 (default) other jam.helios object will be notified if an  device scan has been exectued. The new result will update all umenus connected to the leftmost outlet." }
+        description{ "If set to 1 other jam.helios object will be notified if an  device scan has been exectued. The new result will update all umenus connected to the leftmost outlet. Default: 0" }
     };
     
     attribute<int, threadsafe::no, limit::clamp> samplerate {
@@ -99,7 +99,7 @@ public:
         "samplerate",
         30000,
         title{ "Samplerate" },
-        description{ "Points per second send to the laser projector.<br /><b>Note</b>:It is recommended to keep sampling rate at 30000 or below, as higher values can cause problems in certain devices like LaserCube Wifi" },
+        description{ "Points per second send to the laser projector.<br /><b>Note</b>:It is recommended to keep sampling rate at 30000 or below, as higher values can cause problems in certain devices like LaserCube Wifi." },
         range{ 1000, 100000 },
     };
     
@@ -217,6 +217,7 @@ public:
             if (args.size() > 1) {
                 cwarn << "extra argument for message open" << endl;
             }
+            
             atom device_id = args[0];
             std::string dev_name = "";
             int dev_index = 0;

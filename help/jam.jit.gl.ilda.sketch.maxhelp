@@ -31,10 +31,9 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 208.0, 289.0, 864.0, 659.0 ],
+						"rect" : [ 0.0, 26.0, 864.0, 659.0 ],
 						"gridsize" : [ 15.0, 15.0 ],
 						"showontab" : 1,
-						"visible" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
 									"hidden" : 1,
@@ -2652,7 +2651,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 864.0, 659.0 ],
+						"rect" : [ 74.0, 126.0, 864.0, 659.0 ],
 						"default_fontsize" : 13.0,
 						"gridsize" : [ 5.0, 5.0 ],
 						"showontab" : 1,

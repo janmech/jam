@@ -533,7 +533,7 @@ class dmxusbpro : public object<dmxusbpro>
         };
 
         message<threadsafe::yes> open {
-            this, "open", "Open serial connection to a device. <p>Argument: portname [symbol]</p>",
+            this, "open", "Open serial connection to a device.",
             MIN_FUNCTION {
                 if (args.size() > 1) {
                     cwarn << "extra argument for message 'open'" << endl;

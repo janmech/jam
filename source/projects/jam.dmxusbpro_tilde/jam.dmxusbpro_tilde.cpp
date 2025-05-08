@@ -470,7 +470,7 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
         };
 
         message<threadsafe::yes> open {
-            this, "open", "Open serial connection to a device. <p>Argument: portname[symbol]</p>",
+            this, "open", "Open serial connection to a device.",
             MIN_FUNCTION {
                 if (args.size() > 1) {
                     cwarn << "extra argument for message 'open'" << endl;
