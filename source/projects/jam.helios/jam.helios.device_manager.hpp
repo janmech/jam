@@ -67,6 +67,8 @@ namespace jam::helios {
             this->_test = s;
         };
         
+        HeliosDac * getDac();
+        
         std::string getTest() {
             return this->_test;
         }

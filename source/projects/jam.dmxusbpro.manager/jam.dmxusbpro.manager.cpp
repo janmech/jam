@@ -1,5 +1,5 @@
 /// This is global max objext that shall be loaded as an extension by placing it inside the extension folder of the package
-/// this is a frankenstein-ish patching a traditional c-style max object into the project, because it seems that it is not possible to create nobox object with min-defkit
+/// this is a frankenstein-ish patching a traditional c-style max object into the project, because it seems that it is not possible to create nobox object with min-devkit
 
 #include "jam.dmxusbpro.manager.hpp"
 

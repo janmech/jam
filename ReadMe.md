@@ -5,6 +5,7 @@ List of externals:
 
 * `jam.dmxusbpro`- Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with lists.
 * `jam.dmxusbpro~` - Connect to the ENTTEC DMX USB Pro interface. Conrol DMX data with signals.
+* `jam.heliosinfo` - Fill a pop-up menu with Helios DAC device names
 * `jam.helios` - Connect to a Helios ILDA DAC
 * `jam.ilda.compose` - Create and mofify ILDA files for laser animation.
 * `jam.ilda.dict` - Create a dictionary from an ILDA file with file information
@@ -43,7 +44,7 @@ Windows: unsupported
 **2.** create the 'build' directory:
 ``mkdir build``
 
-**3.**  `` cd build`` and run ``cmake cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G Xcode ..`` 
+**3.**  `` cd build`` and run ``cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G Xcode ..`` 
 
 ## Manual steps to configure the build targets:
 
@@ -66,6 +67,13 @@ Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
 
 * 	CoreFoundation.framework
 * 	IOKit.framework
+
+### Target: *jam.heliosinfo*
+Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
+
+* 	CoreFoundation.framework
+* 	IOKit.framework
+*  Security.framework
 
 ### Target: *jam.helios*
 Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:

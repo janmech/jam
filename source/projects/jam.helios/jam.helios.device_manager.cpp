@@ -8,7 +8,9 @@
 #include "./jam.helios.device_manager.hpp"
 
 namespace jam::helios {
-    
+    HeliosDac * DeviceManager::getDac() {
+        return &this->_helios_dac;
+    };
     int DeviceManager::deviceScan() {
         this->_is_scanning = true;
         this->_helios_dac.CloseDevices();

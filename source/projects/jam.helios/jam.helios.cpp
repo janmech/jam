@@ -23,6 +23,8 @@
 
 using namespace c74::min;
 
+
+
 class helios : public object<helios>
 {
     
@@ -47,6 +49,8 @@ protected:
     } queued_message_t;
     
     std::thread _device_scan_thread;
+    std::thread _projector_thread;
+    bool _projector_in_running = false;
     fifo<queued_message_t> _to_max_queue_2{ 1000 };
     std::mutex _enqueue_msg_lock;
     jam::helios::DeviceManager& _deviceManager = jam::helios::DeviceManager::get();
@@ -62,6 +66,46 @@ protected:
         bool result = this->_to_max_queue_2.try_dequeue(msg_data);
         _enqueue_msg_lock.unlock();
         return result;
+    }
+    
+    std::string heliosErrorToString(int error) {
+        
+        switch (error) {
+            case HELIOS_SUCCESS:
+                return "HELIOS_SUCCESS";
+            case HELIOS_ERROR_NOT_INITIALIZED:
+                return "HELIOS_ERROR_NOT_INITIALIZED";
+            case HELIOS_ERROR_INVALID_DEVNUM:
+                return "HELIOS_ERROR_INVALID_DEVNUM";
+            case HELIOS_ERROR_NULL_POINTS:
+                return "HELIOS_ERROR_NULL_POINTS";
+            case HELIOS_ERROR_TOO_MANY_POINTS:
+                return "HELIOS_ERROR_TOO_MANY_POINTS";
+            case HELIOS_ERROR_PPS_TOO_HIGH:
+                return "HELIOS_ERROR_PPS_TOO_HIGH";
+            case HELIOS_ERROR_PPS_TOO_LOW:
+                return "HELIOS_ERROR_PPS_TOO_LOW";
+            case HELIOS_ERROR_DEVICE_CLOSED:
+                return "HELIOS_ERROR_PPS_TOO_LOW";
+            case HELIOS_ERROR_DEVICE_FRAME_READY:
+                return "HELIOS_ERROR_DEVICE_FRAME_READY";
+            case HELIOS_ERROR_DEVICE_SEND_CONTROL:
+                return "HELIOS_ERROR_DEVICE_SEND_CONTROL";
+            case HELIOS_ERROR_DEVICE_RESULT:
+                return "HELIOS_ERROR_DEVICE_RESULT";
+            case HELIOS_ERROR_DEVICE_NULL_BUFFER:
+                return "HELIOS_ERROR_DEVICE_NULL_BUFFER";
+            case HELIOS_ERROR_DEVICE_SIGNAL_TOO_LONG:
+                return "HELIOS_ERROR_DEVICE_SIGNAL_TOO_LONG";
+            case HELIOS_ERROR_NOT_SUPPORTED:
+                return "HELIOS_ERROR_NOT_SUPPORTED";
+            case HELIOS_ERROR_NETWORK:
+                return "HELIOS_ERROR_NETWORK";
+            case HELIOS_ERROR_LIBUSB_BASE:
+                return "HELIOS_ERROR_LIBUSB_BASE";
+            default:
+                return "UNKNOWN ERROR";
+        }
     }
     
 public:
@@ -88,8 +132,8 @@ public:
     outlet<> outlet_connected{ this, "(int) State of Connection", "int" };
     outlet<> outlet_dumpout{ this, "dumpout" };
     
-    attribute<bool> notifyothers{
-        this, "notifyothers", false,
+    attribute<bool> notifyothers {
+        this, "notifyothers", true,
         title{ "Notify others" },
         description{ "If set to 1 other jam.helios object will be notified if an  device scan has been exectued. The new result will update all umenus connected to the leftmost outlet. Default: 0" }
     };
@@ -101,6 +145,15 @@ public:
         title{ "Samplerate" },
         description{ "Points per second send to the laser projector.<br /><b>Note</b>:It is recommended to keep sampling rate at 30000 or below, as higher values can cause problems in certain devices like LaserCube Wifi." },
         range{ 1000, 100000 },
+    };
+    
+    attribute<int, threadsafe::no, limit::clamp> fps {
+        this,
+        "fps",
+        30000,
+        title{ "Frame Per Seconf" },
+        description{ "" },
+        range{ 1, 100 },
     };
     
     attribute<bool> invert_x {
@@ -193,7 +246,7 @@ public:
         MIN_FUNCTION{
             std::vector<jam::helios::device_info_t>* devs = this->_deviceManager.getOpenDevices();
             if (devs->size() == 0) {
-                cwarn << "No devices registered. Try re-scanning." << endl;
+                cwarn << "No devices connected." << endl;
             }
             for (jam::helios::device_info_t info : *devs) {
                 cout << "Device " << info.index + 1 << endl;
@@ -300,8 +353,162 @@ public:
         }
     };
     
+    message<threadsafe::no> integer {
+        this, "int", "Start scanning",
+        MIN_FUNCTION {
+            bool run = static_cast<int>(args[0]) != 0;
+            if(!run) {
+                this->_projector_in_running = false;
+                return {};
+            }
+            if(this->_projector_in_running) {
+                return {};
+            }
+            this->_projector_in_running = true;
+            
+            
+            this->_projector_thread = std::thread([this]() {
+                const int numPointsPerFrame = 1000;
+                
+                    //                HeliosDac * helios = _deviceManager.getDac();
+                HeliosDac * helios = new HeliosDac();
+                helios->CloseDevices();
+                int numDevs = helios->OpenDevices();
+                HeliosPointHighRes* frame =  new HeliosPointHighRes[numPointsPerFrame];
+                int x = 0;
+                int y = 0;
+                
+                int dist = 1000;
+                
+                
+                
+                y = 0xFFFF / 2;
+                for (int j = 0; j < numPointsPerFrame; j++) {
+                    x = 30000 + (0xFFFF / (numPointsPerFrame * 1))  * j;
+//                    cout << x << endl;
+                    frame[j].x = x;
+                    frame[j].y = y;
+                    frame[j].r = 0xFFFF;
+                    frame[j].g = 0xFFFF;
+                    frame[j].b = 0xFFFF;
+                }
+                
+                
+                int j = 0;
+                while (this->_projector_in_running) {
+                    int status = helios->GetStatus(j);
+                    if (status == 1) {
+                        int result = helios->WriteFrameHighResolution(j, (int)samplerate, HELIOS_FLAGS_START_IMMEDIATELY, frame, numPointsPerFrame);
+                        if(result != HELIOS_SUCCESS) {
+                            cerr << this->heliosErrorToString(result) << endl;
+                        }
+                        std::this_thread::sleep_for (std::chrono::milliseconds(1000 / (int)fps));
+                    }
+                }
+                delete[] frame;
+                helios->CloseDevices();
+                delete helios;
+            });
+            this->_projector_thread.detach();
+            return {};
+        }
+    };
+    
+        message<> test {
+            this, "test", "",
+            MIN_FUNCTION {
+                HeliosPointHighRes** frame = new HeliosPointHighRes*[30];
+                const int numPointsPerFrame = 1000;
+                const int pointsPerSecond = 30000;
+                int x = 0;
+                int y = 0;
+                for (int i = 0; i < 30; i++) {
+                    frame[i] = new HeliosPointHighRes[numPointsPerFrame];
+                    y = i * 0xFFFF / 30;
+                    for (int j = 0; j < numPointsPerFrame; j++) {
+                        if (j < (numPointsPerFrame/2))
+                            x = j * 0xFFFF / (numPointsPerFrame/2);
+                        else
+                            x = 0xFFFF - ((j - (numPointsPerFrame / 2)) * 0xFFFF / (numPointsPerFrame / 2));
+
+                        frame[i][j].x = x;
+                        frame[i][j].y = y;
+                        frame[i][j].r = 0xD0FF;
+                        frame[i][j].g = 0xFFFF;
+                        frame[i][j].b = 0xD0FF;
+                            //frame[i][j].user1 = 0; // Use HeliosPointExt with WriteFrameExtended() if you need more channels
+                            //frame[i][j].user2 = 10;
+                            //frame[i][j].user3 = 20;
+                            //frame[i][j].user4 = 30;
+                            //frame[i][j].i = 0xFFFF;
+                        }
+                    }
+
+                    // Connect to DACs and output frames
+                    // First scan for connected devices and open the connection(s).
+                HeliosDac helios;
+                int numDevs = helios.OpenDevices();
+
+                if (numDevs <= 0) {
+                    cout << "No DACs found." << endl;
+                    return {};
+                    }
+                cout << "Found " << numDevs << " DACs:" <<endl;
+                for (int j = 0; j < numDevs; j++) {
+                    char name[32];
+                    if (helios.GetName(j, name) == HELIOS_SUCCESS)
+                        cout << "  - " << name << " USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
+                    else
+                        cout << "  - (unknown dac)  USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
+                    }
+                cout << "Outputting animation..." << endl;
+
+                int i = 0;
+                while (1) {
+                    i++;
+                    if (i > 200)
+                        {
+                        break;
+                        }
+
+
+                        // Send each frame to the DAC.
+                    for (int j = 0; j < numDevs; j++) {
+                            // Wait for ready status. You must call GetStatus() until it returns 1 before each and every WriteFrame*() call that you do.
+                        for (unsigned int k = 0; k < 1024; k++)
+                            {
+                            int status = helios.GetStatus(j);
+                            if (status == 1)
+                                {
+//                            helios.WriteFrameHighResolution(j, pointsPerSecond, HELIOS_FLAGS_DEFAULT, frame[i % 30], numPointsPerFrame);
+                                helios.WriteFrameHighResolution(j, (int)samplerate, HELIOS_FLAGS_DEFAULT, frame[15], numPointsPerFrame);
+                                break;
+                                }
+                            else if (status < 0)
+                                {
+                                cout << "Error when polling status for device" << j <<":" << status << endl;
+                                break;
+                                }
+                            }
+                            // In this loop, timing is handled by the GetStatus polling, which only returns 1 once there is room in the DAC to send the next frame.
+                            // You need to call WriteFrame*() in time (before the previously written frame finished playing), to not let the buffers in the DAC underrun.
+                            // You should also make frames large enough to account for transfer overheads and timing jitter. Frames should be 10 milliseconds or longer on average, generally speaking.
+                        }
+                    }
+
+                    // Freeing connection when we're done
+                helios.CloseDevices();
+                for (int i = 0; i < 30; i++) {
+                    delete frame[i];
+                }
+                delete[] frame;
+
+                return {};
+            }
+        };
+    
     timer<> deliverer_to_max {
-        this, MIN_FUNCTION{
+        this, MIN_FUNCTION {
             queued_message_t queue_msg;
             
             while (_dequeue_msg_to_max(queue_msg)) {
