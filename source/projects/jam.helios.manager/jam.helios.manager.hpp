@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 #include <mutex>
+#include "../jam.helios.connector/jam.helios.connector.hpp"
 
 
 
@@ -12,10 +13,9 @@
 
 typedef struct _jam_hm
 {
-    std::mutex _file_access_lock;
     c74::max::t_object s_obj;     // t_object
+    jam::helios::Connector * _connector = nullptr;
     
-
 } t_jam_hm;
 #endif
 

@@ -44,6 +44,7 @@
 #define TO_MAX_CONSOLE                       0xFF
 #define RESPONSE_TIMEOUT                     250
 
+// TODO: this should be in namespace jam::dmx
 class Connector {
 
     typedef struct {

@@ -75,6 +75,13 @@ Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
 * 	IOKit.framework
 *  Security.framework
 
+### Target: *jam.helios.manager*
+Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
+
+* 	CoreFoundation.framework
+* 	IOKit.framework
+*  Security.framework
+
 ### Target: *jam.helios*
 Select the tab *Build Phases*. In the section *Link Binary With Libraries* add:
 

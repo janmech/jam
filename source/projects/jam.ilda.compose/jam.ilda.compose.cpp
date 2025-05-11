@@ -47,7 +47,6 @@ using VecGlyphPoints = std::vector<jam::ttf::GlyphVertex>;
 
 
 
-    /// <#Description#>
 class ildacompose : public object<ildacompose>
 {
 

@@ -14,14 +14,11 @@
 #include <iostream>
 #include <string>
 #include "c74_min.h"
-#include "helios-sdk/cpp/HeliosDac.h"
-#include "helios-sdk/cpp/libusb.h"
-#include "jam.helios.device_manager.hpp"
+#include "../jam.helios.connector/jam.helios.connector.hpp"
 
-#define OBJECT_VERSION "jam.helios v.0.0.0"
-#define HELIOS_FILE_CHUNK 1024
 
 using namespace c74::min;
+using HeliosConnector = jam::helios::Connector;
 
 
 
@@ -53,7 +50,17 @@ protected:
     bool _projector_in_running = false;
     fifo<queued_message_t> _to_max_queue_2{ 1000 };
     std::mutex _enqueue_msg_lock;
-    jam::helios::DeviceManager& _deviceManager = jam::helios::DeviceManager::get();
+    
+    c74::max::t_object * _manager = nullptr;
+    
+    HeliosConnector * _connector = nullptr;
+    
+    HeliosConnector * _getConnector() {
+        if(this->_connector == nullptr) {
+            this->_connector = (HeliosConnector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
+        }
+        return this->_connector;
+    }
     
     void _enqueue_msg_to_max(const queued_message_t& msg_to_max) {
         _enqueue_msg_lock.lock();
@@ -111,13 +118,14 @@ protected:
 public:
     helios(const atoms& args = {}) {
         if (!dummy()) {
-            this->_deviceManager.addObjInstance(this->maxobj());
+            this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.helios.manager"), 0, NULL);
+            this->_connector = (HeliosConnector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
         }
     }
     
     ~helios() {
         if (!dummy()) {
-            this->_deviceManager.removeObjInstance(this->maxobj());
+            
         }
     }
     
@@ -173,13 +181,13 @@ public:
         this, "menu", "Get list of connected devices and build menu from it.",
         MIN_FUNCTION{
             this->close();
-            if (this->_deviceManager.getOpenDevices()->size() == 0) {
+            if (this->_getConnector()->getOpenDevices()->size() == 0) {
                 cwarn << "No devices registered. Try re-scanning." << endl;
             }
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'menu'" << endl;
             }
-            std::vector<jam::helios::device_info_t>* open_devices = this->_deviceManager.getOpenDevices();
+            std::vector<jam::helios::device_info_t>* open_devices = this->_getConnector()->getOpenDevices();
             atoms msg_atoms;
             msg_atoms.push_back("clear");
             queued_message_t msg;
@@ -210,7 +218,7 @@ public:
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'menu'" << endl;
             }
-            if (this->_deviceManager.isScanning()) {
+            if (this->_getConnector()->isScanning()) {
                 cwarn << "scan already in progress" << endl;
                 return {};
             }
@@ -219,7 +227,7 @@ public:
                 auto b = this->box();
                 number current_progress{ -1. };
                 b("startprogress", &current_progress);
-                int numDevs = this->_deviceManager.deviceScan();
+                int numDevs = this->_getConnector()->deviceScan();
                 atoms scan_result;
                 scan_result.clear();
                 scan_result.push_back(atom("devicescan"));
@@ -228,12 +236,8 @@ public:
                 msg.set(&outlet_dumpout, scan_result);
                 msg.send(this);
                 b("stopprogress");
-                if (notifyothers) {
-                    this->_deviceManager.notifyInstances();
-                }
-                else {
-                    menu();
-                }
+                menu();
+        
             });
             this->_device_scan_thread.detach();
             
@@ -244,7 +248,7 @@ public:
     message<> deviceinfo {
         this, "deviceinfo", "Print infomation about Helios DAC devices to the Max console.",
         MIN_FUNCTION{
-            std::vector<jam::helios::device_info_t>* devs = this->_deviceManager.getOpenDevices();
+            std::vector<jam::helios::device_info_t>* devs = this->_getConnector()->getOpenDevices();
             if (devs->size() == 0) {
                 cwarn << "No devices connected." << endl;
             }
@@ -252,7 +256,7 @@ public:
                 cout << "Device " << info.index + 1 << endl;
                 cout << "    Name: " << info.name << endl;
                 ;
-                cout << "    Type: " << this->_deviceManager.getTypeName(info.type) << endl;
+                cout << "    Type: " << this->_getConnector()->getTypeName(info.type) << endl;
                 ;
                 cout << "    Firmware: " << info.firmware << endl;
             }
@@ -263,62 +267,62 @@ public:
     message<> open {
         this, "open", "Open connetion to a Helios DAC",
         MIN_FUNCTION{
-            if (args.size() == 0){
-                cwarn << "missing argument for message open" << endl;
-                return {};
-            }
-            if (args.size() > 1) {
-                cwarn << "extra argument for message open" << endl;
-            }
-            
-            atom device_id = args[0];
-            std::string dev_name = "";
-            int dev_index = 0;
-            bool id_is_name = false;
-            if (device_id.a_type == c74::max::A_SYM) {
-                dev_name = (std::string)device_id;
-                id_is_name = true;
-            }
-            else {
-                dev_index = (int)device_id;
-                    // Publicly displayed device indices start with 1, internal inidices with 0. We need to take that into account.
-                if (dev_index < 1) {
-                    cwarn << "device not found" << endl;
-                    return {};
-                }
-                dev_index--;
-            }
-            
-            queued_message_t msg;
-            atoms msg_atoms;
-            auto result = jam::helios::DeviceState::NOTFOUND;
-            
-            if (id_is_name) {
-                result = this->_deviceManager.attachDeviceToInstance(dev_name, this->maxobj());
-            }
-            else {
-                result = this->_deviceManager.attachDeviceToInstance(dev_index, this->maxobj());
-            }
-            switch (result) {
-                case jam::helios::DeviceState::ATTACHED_ERROR_ALREADY_ATTACHED:
-                    cwarn << "device already opened by other instance" << endl;
-                    break;
-                case jam::helios::DeviceState::NOTFOUND:
-                    cwarn << "device not found" << endl;
-                    break;
-                case jam::helios::DeviceState::ATTACHED_SUCCESS:
-                    break;
-                default:
-                    cwarn << "error not opening device" << endl;
-            }
-            if (result != jam::helios::DeviceState::ATTACHED_SUCCESS) {
-                msg_atoms.push_back(0);
-            }
-            else {
-                msg_atoms.push_back(1);
-            }
-            msg.set(&outlet_connected, msg_atoms);
-            msg.send(this);
+//            if (args.size() == 0){
+//                cwarn << "missing argument for message open" << endl;
+//                return {};
+//            }
+//            if (args.size() > 1) {
+//                cwarn << "extra argument for message open" << endl;
+//            }
+//            
+//            atom device_id = args[0];
+//            std::string dev_name = "";
+//            int dev_index = 0;
+//            bool id_is_name = false;
+//            if (device_id.a_type == c74::max::A_SYM) {
+//                dev_name = (std::string)device_id;
+//                id_is_name = true;
+//            }
+//            else {
+//                dev_index = (int)device_id;
+//                    // Publicly displayed device indices start with 1, internal inidices with 0. We need to take that into account.
+//                if (dev_index < 1) {
+//                    cwarn << "device not found" << endl;
+//                    return {};
+//                }
+//                dev_index--;
+//            }
+//            
+//            queued_message_t msg;
+//            atoms msg_atoms;
+//            auto result = jam::helios::DeviceState::NOTFOUND;
+//            
+//            if (id_is_name) {
+//                result = this->_deviceManager.attachDeviceToInstance(dev_name, this->maxobj());
+//            }
+//            else {
+//                result = this->_deviceManager.attachDeviceToInstance(dev_index, this->maxobj());
+//            }
+//            switch (result) {
+//                case jam::helios::DeviceState::ATTACHED_ERROR_ALREADY_ATTACHED:
+//                    cwarn << "device already opened by other instance" << endl;
+//                    break;
+//                case jam::helios::DeviceState::NOTFOUND:
+//                    cwarn << "device not found" << endl;
+//                    break;
+//                case jam::helios::DeviceState::ATTACHED_SUCCESS:
+//                    break;
+//                default:
+//                    cwarn << "error not opening device" << endl;
+//            }
+//            if (result != jam::helios::DeviceState::ATTACHED_SUCCESS) {
+//                msg_atoms.push_back(0);
+//            }
+//            else {
+//                msg_atoms.push_back(1);
+//            }
+//            msg.set(&outlet_connected, msg_atoms);
+//            msg.send(this);
             return {};
         }
     };
@@ -326,29 +330,29 @@ public:
     message<> close {
         this, "close", "Close connetion to Helios DAC",
         MIN_FUNCTION{
-            this->_deviceManager.detachDeviceFromInstance(this->maxobj());
-            queued_message_t msg;
-            atoms msg_atoms;
-            msg_atoms.push_back(0);
-            msg.set(&outlet_connected, msg_atoms);
-            msg.send(this);
-            return {};
+//            this->_deviceManager.detachDeviceFromInstance(this->maxobj());
+//            queued_message_t msg;
+//            atoms msg_atoms;
+//            msg_atoms.push_back(0);
+//            msg.set(&outlet_connected, msg_atoms);
+//            msg.send(this);
+//            return {};
         }
     };
     
     message<> shutter {
         this, "shutter", "Open/Close the shutter. <p><b>Argument:</b><br /> shutter_state [int]</p>",
         MIN_FUNCTION{
-            if (args.size() < 1){
-                cwarn << "missing argument for message shutter" << endl;
-                return {};
-            }
-            if (args.size() > 1) {
-                cwarn << "extra argument for message shutter" << endl;
-            }
-            int shutter_state_int = (int)args[0];
-            bool shutter_state = shutter_state_int = !0;
-            this->_deviceManager.setShutter(this->maxobj(), shutter_state);
+//            if (args.size() < 1){
+//                cwarn << "missing argument for message shutter" << endl;
+//                return {};
+//            }
+//            if (args.size() > 1) {
+//                cwarn << "extra argument for message shutter" << endl;
+//            }
+//            int shutter_state_int = (int)args[0];
+//            bool shutter_state = shutter_state_int = !0;
+//            this->_deviceManager.setShutter(this->maxobj(), shutter_state);
             return {};
         }
     };
@@ -414,98 +418,99 @@ public:
         }
     };
     
-        message<> test {
-            this, "test", "",
-            MIN_FUNCTION {
-                HeliosPointHighRes** frame = new HeliosPointHighRes*[30];
-                const int numPointsPerFrame = 1000;
-                const int pointsPerSecond = 30000;
-                int x = 0;
-                int y = 0;
-                for (int i = 0; i < 30; i++) {
-                    frame[i] = new HeliosPointHighRes[numPointsPerFrame];
-                    y = i * 0xFFFF / 30;
-                    for (int j = 0; j < numPointsPerFrame; j++) {
-                        if (j < (numPointsPerFrame/2))
-                            x = j * 0xFFFF / (numPointsPerFrame/2);
-                        else
-                            x = 0xFFFF - ((j - (numPointsPerFrame / 2)) * 0xFFFF / (numPointsPerFrame / 2));
-
-                        frame[i][j].x = x;
-                        frame[i][j].y = y;
-                        frame[i][j].r = 0xD0FF;
-                        frame[i][j].g = 0xFFFF;
-                        frame[i][j].b = 0xD0FF;
-                            //frame[i][j].user1 = 0; // Use HeliosPointExt with WriteFrameExtended() if you need more channels
-                            //frame[i][j].user2 = 10;
-                            //frame[i][j].user3 = 20;
-                            //frame[i][j].user4 = 30;
-                            //frame[i][j].i = 0xFFFF;
-                        }
-                    }
-
-                    // Connect to DACs and output frames
-                    // First scan for connected devices and open the connection(s).
-                HeliosDac helios;
-                int numDevs = helios.OpenDevices();
-
-                if (numDevs <= 0) {
-                    cout << "No DACs found." << endl;
-                    return {};
-                    }
-                cout << "Found " << numDevs << " DACs:" <<endl;
-                for (int j = 0; j < numDevs; j++) {
-                    char name[32];
-                    if (helios.GetName(j, name) == HELIOS_SUCCESS)
-                        cout << "  - " << name << " USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
+    message<> test {
+        this, "test", "",
+        MIN_FUNCTION {
+            HeliosPointHighRes** frame = new HeliosPointHighRes*[30];
+            const int numPointsPerFrame = 1000;
+            const int pointsPerSecond = 30000;
+            int x = 0;
+            int y = 0;
+            for (int i = 0; i < 30; i++) {
+                frame[i] = new HeliosPointHighRes[numPointsPerFrame];
+                y = i * 0xFFFF / 30;
+                for (int j = 0; j < numPointsPerFrame; j++) {
+                    if (j < (numPointsPerFrame/2))
+                        x = j * 0xFFFF / (numPointsPerFrame/2);
                     else
-                        cout << "  - (unknown dac)  USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
-                    }
-                cout << "Outputting animation..." << endl;
-
-                int i = 0;
-                while (1) {
-                    i++;
-                    if (i > 200)
-                        {
-                        break;
-                        }
-
-
-                        // Send each frame to the DAC.
-                    for (int j = 0; j < numDevs; j++) {
-                            // Wait for ready status. You must call GetStatus() until it returns 1 before each and every WriteFrame*() call that you do.
-                        for (unsigned int k = 0; k < 1024; k++)
-                            {
-                            int status = helios.GetStatus(j);
-                            if (status == 1)
-                                {
-//                            helios.WriteFrameHighResolution(j, pointsPerSecond, HELIOS_FLAGS_DEFAULT, frame[i % 30], numPointsPerFrame);
-                                helios.WriteFrameHighResolution(j, (int)samplerate, HELIOS_FLAGS_DEFAULT, frame[15], numPointsPerFrame);
-                                break;
-                                }
-                            else if (status < 0)
-                                {
-                                cout << "Error when polling status for device" << j <<":" << status << endl;
-                                break;
-                                }
-                            }
-                            // In this loop, timing is handled by the GetStatus polling, which only returns 1 once there is room in the DAC to send the next frame.
-                            // You need to call WriteFrame*() in time (before the previously written frame finished playing), to not let the buffers in the DAC underrun.
-                            // You should also make frames large enough to account for transfer overheads and timing jitter. Frames should be 10 milliseconds or longer on average, generally speaking.
-                        }
-                    }
-
-                    // Freeing connection when we're done
-                helios.CloseDevices();
-                for (int i = 0; i < 30; i++) {
-                    delete frame[i];
+                        x = 0xFFFF - ((j - (numPointsPerFrame / 2)) * 0xFFFF / (numPointsPerFrame / 2));
+                    
+                    frame[i][j].x = x;
+                    frame[i][j].y = y;
+                    frame[i][j].r = 0xD0FF;
+                    frame[i][j].g = 0xFFFF;
+                    frame[i][j].b = 0xD0FF;
+                        //frame[i][j].user1 = 0; // Use HeliosPointExt with WriteFrameExtended() if you need more channels
+                        //frame[i][j].user2 = 10;
+                        //frame[i][j].user3 = 20;
+                        //frame[i][j].user4 = 30;
+                        //frame[i][j].i = 0xFFFF;
                 }
-                delete[] frame;
-
+            }
+            
+                // Connect to DACs and output frames
+                // First scan for connected devices and open the connection(s).
+            HeliosDac helios;
+            int numDevs = helios.OpenDevices();
+            
+            if (numDevs <= 0) {
+                cout << "No DACs found." << endl;
                 return {};
             }
-        };
+            cout << "Found " << numDevs << " DACs:" <<endl;
+            for (int j = 0; j < numDevs; j++) {
+                char name[32];
+                if (helios.GetName(j, name) == HELIOS_SUCCESS)
+                    cout << "  - " << name << " USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
+                else
+                    cout << "  - (unknown dac)  USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
+            }
+            cout << "Outputting animation..." << endl;
+            
+            int i = 0;
+            while (1) {
+                i++;
+                if (i > 200)
+                    {
+                    break;
+                    }
+                
+                
+                    // Send each frame to the DAC.
+                for (int j = 0; j < numDevs; j++) {
+                        // Wait for ready status. You must call GetStatus() until it returns 1 before each and every WriteFrame*() call that you do.
+                    for (unsigned int k = 0; k < 1024; k++)
+                        {
+                        int status = helios.GetStatus(j);
+                        if (status == 1)
+                            {
+                                //                            helios.WriteFrameHighResolution(j, pointsPerSecond, HELIOS_FLAGS_DEFAULT, frame[i % 30], numPointsPerFrame);
+                            helios.WriteFrameHighResolution(j, (int)samplerate, HELIOS_FLAGS_DEFAULT, frame[15], numPointsPerFrame);
+                            break;
+                            }
+                        else if (status < 0)
+                            {
+                            cout << "Error when polling status for device" << j <<":" << status << endl;
+                            break;
+                            }
+                        }
+                        // In this loop, timing is handled by the GetStatus polling, which only returns 1 once there is room in the DAC to send the next frame.
+                        // You need to call WriteFrame*() in time (before the previously written frame finished playing), to not let the buffers in the DAC underrun.
+                        // You should also make frames large enough to account for transfer overheads and timing jitter. Frames should be 10 milliseconds or longer on average, generally speaking.
+                }
+            }
+            
+                // Freeing connection when we're done
+            helios.CloseDevices();
+            for (int i = 0; i < 30; i++) {
+                delete frame[i];
+            }
+            delete[] frame;
+            
+            return {};
+        }
+    };
+    
     
     timer<> deliverer_to_max {
         this, MIN_FUNCTION {
