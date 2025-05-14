@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <map>
 #include "helios-sdk/cpp/HeliosDac.h"
 #include "helios-sdk/cpp/libusb.h"
 #include "c74_min_api.h"
@@ -16,9 +16,9 @@ namespace jam::helios {
     };
     
     enum DeviceState {
-        ATTACHED_ERROR_ALREADY_ATTACHED = -2,
+        ATTACH_ERROR_ALREADY_ATTACHED = -2,
         NOTFOUND = -1,
-        ATTACHED_SUCCESS = 0,
+        ATTACH_SUCCESS = 0,
     };
     
     typedef struct DeviceInfo {
@@ -31,9 +31,9 @@ namespace jam::helios {
     
     class Connector {
         
-        
     public:
         Connector(const Connector&) = delete;
+        
         ~Connector() {
             delete _open_devices;
         }
@@ -44,17 +44,32 @@ namespace jam::helios {
         }
         
         int deviceScan();
+        
         bool isScanning();
+        
         std::vector<device_info_t> * getOpenDevices();
+        
         std::string getTypeName(DacType type);
+        
         bool getDeviceByIndex(int index, device_info_t * device_info);
+        
+        DeviceState attachDevice(int device_index, uint instance_id);
+        
+        void detachDevice(uint instance_id);
+        
+        
         
         
     protected:
         bool _is_scanning = false;
+        
         HeliosDac _helios_dac;
+        
         std::mutex _open_dev_lock;
+        
         std::vector<device_info_t> *_open_devices;
+        
+        std::map<int, uint> _attached_devices = {};
         
     private:
         Connector() {

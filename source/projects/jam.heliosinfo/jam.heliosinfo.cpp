@@ -66,6 +66,29 @@ protected:
         return this->_connector;
     }
     
+    void _makeMenu() {
+        std::vector<jam::helios::device_info_t>* open_devices = this->_getConnector()->getOpenDevices();
+        atoms msg_atoms;
+        msg_atoms.push_back("clear");
+        queued_message_t msg;
+        msg.set(&outlet_menu, msg_atoms);
+        msg.send(this);
+        
+        msg_atoms.clear();
+        msg_atoms.push_back("append");
+        msg_atoms.push_back("(Select Interface)");
+        msg.setAtoms(msg_atoms);
+        msg.send(this);
+        
+        msg_atoms.clear();
+        for (size_t i = 0; i < open_devices->size(); i++) {
+            msg_atoms.push_back("append");
+            msg_atoms.push_back((*open_devices)[i].name);
+            msg.setAtoms(msg_atoms);
+            msg.send(this);
+        }
+    }
+    
     
     
 public:
@@ -115,7 +138,7 @@ public:
                 msg.set(&outlet_dumpout, scan_result);
                 msg.send(this);
                 b("stopprogress");
-                menu();
+                this->_makeMenu();
             });
             this->_device_scan_thread.detach();
             
@@ -133,26 +156,7 @@ public:
             if (args.size() > 1) {
                 cwarn << "extra argument for message 'menu'" << endl;
             }
-            std::vector<jam::helios::device_info_t>* open_devices = this->_getConnector()->getOpenDevices();
-            atoms msg_atoms;
-            msg_atoms.push_back("clear");
-            queued_message_t msg;
-            msg.set(&outlet_menu, msg_atoms);
-            msg.send(this);
-            
-            msg_atoms.clear();
-            msg_atoms.push_back("append");
-            msg_atoms.push_back("(Select Interface)");
-            msg.setAtoms(msg_atoms);
-            msg.send(this);
-            
-            msg_atoms.clear();
-            for (size_t i = 0; i < open_devices->size(); i++) {
-                msg_atoms.push_back("append");
-                msg_atoms.push_back((*open_devices)[i].name);
-                msg.setAtoms(msg_atoms);
-                msg.send(this);
-            }
+            this->_makeMenu();
             return {};
         }
     };

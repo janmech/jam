@@ -26,6 +26,8 @@ class helios : public object<helios>
 {
     
 protected:
+    uint _instance_id = 0;                  // Unique ID for each object instance.
+    
     typedef struct QuededMessage {
         outlet<>* out;
         atoms msg_atoms;
@@ -45,10 +47,16 @@ protected:
         }
     } queued_message_t;
     
+    int _attached_device = -1;
+    
     std::thread _device_scan_thread;
+    
     std::thread _projector_thread;
+    
     bool _projector_in_running = false;
+    
     fifo<queued_message_t> _to_max_queue_2{ 1000 };
+    
     std::mutex _enqueue_msg_lock;
     
     c74::max::t_object * _manager = nullptr;
@@ -115,11 +123,19 @@ protected:
         }
     }
     
+    uint getInstanceId() {
+        return this->_instance_id;
+    }
+    
 public:
     helios(const atoms& args = {}) {
         if (!dummy()) {
             this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.helios.manager"), 0, NULL);
             this->_connector = (HeliosConnector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
+            struct timespec ts;
+            clock_gettime(CLOCK_REALTIME, &ts);
+            srand((unsigned int)ts.tv_nsec);
+            this->_instance_id = rand();
         }
     }
     
@@ -176,167 +192,68 @@ public:
         description{ "Invert the output of the Y-axis (vertically)" }
     };
     
-    message<> menu {
-        
-        this, "menu", "Get list of connected devices and build menu from it.",
-        MIN_FUNCTION{
-            this->close();
-            if (this->_getConnector()->getOpenDevices()->size() == 0) {
-                cwarn << "No devices registered. Try re-scanning." << endl;
-            }
-            if (args.size() > 1) {
-                cwarn << "extra argument for message 'menu'" << endl;
-            }
-            std::vector<jam::helios::device_info_t>* open_devices = this->_getConnector()->getOpenDevices();
-            atoms msg_atoms;
-            msg_atoms.push_back("clear");
-            queued_message_t msg;
-            msg.set(&outlet_menu, msg_atoms);
-            msg.send(this);
-            
-            msg_atoms.clear();
-            msg_atoms.push_back("append");
-            msg_atoms.push_back("(Select Interface)");
-            msg.setAtoms(msg_atoms);
-            msg.send(this);
-            
-            msg_atoms.clear();
-            for (size_t i = 0; i < open_devices->size(); i++) {
-                msg_atoms.push_back("append");
-                msg_atoms.push_back((*open_devices)[i].name);
-                msg.setAtoms(msg_atoms);
-                msg.send(this);
-            }
-            return {};
-        }
-    };
     
-    message<> devicescan {
-        this, "devicescan", "Scan for connected Helios DACs.",
-        MIN_FUNCTION{
-            this->close();
-            if (args.size() > 1) {
-                cwarn << "extra argument for message 'menu'" << endl;
-            }
-            if (this->_getConnector()->isScanning()) {
-                cwarn << "scan already in progress" << endl;
-                return {};
-            }
-            
-            this->_device_scan_thread = std::thread([this]() {
-                auto b = this->box();
-                number current_progress{ -1. };
-                b("startprogress", &current_progress);
-                int numDevs = this->_getConnector()->deviceScan();
-                atoms scan_result;
-                scan_result.clear();
-                scan_result.push_back(atom("devicescan"));
-                scan_result.push_back(atom(numDevs));
-                queued_message_t msg;
-                msg.set(&outlet_dumpout, scan_result);
-                msg.send(this);
-                b("stopprogress");
-                menu();
-        
-            });
-            this->_device_scan_thread.detach();
-            
-            return {};
-        }
-    };
     
-    message<> deviceinfo {
-        this, "deviceinfo", "Print infomation about Helios DAC devices to the Max console.",
-        MIN_FUNCTION{
-            std::vector<jam::helios::device_info_t>* devs = this->_getConnector()->getOpenDevices();
-            if (devs->size() == 0) {
-                cwarn << "No devices connected." << endl;
-            }
-            for (jam::helios::device_info_t info : *devs) {
-                cout << "Device " << info.index + 1 << endl;
-                cout << "    Name: " << info.name << endl;
-                ;
-                cout << "    Type: " << this->_getConnector()->getTypeName(info.type) << endl;
-                ;
-                cout << "    Firmware: " << info.firmware << endl;
-            }
-            return {};
-        }
-    };
     
     message<> open {
         this, "open", "Open connetion to a Helios DAC",
         MIN_FUNCTION{
-//            if (args.size() == 0){
-//                cwarn << "missing argument for message open" << endl;
-//                return {};
-//            }
-//            if (args.size() > 1) {
-//                cwarn << "extra argument for message open" << endl;
-//            }
-//            
-//            atom device_id = args[0];
-//            std::string dev_name = "";
-//            int dev_index = 0;
-//            bool id_is_name = false;
-//            if (device_id.a_type == c74::max::A_SYM) {
-//                dev_name = (std::string)device_id;
-//                id_is_name = true;
-//            }
-//            else {
-//                dev_index = (int)device_id;
-//                    // Publicly displayed device indices start with 1, internal inidices with 0. We need to take that into account.
-//                if (dev_index < 1) {
-//                    cwarn << "device not found" << endl;
-//                    return {};
-//                }
-//                dev_index--;
-//            }
-//            
-//            queued_message_t msg;
-//            atoms msg_atoms;
-//            auto result = jam::helios::DeviceState::NOTFOUND;
-//            
-//            if (id_is_name) {
-//                result = this->_deviceManager.attachDeviceToInstance(dev_name, this->maxobj());
-//            }
-//            else {
-//                result = this->_deviceManager.attachDeviceToInstance(dev_index, this->maxobj());
-//            }
-//            switch (result) {
-//                case jam::helios::DeviceState::ATTACHED_ERROR_ALREADY_ATTACHED:
-//                    cwarn << "device already opened by other instance" << endl;
-//                    break;
-//                case jam::helios::DeviceState::NOTFOUND:
-//                    cwarn << "device not found" << endl;
-//                    break;
-//                case jam::helios::DeviceState::ATTACHED_SUCCESS:
-//                    break;
-//                default:
-//                    cwarn << "error not opening device" << endl;
-//            }
-//            if (result != jam::helios::DeviceState::ATTACHED_SUCCESS) {
-//                msg_atoms.push_back(0);
-//            }
-//            else {
-//                msg_atoms.push_back(1);
-//            }
-//            msg.set(&outlet_connected, msg_atoms);
-//            msg.send(this);
+            if (args.size() == 0){
+                return {};
+            }
+    
+            
+            if(args[0].type() != message_type::int_argument && args[0].type() != message_type::float_argument) {
+                return {};
+            }
+            int device_index = args[0];
+            if(device_index < 1) {
+                return {};
+            }
+            
+            device_index--;
+            
+            auto result = this->_getConnector()->attachDevice(device_index, this->getInstanceId());
+            
+            bool connection_state = false;
+            switch(result) {
+                case jam::helios::DeviceState::ATTACH_SUCCESS:
+                    connection_state = true;
+                    this->_attached_device = device_index;
+                    break;
+                case jam::helios::DeviceState::NOTFOUND:
+                    cwarn << "device index " << device_index << " out of range" << endl;
+                    break;
+                case jam::helios::DeviceState::ATTACH_ERROR_ALREADY_ATTACHED:
+                    cwarn << "device " << device_index << " already opened by another instance" << endl;
+                    break;
+                default:
+                    break;
+            }
+
+            
+            queued_message_t msg;
+            atoms msg_atoms;
+            msg_atoms.push_back(connection_state);
+            msg.set(&outlet_connected, msg_atoms);
+            msg.send(this);
             return {};
         }
     };
     
     message<> close {
         this, "close", "Close connetion to Helios DAC",
-        MIN_FUNCTION{
-//            this->_deviceManager.detachDeviceFromInstance(this->maxobj());
-//            queued_message_t msg;
-//            atoms msg_atoms;
-//            msg_atoms.push_back(0);
-//            msg.set(&outlet_connected, msg_atoms);
-//            msg.send(this);
-//            return {};
+        MIN_FUNCTION {
+            if(this->_attached_device > -1) {
+                this->_getConnector()->detachDevice(this->getInstanceId());
+                this->_attached_device = -1;
+                queued_message_t msg;
+                atoms msg_atoms;
+                msg_atoms.push_back(0);
+                msg.set(&outlet_connected, msg_atoms);
+                msg.send(this);
+            }
+            return {};
         }
     };
     
