@@ -57,6 +57,8 @@ namespace jam::helios {
         
         void detachDevice(uint instance_id);
         
+        HeliosDac * getDac();
+        
         
         
         

@@ -14,18 +14,47 @@
 #include <iostream>
 #include <string>
 #include "c74_min.h"
+#include "../jam.helper/attribute_args_helper.hpp"
 #include "../jam.helios.connector/jam.helios.connector.hpp"
+
+#define POINTS_PER_FRAME 1000
+#define X_Y_MAX 65500
+#define X_Y_MIN 35
 
 
 using namespace c74::min;
 using HeliosConnector = jam::helios::Connector;
+using fvec = std::vector<number>;
 
+
+typedef struct LaserPoint {
+    uint16_t x = 32767; // 65535 (0xFFFF)  / 2
+    uint16_t y = 32767; // 65535 (0xFFFF)  / 2
+    bool blanking = false;
+} laser_point_t;
+
+typedef struct CoordPoint {
+    number x = 0.;
+    number y = 0.;
+} coord_point_t;
+
+using lpvec = std::vector<laser_point_t>;
 
 
 class helios : public object<helios>
 {
     
 protected:
+    
+    HeliosPointHighRes* frame_1 = nullptr;
+    HeliosPointHighRes* frame_2 = nullptr;
+    HeliosPointHighRes* frame_play = nullptr;
+    HeliosPointHighRes* frame_edit = nullptr;
+    
+    lpvec _frame_points;
+        
+    uint16_t _color[3] = {0xFFFF, 0xFFFF,0xFFFF};
+    
     uint _instance_id = 0;                  // Unique ID for each object instance.
     
     typedef struct QuededMessage {
@@ -48,8 +77,6 @@ protected:
     } queued_message_t;
     
     int _attached_device = -1;
-    
-    std::thread _device_scan_thread;
     
     std::thread _projector_thread;
     
@@ -127,6 +154,107 @@ protected:
         return this->_instance_id;
     }
     
+    void _fillFrame(HeliosPointHighRes * frame, lpvec lps) {
+        std::mutex lock;
+        lock.lock();
+        for (int i = 0; i < POINTS_PER_FRAME; i++) {
+            frame[i].x = lps[i].x;
+            frame[i].y = lps[i].y;
+            frame[i].r = lps[i].blanking ? 0 : this->_color[0];
+            frame[i].g = lps[i].blanking ? 0 : this->_color[1];
+            frame[i].b = lps[i].blanking ? 0 : this->_color[2];
+            
+        }
+        lock.unlock();
+    }
+    
+    void _drawFrame() {
+        std::mutex lock;
+        lock.lock();
+        HeliosPointHighRes* old_frame_play = this->frame_play;
+        this->frame_play = this->frame_edit;
+        this->frame_edit = old_frame_play;
+        lock.unlock();
+    }
+    
+    number _map(number x, number in_min, number in_max, number out_min, number out_max)
+    {
+      return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+    
+    number _toPrecision(number value, uint precision = 3) {
+        value = (int)(value * (10 * precision));
+        return (number)value / (10 * precision);
+    }
+    
+    laser_point_t _toLaserPoint(coord_point_t p) {
+        laser_point_t lp;
+        // from -1/1 to 0/0xFFFF (65535)
+        number x_mapped = this->_map(p.x, -1., 1., 0., 65535.);
+        number y_mapped = this->_map(p.y, -1., 1.,  0., 65535.);
+        lp.x = (uint16_t)x_mapped;
+        lp.y = (uint16_t)y_mapped;
+        return lp;
+        
+    };
+    
+    
+    lpvec _makeEllipsePoints(
+        coord_point_t c,
+        coord_point_t r,
+        const number theta_start = 0,
+        const number theta_end = 360,
+        int segments = 1000
+    ) {
+        lpvec points;
+        if(theta_start == theta_end) {
+            return points;
+        }
+        number rad_start = theta_start * (PI / 180.);
+        number rad_end = theta_end * (PI / 180.);
+        number rad_range = rad_end - rad_start;
+        
+        
+        for (int i = 0; i < segments; ++i) {
+            coord_point_t cp;
+           
+            number angle = rad_start + (rad_range * i / segments);
+            // number angle = rad_start + (number)(rad_range * (number)i / (number)segments);
+            cp.x = c.x + r.x * std::cos(angle);
+            cp.y = c.y + r.y * std::sin(angle);
+            
+            cp.x = std::clamp(cp.x, -1., 1.);
+            cp.y = std::clamp(cp.y, -1., 1.);
+            
+            laser_point_t lp = this->_toLaserPoint(cp);
+            bool visible = lp.x >= X_Y_MIN && lp.x <= X_Y_MAX && lp.y >= X_Y_MIN && lp.y <= X_Y_MAX;
+            lp.blanking = !visible;
+            points.push_back(lp);
+        }
+        points[segments - 1] = points[0];
+        return points;
+        
+    }
+    
+    lpvec _makeDotPoints(number x, number y) {
+        lpvec points;
+        number x_coord_prev = 0.;
+        for(int i = 0; i < POINTS_PER_FRAME; i++) {
+            coord_point_t cp;
+            cp.y = y;
+            number offset = (2. / (number)(POINTS_PER_FRAME) * (number)i);
+            number x_coord = -1. + offset;
+            cp.x = x_coord;
+            bool blanking = !(x >= x_coord_prev && x <= x_coord);
+            laser_point_t lp = this->_toLaserPoint(cp);
+            lp.blanking = blanking;
+            x_coord_prev = x_coord;
+            points.push_back(lp);
+        }
+        return points;
+    }
+ 
+    
 public:
     helios(const atoms& args = {}) {
         if (!dummy()) {
@@ -136,12 +264,24 @@ public:
             clock_gettime(CLOCK_REALTIME, &ts);
             srand((unsigned int)ts.tv_nsec);
             this->_instance_id = rand();
+            
+            this->frame_1 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+            this->frame_2 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+            laser_point_t lp{0, 0};
+            lpvec empty_frame{POINTS_PER_FRAME, lp};
+            this->_frame_points = empty_frame;
+            this->_fillFrame(this->frame_1, empty_frame);
+            this->_fillFrame(this->frame_2, empty_frame);
+            this->frame_play = this->frame_1;
+            this->frame_edit = this->frame_2;
         }
     }
     
     ~helios() {
         if (!dummy()) {
-            
+            close();
+//            delete[] this->frame_1;
+//            delete[] this->frame_2;
         }
     }
     
@@ -155,13 +295,7 @@ public:
     outlet<> outlet_menu{ this, "(anything) Connect to umenu", "message" };
     outlet<> outlet_connected{ this, "(int) State of Connection", "int" };
     outlet<> outlet_dumpout{ this, "dumpout" };
-    
-    attribute<bool> notifyothers {
-        this, "notifyothers", true,
-        title{ "Notify others" },
-        description{ "If set to 1 other jam.helios object will be notified if an  device scan has been exectued. The new result will update all umenus connected to the leftmost outlet. Default: 0" }
-    };
-    
+
     attribute<int, threadsafe::no, limit::clamp> samplerate {
         this,
         "samplerate",
@@ -174,10 +308,10 @@ public:
     attribute<int, threadsafe::no, limit::clamp> fps {
         this,
         "fps",
-        30000,
-        title{ "Frame Per Seconf" },
+        60,
+        title{ "Frame Per Second" },
         description{ "" },
-        range{ 1, 100 },
+        range{ 1, 200 },
     };
     
     attribute<bool> invert_x {
@@ -192,17 +326,33 @@ public:
         description{ "Invert the output of the Y-axis (vertically)" }
     };
     
+    attribute<fvec> lasercolor {
+        this, "lasercolor", { 1., 1, 1., 1.},
+        setter { MIN_FUNCTION {
+            atoms cleaned_args;
+            jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 4, 1.);
+            cleaned_args[3] = 1.;
+            this->_color[0] = static_cast<uint16_t>((number)cleaned_args[0] * (number)0xFFFF);
+            this->_color[1] = static_cast<uint16_t>((number)cleaned_args[1] * (number)0xFFFF);
+            this->_color[2] = static_cast<uint16_t>((number)cleaned_args[2] * (number)0xFFFF);
+            if(this->initialized()) {
+                this->_fillFrame(this->frame_edit, this->_frame_points);
+                this->_drawFrame();
+            }
+            return cleaned_args;
+        }},
+        title {"Laser Color"},
+        description {"Laser Color"},
+        style {c74::min::style::color},
+    };
     
-    
-    
+
     message<> open {
         this, "open", "Open connetion to a Helios DAC",
         MIN_FUNCTION{
             if (args.size() == 0){
                 return {};
             }
-    
-            
             if(args[0].type() != message_type::int_argument && args[0].type() != message_type::float_argument) {
                 return {};
             }
@@ -274,12 +424,55 @@ public:
         }
     };
     
+    message<threadsafe::no> dot {
+        this, "dot", "Project a dot at position x/y",
+        MIN_FUNCTION {
+            if(args.size() < 2) {
+                return {};
+            }
+            number x = std::clamp((number)args[0], -1., 1.);
+            number y = std::clamp((number)args[1], -1., 1.) * -1.;
+            this->_frame_points = this->_makeDotPoints(x, y);
+            this->_fillFrame(this->frame_edit, this->_frame_points);
+            this->_drawFrame();
+            return {};
+        }
+    };
+    
+    message<threadsafe::no> circle {
+        this, "circle", "Project a circle at position x/y with radus r",
+        MIN_FUNCTION {
+            if(args.size() < 2) {
+                return {};
+            }
+            number r = 0.3;
+            if (args.size() >= 3) {
+                r = std::clamp((number)args[2], 0., 1.);
+            }
+            number x = std::clamp((number)args[0], -1., 1.);
+            number y = std::clamp((number)args[1], -1., 1.) * -1.;
+            coord_point_t center = {x, y};
+            coord_point_t  radius = {r, r};
+            
+            this->_frame_points = this->_makeEllipsePoints(center, radius);
+            this->_fillFrame(this->frame_edit, this->_frame_points);
+            this->_drawFrame();
+            return {};
+        }
+    };
+    
+    
+    
     message<threadsafe::no> integer {
         this, "int", "Start scanning",
         MIN_FUNCTION {
+            if(this->_attached_device < 0) {
+                return {};
+            }
             bool run = static_cast<int>(args[0]) != 0;
             if(!run) {
                 this->_projector_in_running = false;
+                this->_getConnector()->getDac()->SetShutter(this->_attached_device, false);
                 return {};
             }
             if(this->_projector_in_running) {
@@ -287,147 +480,24 @@ public:
             }
             this->_projector_in_running = true;
             
-            
             this->_projector_thread = std::thread([this]() {
-                const int numPointsPerFrame = 1000;
-                
-                    //                HeliosDac * helios = _deviceManager.getDac();
-                HeliosDac * helios = new HeliosDac();
-                helios->CloseDevices();
-                int numDevs = helios->OpenDevices();
-                HeliosPointHighRes* frame =  new HeliosPointHighRes[numPointsPerFrame];
-                int x = 0;
-                int y = 0;
-                
-                int dist = 1000;
-                
-                
-                
-                y = 0xFFFF / 2;
-                for (int j = 0; j < numPointsPerFrame; j++) {
-                    x = 30000 + (0xFFFF / (numPointsPerFrame * 1))  * j;
-//                    cout << x << endl;
-                    frame[j].x = x;
-                    frame[j].y = y;
-                    frame[j].r = 0xFFFF;
-                    frame[j].g = 0xFFFF;
-                    frame[j].b = 0xFFFF;
-                }
-                
-                
-                int j = 0;
+                HeliosDac * helios = this->_getConnector()->getDac();
                 while (this->_projector_in_running) {
-                    int status = helios->GetStatus(j);
+                    int status = helios->GetStatus(this->_attached_device);
                     if (status == 1) {
-                        int result = helios->WriteFrameHighResolution(j, (int)samplerate, HELIOS_FLAGS_START_IMMEDIATELY, frame, numPointsPerFrame);
+                        int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, this->frame_play, POINTS_PER_FRAME);
                         if(result != HELIOS_SUCCESS) {
                             cerr << this->heliosErrorToString(result) << endl;
                         }
                         std::this_thread::sleep_for (std::chrono::milliseconds(1000 / (int)fps));
                     }
                 }
-                delete[] frame;
-                helios->CloseDevices();
-                delete helios;
+//                delete[] frame;
             });
             this->_projector_thread.detach();
             return {};
         }
     };
-    
-    message<> test {
-        this, "test", "",
-        MIN_FUNCTION {
-            HeliosPointHighRes** frame = new HeliosPointHighRes*[30];
-            const int numPointsPerFrame = 1000;
-            const int pointsPerSecond = 30000;
-            int x = 0;
-            int y = 0;
-            for (int i = 0; i < 30; i++) {
-                frame[i] = new HeliosPointHighRes[numPointsPerFrame];
-                y = i * 0xFFFF / 30;
-                for (int j = 0; j < numPointsPerFrame; j++) {
-                    if (j < (numPointsPerFrame/2))
-                        x = j * 0xFFFF / (numPointsPerFrame/2);
-                    else
-                        x = 0xFFFF - ((j - (numPointsPerFrame / 2)) * 0xFFFF / (numPointsPerFrame / 2));
-                    
-                    frame[i][j].x = x;
-                    frame[i][j].y = y;
-                    frame[i][j].r = 0xD0FF;
-                    frame[i][j].g = 0xFFFF;
-                    frame[i][j].b = 0xD0FF;
-                        //frame[i][j].user1 = 0; // Use HeliosPointExt with WriteFrameExtended() if you need more channels
-                        //frame[i][j].user2 = 10;
-                        //frame[i][j].user3 = 20;
-                        //frame[i][j].user4 = 30;
-                        //frame[i][j].i = 0xFFFF;
-                }
-            }
-            
-                // Connect to DACs and output frames
-                // First scan for connected devices and open the connection(s).
-            HeliosDac helios;
-            int numDevs = helios.OpenDevices();
-            
-            if (numDevs <= 0) {
-                cout << "No DACs found." << endl;
-                return {};
-            }
-            cout << "Found " << numDevs << " DACs:" <<endl;
-            for (int j = 0; j < numDevs; j++) {
-                char name[32];
-                if (helios.GetName(j, name) == HELIOS_SUCCESS)
-                    cout << "  - " << name << " USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
-                else
-                    cout << "  - (unknown dac)  USB?: " << helios.GetIsUsb(j) << " FW: " << helios.GetFirmwareVersion(j) << endl;
-            }
-            cout << "Outputting animation..." << endl;
-            
-            int i = 0;
-            while (1) {
-                i++;
-                if (i > 200)
-                    {
-                    break;
-                    }
-                
-                
-                    // Send each frame to the DAC.
-                for (int j = 0; j < numDevs; j++) {
-                        // Wait for ready status. You must call GetStatus() until it returns 1 before each and every WriteFrame*() call that you do.
-                    for (unsigned int k = 0; k < 1024; k++)
-                        {
-                        int status = helios.GetStatus(j);
-                        if (status == 1)
-                            {
-                                //                            helios.WriteFrameHighResolution(j, pointsPerSecond, HELIOS_FLAGS_DEFAULT, frame[i % 30], numPointsPerFrame);
-                            helios.WriteFrameHighResolution(j, (int)samplerate, HELIOS_FLAGS_DEFAULT, frame[15], numPointsPerFrame);
-                            break;
-                            }
-                        else if (status < 0)
-                            {
-                            cout << "Error when polling status for device" << j <<":" << status << endl;
-                            break;
-                            }
-                        }
-                        // In this loop, timing is handled by the GetStatus polling, which only returns 1 once there is room in the DAC to send the next frame.
-                        // You need to call WriteFrame*() in time (before the previously written frame finished playing), to not let the buffers in the DAC underrun.
-                        // You should also make frames large enough to account for transfer overheads and timing jitter. Frames should be 10 milliseconds or longer on average, generally speaking.
-                }
-            }
-            
-                // Freeing connection when we're done
-            helios.CloseDevices();
-            for (int i = 0; i < 30; i++) {
-                delete frame[i];
-            }
-            delete[] frame;
-            
-            return {};
-        }
-    };
-    
     
     timer<> deliverer_to_max {
         this, MIN_FUNCTION {

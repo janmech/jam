@@ -110,4 +110,8 @@ namespace jam::helios {
             }
         }
     };
+    
+    HeliosDac * Connector::getDac() {
+        return &this->_helios_dac;
+    }
 };
