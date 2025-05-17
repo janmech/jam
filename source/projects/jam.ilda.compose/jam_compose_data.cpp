@@ -116,8 +116,7 @@ namespace jam::compose {
     }
     
     void DataSet::_processDataPoints() {
-            // apply scaling
-            // apply rotation
+           
         number cos_a      = std::cos(this->_rotation_rad);
         number sin_a      = std::sin(this->_rotation_rad);
         this->_points_processed.clear();
@@ -131,10 +130,11 @@ namespace jam::compose {
             pp.blanking = p.blanking;
             pp.last_point = p.last_point;
             
+                // apply scaling
             pp.x = p.x * this->_scale_factor.x;
             pp.y = p.y * this->_scale_factor.y;
             
-            
+                // apply rotation
                 // calculate delta x/y - ajust for rotation anchor
             Point2D delta = { pp.x - this->_rotation_anchor.x, pp.y - this->_rotation_anchor.y};
             

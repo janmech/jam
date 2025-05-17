@@ -52,6 +52,12 @@ protected:
     HeliosPointHighRes* _edit_frame = nullptr;
     
     lpvec _frame_points;
+    
+    number _rotation_angle = 0.;
+    
+    coord_point_t _scaling {1., 1.};
+    
+    coord_point_t _rotation_anchor = {0., 0.};
         
     uint16_t _color[3] = {0xFFFF, 0xFFFF,0xFFFF};
     
@@ -154,15 +160,48 @@ protected:
         return this->_instance_id;
     }
     
+    lpvec _rotateAndScale(const lpvec & lps) {
+        lpvec rotated;
+        number cos_a      = std::cos(this->_rotation_angle);
+        number sin_a      = std::sin(this->_rotation_angle);
+        for(auto lp: lps) {
+            coord_point_t coord_point = this->_toCoordPoint(lp);
+            
+                // apply rotation
+                // calculate delta x/y - ajust for rotation anchor
+            coord_point_t delta = {coord_point.x - this->_rotation_anchor.x, coord_point.y - this->_rotation_anchor.y};
+       
+            coord_point.x = (delta.x * cos_a) - (delta.y * sin_a) + this->_rotation_anchor.x;
+            coord_point.y = (delta.x * sin_a) + (delta.y * cos_a) + this->_rotation_anchor.y;
+            
+                //apply scaling
+            coord_point.x = coord_point.x * this->_scaling.x;
+            coord_point.y = coord_point.y * this->_scaling.y;
+            
+            coord_point.x = std::clamp(coord_point.x, -1., 1.);
+            coord_point.y = std::clamp(coord_point.y, -1., 1.);
+            
+            laser_point_t rp = this->_toLaserPoint(coord_point);
+            rp.blanking = lp.blanking;
+            if(!this->_laserPointVisible(rp)) {
+                rp.blanking = true;
+            }
+            rotated.push_back(rp);
+        }
+        return rotated;
+    }
+    
     void _fillFrame(HeliosPointHighRes * frame, lpvec lps) {
+        lpvec processed = this->_rotateAndScale(lps);
+//        lpvec processed = lps;
         std::mutex lock;
         lock.lock();
         for (int i = 0; i < POINTS_PER_FRAME; i++) {
-            frame[i].x = lps[i].x;
-            frame[i].y = lps[i].y;
-            frame[i].r = lps[i].blanking ? 0 : this->_color[0];
-            frame[i].g = lps[i].blanking ? 0 : this->_color[1];
-            frame[i].b = lps[i].blanking ? 0 : this->_color[2];
+            frame[i].x = processed[i].x;
+            frame[i].y = processed[i].y;
+            frame[i].r = processed[i].blanking ? 0 : this->_color[0];
+            frame[i].g = processed[i].blanking ? 0 : this->_color[1];
+            frame[i].b = processed[i].blanking ? 0 : this->_color[2];
             
         }
         lock.unlock();
@@ -203,8 +242,15 @@ protected:
             lp.blanking = !this->_laserPointVisible(lp);
         }
         return lp;
-        
     };
+    
+    coord_point_t _toCoordPoint(const laser_point_t &lp) {
+        coord_point_t cp;
+    
+        cp.x = this->_map((number)lp.x, 0., 65535., -1., 1.);
+        cp.y = this->_map((number)lp.y, 0., 65535., -1., 1.);
+        return cp;;
+    }
     
     
     lpvec _makeEllipsePoints(
@@ -261,27 +307,18 @@ protected:
     
     
     lpvec _makeLinePoints(
-          const coord_point_t& center,
-          number width,
-          number theta
+          const coord_point_t& p1,
+          const coord_point_t& p2
           ) {
-        number θ = theta * (PI / 180.);
-        number ux =  std::cos(θ);
-        number uy = -std::sin(θ);
-        
-        number half = width * 0.5f;
-        coord_point_t p1 { center.x + ux * half, center.y + uy * half };
-        coord_point_t p2 { center.x - ux * half, center.y - uy * half };
         lpvec points;
-  
+        number delta_x = p2.x - p1.x;
+        number delta_y = p2.y - p1.y;
         for (int i = 0; i < POINTS_PER_FRAME; ++i) {
-//            bool blanking = i <= 100 || i >= POINTS_PER_FRAME - 100;
             number t = static_cast<number>(i) / POINTS_PER_FRAME;
-            number x = (1.0 - t) * p1.x + t * p2.x;
-            number y = (1.0 - t) * p1.y + t * p2.y;
+            number x = p1.x + t * delta_x;
+            number y = p1.y + t * delta_y;
             coord_point_t cp{std::clamp(x, -1., 1.), std::clamp(y, -1., 1.)};
             laser_point_t lp = this->_toLaserPoint(cp);
-//            lp.blanking = !blanking ? lp.blanking : blanking;
             points.push_back(lp);
         }
         for(int i = 1; i < 10; i++) {
@@ -390,6 +427,28 @@ public:
         style {c74::min::style::color},
     };
     
+    attribute<fvec> scale{
+        this, "rotate", {1., 1.},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 2, 1.);
+                
+                cleaned_args[0] = std::clamp((number)cleaned_args[0], -1., 1.);
+                cleaned_args[1] = std::clamp((number)cleaned_args[1], -1., 1.);
+                
+                this->_scaling = {cleaned_args[0], cleaned_args[1]};
+                if(this->initialized()) {
+                    this->_fillFrame(this->_edit_frame, this->_frame_points);
+                    this->_drawFrame();
+                }
+                return cleaned_args;
+            }
+        },
+        title {"Scale"},
+        description {"Scale the output"},
+
+    };
 
     message<> open {
         this, "open", "Open connetion to a Helios DAC",
@@ -451,23 +510,6 @@ public:
         }
     };
     
-    message<> shutter {
-        this, "shutter", "Open/Close the shutter. <p><b>Argument:</b><br /> shutter_state [int]</p>",
-        MIN_FUNCTION{
-//            if (args.size() < 1){
-//                cwarn << "missing argument for message shutter" << endl;
-//                return {};
-//            }
-//            if (args.size() > 1) {
-//                cwarn << "extra argument for message shutter" << endl;
-//            }
-//            int shutter_state_int = (int)args[0];
-//            bool shutter_state = shutter_state_int = !0;
-//            this->_deviceManager.setShutter(this->maxobj(), shutter_state);
-            return {};
-        }
-    };
-    
     message<threadsafe::no> dot {
         this, "dot", "Project a dot at position x/y",
         MIN_FUNCTION {
@@ -505,26 +547,24 @@ public:
         }
     };
     
-    
     message<threadsafe::no> line {
         this, "line", "Project a line with x/y in the center, width and angle",
         MIN_FUNCTION {
-            if(args.size() < 2) {
+            if(args.size() < 4) {
                 return {};
             }
-            number x = std::clamp((number)args[0], -1., 1.);
-            number y = std::clamp((number)args[1], -1., 1.);
-            coord_point_t center = {x, y};
-            number width = 1.;
-            if(args.size() > 2) {
-                width = (number) args[2];
-            }
-            number theta = 0.;
-            if(args.size() > 3) {
-                theta = (number)args[3];
-            }
+            coord_point_t start = {
+                std::clamp((number)args[0], -1., 1.),
+                std::clamp((number)args[1], -1., 1.) * -1.
+            };
             
-            this->_frame_points = this->_makeLinePoints(center, width, theta);
+            coord_point_t end = {
+                std::clamp((number)args[2], -1., 1.),
+                std::clamp((number)args[3], -1., 1.) * -1.
+            };
+            
+        
+            this->_frame_points = this->_makeLinePoints(start, end);
             this->_fillFrame(this->_edit_frame, this->_frame_points);
             this->_drawFrame();
             
@@ -534,7 +574,27 @@ public:
         }
     };
     
-    
+//    message<threadsafe::no> rotate{
+//        this, "rotate", "Rotate the projection",
+//        MIN_FUNCTION {
+//            
+//            if(args.size() < 1) {
+//
+//                return {};
+//            }
+//            number angle = args[0];
+//            coord_point_t anchor = {0., 0.};
+//            if(args.size() >= 3) {
+//                anchor.x = std::clamp((number)args[1], -1., 1.);
+//                anchor.y = std::clamp((number)args[2], -1., 1.);
+//            }
+//            this->_rotation_angle = angle * (PI / 180.);
+//            this->_rotation_anchor = anchor;
+//            this->_fillFrame(this->_edit_frame, this->_frame_points);
+//            this->_drawFrame();
+//            return {};
+//        }
+//    };
     
     message<threadsafe::no> integer {
         this, "int", "Start scanning",
@@ -565,7 +625,6 @@ public:
                         std::this_thread::sleep_for (std::chrono::milliseconds(1000 / (int)fps));
                     }
                 }
-//                delete[] frame;
             });
             this->_projector_thread.detach();
             return {};
