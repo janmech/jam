@@ -46,10 +46,10 @@ class helios : public object<helios>
     
 protected:
     
-    HeliosPointHighRes* frame_1 = nullptr;
-    HeliosPointHighRes* frame_2 = nullptr;
-    HeliosPointHighRes* frame_play = nullptr;
-    HeliosPointHighRes* frame_edit = nullptr;
+    HeliosPointHighRes* _frame_1 = nullptr;
+    HeliosPointHighRes* _frame_2 = nullptr;
+    HeliosPointHighRes* _play_frame = nullptr;
+    HeliosPointHighRes* _edit_frame = nullptr;
     
     lpvec _frame_points;
         
@@ -171,9 +171,9 @@ protected:
     void _drawFrame() {
         std::mutex lock;
         lock.lock();
-        HeliosPointHighRes* old_frame_play = this->frame_play;
-        this->frame_play = this->frame_edit;
-        this->frame_edit = old_frame_play;
+        HeliosPointHighRes* old_frame_play = this->_play_frame;
+        this->_play_frame = this->_edit_frame;
+        this->_edit_frame = old_frame_play;
         lock.unlock();
     }
     
@@ -187,13 +187,21 @@ protected:
         return (number)value / (10 * precision);
     }
     
-    laser_point_t _toLaserPoint(coord_point_t p) {
+    bool _laserPointVisible(laser_point_t &lp) {
+        
+        return lp.x >= X_Y_MIN && lp.x <= X_Y_MAX && lp.y >= X_Y_MIN && lp.y <= X_Y_MAX;
+    }
+    
+    laser_point_t _toLaserPoint(coord_point_t p, bool set_blanking = true) {
         laser_point_t lp;
         // from -1/1 to 0/0xFFFF (65535)
         number x_mapped = this->_map(p.x, -1., 1., 0., 65535.);
         number y_mapped = this->_map(p.y, -1., 1.,  0., 65535.);
         lp.x = (uint16_t)x_mapped;
         lp.y = (uint16_t)y_mapped;
+        if(set_blanking) {
+            lp.blanking = !this->_laserPointVisible(lp);
+        }
         return lp;
         
     };
@@ -227,13 +235,10 @@ protected:
             cp.y = std::clamp(cp.y, -1., 1.);
             
             laser_point_t lp = this->_toLaserPoint(cp);
-            bool visible = lp.x >= X_Y_MIN && lp.x <= X_Y_MAX && lp.y >= X_Y_MIN && lp.y <= X_Y_MAX;
-            lp.blanking = !visible;
             points.push_back(lp);
         }
         points[segments - 1] = points[0];
         return points;
-        
     }
     
     lpvec _makeDotPoints(number x, number y) {
@@ -246,11 +251,44 @@ protected:
             number x_coord = -1. + offset;
             cp.x = x_coord;
             bool blanking = !(x >= x_coord_prev && x <= x_coord);
-            laser_point_t lp = this->_toLaserPoint(cp);
+            laser_point_t lp = this->_toLaserPoint(cp, false);
             lp.blanking = blanking;
             x_coord_prev = x_coord;
             points.push_back(lp);
         }
+        return points;
+    }
+    
+    
+    lpvec _makeLinePoints(
+          const coord_point_t& center,
+          number width,
+          number theta
+          ) {
+        number θ = theta * (PI / 180.);
+        number ux =  std::cos(θ);
+        number uy = -std::sin(θ);
+        
+        number half = width * 0.5f;
+        coord_point_t p1 { center.x + ux * half, center.y + uy * half };
+        coord_point_t p2 { center.x - ux * half, center.y - uy * half };
+        lpvec points;
+  
+        for (int i = 0; i < POINTS_PER_FRAME; ++i) {
+//            bool blanking = i <= 100 || i >= POINTS_PER_FRAME - 100;
+            number t = static_cast<number>(i) / POINTS_PER_FRAME;
+            number x = (1.0 - t) * p1.x + t * p2.x;
+            number y = (1.0 - t) * p1.y + t * p2.y;
+            coord_point_t cp{std::clamp(x, -1., 1.), std::clamp(y, -1., 1.)};
+            laser_point_t lp = this->_toLaserPoint(cp);
+//            lp.blanking = !blanking ? lp.blanking : blanking;
+            points.push_back(lp);
+        }
+        for(int i = 1; i < 10; i++) {
+            points[POINTS_PER_FRAME - i] = points[0];
+            points[POINTS_PER_FRAME - i].blanking = true;
+        }
+        
         return points;
     }
  
@@ -265,21 +303,27 @@ public:
             srand((unsigned int)ts.tv_nsec);
             this->_instance_id = rand();
             
-            this->frame_1 =  new HeliosPointHighRes[POINTS_PER_FRAME];
-            this->frame_2 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+            this->_frame_1 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+            this->_frame_2 =  new HeliosPointHighRes[POINTS_PER_FRAME];
             laser_point_t lp{0, 0};
             lpvec empty_frame{POINTS_PER_FRAME, lp};
             this->_frame_points = empty_frame;
-            this->_fillFrame(this->frame_1, empty_frame);
-            this->_fillFrame(this->frame_2, empty_frame);
-            this->frame_play = this->frame_1;
-            this->frame_edit = this->frame_2;
+            this->_fillFrame(this->_frame_1, empty_frame);
+            this->_fillFrame(this->_frame_2, empty_frame);
+            this->_play_frame = this->_frame_1;
+            this->_edit_frame = this->_frame_2;
         }
     }
     
     ~helios() {
         if (!dummy()) {
             close();
+            if(this->_frame_1 != nullptr) {
+                delete [] this->_frame_1;
+            }
+            if(this->_frame_2 != nullptr) {
+                delete [] this->_frame_2;
+            }
 //            delete[] this->frame_1;
 //            delete[] this->frame_2;
         }
@@ -336,7 +380,7 @@ public:
             this->_color[1] = static_cast<uint16_t>((number)cleaned_args[1] * (number)0xFFFF);
             this->_color[2] = static_cast<uint16_t>((number)cleaned_args[2] * (number)0xFFFF);
             if(this->initialized()) {
-                this->_fillFrame(this->frame_edit, this->_frame_points);
+                this->_fillFrame(this->_edit_frame, this->_frame_points);
                 this->_drawFrame();
             }
             return cleaned_args;
@@ -433,7 +477,7 @@ public:
             number x = std::clamp((number)args[0], -1., 1.);
             number y = std::clamp((number)args[1], -1., 1.) * -1.;
             this->_frame_points = this->_makeDotPoints(x, y);
-            this->_fillFrame(this->frame_edit, this->_frame_points);
+            this->_fillFrame(this->_edit_frame, this->_frame_points);
             this->_drawFrame();
             return {};
         }
@@ -455,8 +499,37 @@ public:
             coord_point_t  radius = {r, r};
             
             this->_frame_points = this->_makeEllipsePoints(center, radius);
-            this->_fillFrame(this->frame_edit, this->_frame_points);
+            this->_fillFrame(this->_edit_frame, this->_frame_points);
             this->_drawFrame();
+            return {};
+        }
+    };
+    
+    
+    message<threadsafe::no> line {
+        this, "line", "Project a line with x/y in the center, width and angle",
+        MIN_FUNCTION {
+            if(args.size() < 2) {
+                return {};
+            }
+            number x = std::clamp((number)args[0], -1., 1.);
+            number y = std::clamp((number)args[1], -1., 1.);
+            coord_point_t center = {x, y};
+            number width = 1.;
+            if(args.size() > 2) {
+                width = (number) args[2];
+            }
+            number theta = 0.;
+            if(args.size() > 3) {
+                theta = (number)args[3];
+            }
+            
+            this->_frame_points = this->_makeLinePoints(center, width, theta);
+            this->_fillFrame(this->_edit_frame, this->_frame_points);
+            this->_drawFrame();
+            
+            
+        
             return {};
         }
     };
@@ -485,7 +558,7 @@ public:
                 while (this->_projector_in_running) {
                     int status = helios->GetStatus(this->_attached_device);
                     if (status == 1) {
-                        int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, this->frame_play, POINTS_PER_FRAME);
+                        int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, this->_play_frame, POINTS_PER_FRAME);
                         if(result != HELIOS_SUCCESS) {
                             cerr << this->heliosErrorToString(result) << endl;
                         }
