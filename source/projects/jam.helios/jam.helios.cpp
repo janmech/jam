@@ -53,11 +53,11 @@ protected:
     
     lpvec _frame_points;
     
-    number _rotation_angle = 0.;
-    
     coord_point_t _scaling {1., 1.};
     
-    coord_point_t _rotation_anchor = {0., 0.};
+    number _rotation_angle = 0.;
+    
+    coord_point_t _rotation_center = {0., 0.};
         
     uint16_t _color[3] = {0xFFFF, 0xFFFF,0xFFFF};
     
@@ -169,10 +169,10 @@ protected:
             
                 // apply rotation
                 // calculate delta x/y - ajust for rotation anchor
-            coord_point_t delta = {coord_point.x - this->_rotation_anchor.x, coord_point.y - this->_rotation_anchor.y};
+            coord_point_t delta = {coord_point.x - this->_rotation_center.x, coord_point.y - this->_rotation_center.y};
        
-            coord_point.x = (delta.x * cos_a) - (delta.y * sin_a) + this->_rotation_anchor.x;
-            coord_point.y = (delta.x * sin_a) + (delta.y * cos_a) + this->_rotation_anchor.y;
+            coord_point.x = (delta.x * cos_a) - (delta.y * sin_a) + this->_rotation_center.x;
+            coord_point.y = (delta.x * sin_a) + (delta.y * cos_a) + this->_rotation_center.y;
             
                 //apply scaling
             coord_point.x = coord_point.x * this->_scaling.x;
@@ -193,7 +193,6 @@ protected:
     
     void _fillFrame(HeliosPointHighRes * frame, lpvec lps) {
         lpvec processed = this->_rotateAndScale(lps);
-//        lpvec processed = lps;
         std::mutex lock;
         lock.lock();
         for (int i = 0; i < POINTS_PER_FRAME; i++) {
@@ -361,8 +360,6 @@ public:
             if(this->_frame_2 != nullptr) {
                 delete [] this->_frame_2;
             }
-//            delete[] this->frame_1;
-//            delete[] this->frame_2;
         }
     }
     
@@ -428,7 +425,7 @@ public:
     };
     
     attribute<fvec> scale{
-        this, "rotate", {1., 1.},
+        this, "scale", {1., 1.},
         setter {
             MIN_FUNCTION {
                 atoms cleaned_args;
@@ -449,7 +446,29 @@ public:
         description {"Scale the output"},
 
     };
-
+    
+    attribute<fvec> rotate {
+        this, "rotate", {0., 0., 0.},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 3, 0.);
+                this->_rotation_angle = (number)cleaned_args[0] * (PI / 180.);
+                cleaned_args[1] = (number)std::clamp((number)cleaned_args[1], -2., 2.);
+                cleaned_args[2] = (number)std::clamp((number)cleaned_args[2], -2., 2.);
+                this->_rotation_center.x = (number)cleaned_args[1];
+                this->_rotation_center.y = (number)cleaned_args[2];
+                if(this->initialized()) {
+                    this->_fillFrame(this->_edit_frame, this->_frame_points);
+                    this->_drawFrame();
+                }
+                return cleaned_args;
+            }
+        },
+        title {"Rotate"},
+        description {"Rotate the output"},
+    };
+    
     message<> open {
         this, "open", "Open connetion to a Helios DAC",
         MIN_FUNCTION{
@@ -573,28 +592,6 @@ public:
             return {};
         }
     };
-    
-//    message<threadsafe::no> rotate{
-//        this, "rotate", "Rotate the projection",
-//        MIN_FUNCTION {
-//            
-//            if(args.size() < 1) {
-//
-//                return {};
-//            }
-//            number angle = args[0];
-//            coord_point_t anchor = {0., 0.};
-//            if(args.size() >= 3) {
-//                anchor.x = std::clamp((number)args[1], -1., 1.);
-//                anchor.y = std::clamp((number)args[2], -1., 1.);
-//            }
-//            this->_rotation_angle = angle * (PI / 180.);
-//            this->_rotation_anchor = anchor;
-//            this->_fillFrame(this->_edit_frame, this->_frame_points);
-//            this->_drawFrame();
-//            return {};
-//        }
-//    };
     
     message<threadsafe::no> integer {
         this, "int", "Start scanning",
