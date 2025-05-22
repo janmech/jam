@@ -36,9 +36,9 @@ private:
     
     c74::max::t_object *_sketch_object = NULL;      // Pointer to a the jit.gl.sketch object instance,
                                                     // which actually handles the rendering of the frames
-    c74::max::t_object *_manager;                   // Pointer to global jam.ilda.manager object
+    c74::max::t_object *_ilda_manager;              // Pointer to global jam.ilda.manager object
                                                     // (stores data to be accasibele by other jam.ilda.* object)
-    t_jam_im * _manager_struct_ptr = NULL;          // Pointer to max-object struct of the jam.ilda.manager object
+    t_jam_im * _ilda_manager_struct_ptr = NULL;     // Pointer to max-object struct of the jam.ilda.manager object
     
     std::vector<jam::ilda::IldaFrame> _frames;
     
@@ -102,11 +102,11 @@ protected:
         return ((float)pos / 32768) * 0.85;
     };
     
-    t_jam_im * _getStructPointer() {
-        if(this->_manager_struct_ptr == NULL) {
-            this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
+    t_jam_im * _getIldaManagerStructPointer() {
+        if(this->_ilda_manager_struct_ptr == NULL) {
+            this->_ilda_manager_struct_ptr = (t_jam_im *)typedmess(this->_ilda_manager,symbol("get_struct"),0,0L);
         }
-        return this->_manager_struct_ptr;
+        return this->_ilda_manager_struct_ptr;
     }
     
     c74::max::t_object * _getSketchObject() {
@@ -277,8 +277,8 @@ public:
         if (args.size() > 0) {
             cwarn << "Extra argumnt for oject jam.jit.gl.sketch" << endl;
         }
-        this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
-        this->_manager_struct_ptr = (t_jam_im *)typedmess(this->_manager,symbol("get_struct"),0,0L);
+        this->_ilda_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
+        this->_ilda_manager_struct_ptr = (t_jam_im *)typedmess(this->_ilda_manager,symbol("get_struct"),0,0L);
     }
     
     ~ildasketch() {
@@ -1808,7 +1808,7 @@ public:
             }
             typedmess(this->_getSketchObject(),symbol("reset"),0,0L);
             std::string ilda_file_refence = args[0];
-            std::vector<jam::ilda::IldaFrame> frames = this->_getStructPointer()->getFrames(ilda_file_refence);
+            std::vector<jam::ilda::IldaFrame> frames = this->_getIldaManagerStructPointer()->getFrames(ilda_file_refence);
             this->_frames = frames;
         
             return {};

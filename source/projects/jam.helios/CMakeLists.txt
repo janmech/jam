@@ -35,6 +35,10 @@ set( SOURCE_FILES
     ../jam.dmxusbpro.connector/libusb/os/threads_posix.c
     ../jam.dmxusbpro.connector/libusb/os/events_posix.c
     ../jam.dmxusbpro.connector/libusb/core.c
+    ../jam.ilda_common/ilda_data_record.cpp
+    ../jam.ilda_common/ilda_frame.cpp
+    ../jam.ilda_common/ilda_header.cpp
+    ../jam.ilda_common/ilda_colors.cpp
 )
 
 

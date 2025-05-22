@@ -16,6 +16,13 @@
 #include "c74_min.h"
 #include "../jam.helper/attribute_args_helper.hpp"
 #include "../jam.helios.connector/jam.helios.connector.hpp"
+#include  "../jam.ilda_common/ilda_definitions.hpp"
+#include "../jam.ilda_common/ilda_colors.hpp"
+#include "../jam.ilda.manager/jam.ilda.manager.hpp"
+#include "../jam.ilda_common/ilda_frame.hpp"
+#include "../jam.ilda_common/ilda_header.hpp"
+#include "../jam.ilda_common/ilda_data_record.hpp"
+#include "../jam.ilda_common/ilda_colors.hpp"
 
 #define POINTS_PER_FRAME 1000
 #define X_Y_MAX 65500
@@ -91,6 +98,19 @@ protected:
     fifo<queued_message_t> _to_max_queue_2{ 1000 };
     
     std::mutex _enqueue_msg_lock;
+    
+    c74::max::t_object *_ilda_manager;              // Pointer to global jam.ilda.manager object
+                                                    // (stores data to be accasibele by other jam.ilda.* object)
+    t_jam_im * _ilda_manager_struct_ptr = NULL;     // Pointer to max-object struct of the jam.ilda.manager object
+    
+    std::vector<jam::ilda::IldaFrame> _ilda_frames;
+    
+    t_jam_im * _getIldaManagerStructPointer() {
+        if(this->_ilda_manager_struct_ptr == NULL) {
+            this->_ilda_manager_struct_ptr = (t_jam_im *)typedmess(this->_ilda_manager,symbol("get_struct"),0,0L);
+        }
+        return this->_ilda_manager_struct_ptr;
+    }
     
     c74::max::t_object * _manager = nullptr;
     
@@ -215,8 +235,7 @@ protected:
         lock.unlock();
     }
     
-    number _map(number x, number in_min, number in_max, number out_min, number out_max)
-    {
+    number _map(number x, number in_min, number in_max, number out_min, number out_max) {
       return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
     
@@ -250,7 +269,6 @@ protected:
         cp.y = this->_map((number)lp.y, 0., 65535., -1., 1.);
         return cp;;
     }
-    
     
     lpvec _makeEllipsePoints(
         coord_point_t c,
@@ -304,7 +322,6 @@ protected:
         return points;
     }
     
-    
     lpvec _makeLinePoints(
           const coord_point_t& p1,
           const coord_point_t& p2
@@ -327,11 +344,18 @@ protected:
         
         return points;
     }
+    
+    void _ildaToLaserFrames() {
+        // TODO: we need to parse the ilda frames to a vector of HeliosPointHighRes* arrays
+    }
  
     
 public:
     helios(const atoms& args = {}) {
         if (!dummy()) {
+            this->_ilda_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.ilda.manager"), 0, NULL);
+            this->_ilda_manager_struct_ptr = (t_jam_im *)typedmess(this->_ilda_manager,symbol("get_struct"),0,0L);
+            
             this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.helios.manager"), 0, NULL);
             this->_connector = (HeliosConnector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
             struct timespec ts;
@@ -366,7 +390,7 @@ public:
     MIN_DESCRIPTION { "Connect to a Helios ILDA DAC" };
     MIN_TAGS { "laser control" };
     MIN_AUTHOR{ "Jan Mech" };
-    MIN_RELATED{ "jam.dmxusbpro~, jam.dmxusbpro" };
+    MIN_RELATED{ "jam.dmxusbpro~, jam.dmxusbpro, jam.ilda.file, jam.ilda.compose, jam.ilda.dict, jam.helios, jit.gl.sketch" };
     
     inlet<> input_1{ this, "(anything) Control Messages", "anything" };
     inlet<> input_2{ this, "(dictionary) ilda file dictionary", "dictionary" };
@@ -424,7 +448,7 @@ public:
         style {c74::min::style::color},
     };
     
-    attribute<fvec> scale{
+    attribute<fvec> scale {
         this, "scale", {1., 1.},
         setter {
             MIN_FUNCTION {
@@ -590,6 +614,26 @@ public:
             
         
             return {};
+        }
+    };
+    
+    message<>ilda {
+        this, "ilda", "Reference to an ILDA file.  <br/>To render a file pass in a ilda referecence to a file loaded by <o>jam.ilda.file</o> or created by <o>jam.ilda.compose</o>.",
+        MIN_FUNCTION {
+            if(args.size() < 1) {
+                cwarn << "missing argument for message ilda" << endl;
+                return {};
+            }
+            if(args.size() > 1) {
+                cwarn << "extras argument for message ilda" << endl;
+            }
+
+            std::string ilda_file_refence = args[0];
+            std::vector<jam::ilda::IldaFrame> frames = this->_getIldaManagerStructPointer()->getFrames(ilda_file_refence);
+            this->_ilda_frames = frames;
+        
+            return {};
+            
         }
     };
     
