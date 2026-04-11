@@ -428,12 +428,12 @@ class dmxusbpro_tilde : public object<dmxusbpro_tilde>, public vector_operator<>
         };
 
         attribute<bool> keepsending {
-            this, "keepsending", false,
+            this, "keepsending", true,
             title { "Keep sending" },
-            description { "If set to 0 (default), the device will stop sending DMX data when the connection is closed. If set to 1 the device will continue to send the last received DMX data after the connection has been closed." },
+            description { "If set to 0, the device will stop sending DMX data when the connection is closed. If set to 1 (default) the device will continue to send the last received DMX data after the connection has been closed." },
             setter { MIN_FUNCTION {
                 atoms cleaned_args;
-                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+                jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, true);
                 return cleaned_args;
             }},
         };

@@ -44,7 +44,7 @@ protected:
     
     
     
-        // for _receiveThreadTask()
+    // for _receiveThreadTask()
     std::vector<unsigned char>          _device_response;
     bool                                _is_parsing_response      = false;
     int                                 _response_data_byte_count = 0;
@@ -52,10 +52,10 @@ protected:
     int                                 _response_index           = 0;
     s_chrono::steady_clock::time_point  _response_paring_start    = s_chrono::steady_clock::now();
     
-        // for _sendThreadTask()
+    // for _sendThreadTask()
     std::condition_variable _messages_to_device_queue_cv;
     
-        // for  _processDeviceResponds
+    // for  _processDeviceResponds
     std::vector<unsigned char> _last_dmx_package;
     
     c74::max::t_object * _manager = nullptr;
@@ -514,7 +514,7 @@ public:
         description { "If set to 0, the device will stop sending DMX data when the connection is closed. If set to 1 (default) the device will continue to send the last received DMX data after the connection has been closed." },
         setter { MIN_FUNCTION {
             atoms cleaned_args;
-            jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, false);
+            jam::checkAndFillAttrArgs<bool>(args, &cleaned_args, 1, true);
             return cleaned_args;
         }},
     };
@@ -570,7 +570,7 @@ public:
                 atoms cleaned_args;
                 jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "onchange");
                 std::string value = cleaned_args[0];
-                if(value != "onchange" && value != "raw") {
+                if(value != "onchange" && value != "always") {
                     cleaned_args[0] = "onchange";
                 }
                 return cleaned_args;
@@ -840,9 +840,6 @@ public:
             }
             
             this->_executeCloseDevice();
-            
-            
-            
             return{};
         }
     };
