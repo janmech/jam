@@ -100,8 +100,11 @@ public:
     }
     
     ~heliosinfo() {
+        if(this->_device_scan_thread.joinable()) {
+            this->_device_scan_thread.join();
+        }
         if (!dummy()) {
-            
+        
         }
     }
     
@@ -118,36 +121,42 @@ public:
         this, "devicescan", "Scan for connected Helios DACs.",
         MIN_FUNCTION {
             if (args.size() > 1) {
-                cwarn << "extra argument for message 'menu'" << endl;
+                cwarn << "extra argument for message 'devicescan'" << endl;
             }
+        
             if (this->_getConnector()->isScanning()) {
                 cwarn << "scan already in progress" << endl;
                 return {};
             }
             
-            this->_device_scan_thread = std::thread([this]() {
-                auto b = this->box();
-                number current_progress{ -1. };
-                b("startprogress", &current_progress);
-                int numDevs = this->_connector->deviceScan();
-                atoms scan_result;
-                scan_result.clear();
-                scan_result.push_back(atom("devicescan"));
-                scan_result.push_back(atom(numDevs));
-                queued_message_t msg;
-                msg.set(&outlet_dumpout, scan_result);
-                msg.send(this);
-                b("stopprogress");
-                this->_makeMenu();
-            });
-            this->_device_scan_thread.detach();
+            auto connector = this->_getConnector();
+            int numDevs = connector->deviceScan();
+            cout << "numDevs:" << numDevs << endl;
             
+//            this->_device_scan_thread = std::thread([this]() {
+//                auto b = this->box();
+//                number current_progress{ -1. };
+//                b("startprogress", &current_progress);
+//                auto connector = this->_getConnector();
+//                int numDevs = connector->deviceScan();
+
+////                atoms scan_result;
+////                scan_result.clear();
+////                scan_result.push_back(atom("devicescan"));
+////                scan_result.push_back(atom(numDevs));
+////                queued_message_t msg;
+////                msg.set(&outlet_dumpout, scan_result);
+////                msg.send(this);
+//                b("stopprogress");
+////                this->_makeMenu();
+//            });
+//            _device_scan_thread.detach();
+        
             return {};
         }
     };
     
     message<> menu {
-        
         this, "menu", "Get list of connected devices and build menu from it.",
         MIN_FUNCTION{
             if (this->_getConnector()->getOpenDevices()->size() == 0) {
@@ -194,7 +203,6 @@ public:
             return {};
         }
     };
-    
     
     timer<> deliverer_to_max {
         this, MIN_FUNCTION {

@@ -320,6 +320,8 @@ struct windows_backend {
 	void (*exit)(struct libusb_context *ctx);
 	int (*get_device_list)(struct libusb_context *ctx,
 		struct discovered_devs **discdevs);
+	int (*get_device_string)(libusb_device *dev,
+		enum libusb_device_string_type string_type, char *data, int length);
 	int (*open)(struct libusb_device_handle *dev_handle);
 	void (*close)(struct libusb_device_handle *dev_handle);
 	int (*get_active_config_descriptor)(struct libusb_device *device,
@@ -342,6 +344,13 @@ struct windows_backend {
 	int (*cancel_transfer)(struct usbi_transfer *itransfer);
 	void (*clear_transfer_priv)(struct usbi_transfer *itransfer);
 	enum libusb_transfer_status (*copy_transfer_data)(struct usbi_transfer *itransfer, DWORD length);
+	int (*endpoint_supports_raw_io)(struct libusb_device_handle *dev_handle,
+		uint8_t endpoint);
+	int (*endpoint_set_raw_io)(struct libusb_device_handle *dev_handle,
+		uint8_t endpoint, int enable);
+	int (*get_max_raw_io_transfer_size)(
+                struct libusb_device_handle *dev_handle,
+		uint8_t endpoint);
 };
 
 struct windows_context_priv {

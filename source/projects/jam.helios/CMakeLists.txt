@@ -19,22 +19,13 @@ include_directories(
 
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
+	../jam.helios.connector/helios-sdk/cpp/HeliosDac.cpp
+	../jam.helios.connector/helios-sdk/cpp/idn/idn.cpp
+    ../jam.helios.connector/helios-sdk/cpp/shared_library/HeliosDacAPI.cpp
+    ../jam.helios.connector/helios-sdk/cpp/idn/idnServerList.cpp
+    ../jam.helios.connector/helios-sdk/cpp/idn/plt-posix.c
     ../jam.helper/attribute_args_helper.cpp
     ../jam.helios.connector/jam.helios.connector.cpp
-    ../jam.dmxusbpro.connector/helios-sdk/cpp/HeliosDac.cpp
-    ../jam.dmxusbpro.connector/helios-sdk/cpp/shared_library/HeliosDacAPI.cpp
-    ../jam.dmxusbpro.connector/libusb/sync.c
-    ../jam.dmxusbpro.connector/helios-sdk/cpp/idn/idn.cpp
-    ../jam.dmxusbpro.connector/libusb/io.c
-    ../jam.dmxusbpro.connector/libusb/strerror.c
-    ../jam.dmxusbpro.connector/libusb/descriptor.c
-    ../jam.dmxusbpro.connector/libusb/os/darwin_usb.c
-    ../jam.dmxusbpro.connector/libusb/hotplug.c
-    ../jam.dmxusbpro.connector/helios-sdk/cpp/idn/idnServerList.cpp
-    ../jam.dmxusbpro.connector/helios-sdk/cpp/idn/plt-posix.cpp
-    ../jam.dmxusbpro.connector/libusb/os/threads_posix.c
-    ../jam.dmxusbpro.connector/libusb/os/events_posix.c
-    ../jam.dmxusbpro.connector/libusb/core.c
     ../jam.ilda_common/ilda_data_record.cpp
     ../jam.ilda_common/ilda_frame.cpp
     ../jam.ilda_common/ilda_header.cpp
@@ -46,6 +37,33 @@ add_library(
 	${PROJECT_NAME} 
 	MODULE
 	${SOURCE_FILES}
+)
+
+# 1. Locate the dylib using the correct relative path
+find_library(LIBUSB_BIN 
+    NAMES libusb-1.0.0.dylib 
+    PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/helios-sdk/cpp/libusb_bin/macOS"
+    NO_DEFAULT_PATH
+)
+
+# 2. Check if it was actually found to prevent the "NOTFOUND" error
+if(NOT LIBUSB_BIN)
+    message(FATAL_ERROR "Could not find libusb-1.0.0.dylib! Checked in: ${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/helios-sdk/cpp/libusb_bin/macOS")
+endif()
+
+# 3. Link it
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBUSB_BIN})
+
+# 4. Bundle it
+set_source_files_properties(${LIBUSB_BIN} PROPERTIES 
+    MACOSX_PACKAGE_LOCATION Frameworks
+)
+target_sources(${PROJECT_NAME} PRIVATE ${LIBUSB_BIN})
+
+# 5. Set RPATH
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH "@loader_path/../Frameworks"
 )
 
 

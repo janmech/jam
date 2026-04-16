@@ -7,9 +7,8 @@ namespace jam::helios {
     }
     
     std::vector<device_info_t> *Connector::getOpenDevices() {
-        this->_open_dev_lock.lock();
+        std::lock_guard<std::mutex> lock(_open_devices_lock);
         std::vector<device_info_t> *open_devs = this->_open_devices;
-        this->_open_dev_lock.unlock();
         return open_devs;
     };
     
@@ -29,10 +28,14 @@ namespace jam::helios {
         this->_is_scanning = true;
         this->_helios_dac.CloseDevices();
         
-        this->_open_dev_lock.lock();
-        this->_open_devices->clear();
-        this->_attached_devices.clear();
-        this->_open_dev_lock.unlock();
+        {
+            std::lock_guard<std::mutex> lock(_open_devices_lock);
+            this->_open_devices->clear();
+        }
+        {
+            std::lock_guard<std::mutex> lock(_attached_devices_lock);
+            this->_attached_devices.clear();
+        }
         
         int numDevs = this->_helios_dac.OpenDevices();
         if (numDevs > 0) {
@@ -62,9 +65,12 @@ namespace jam::helios {
                 
                 dac.index = i;
                 
-                this->_open_dev_lock.lock();
-                this->_open_devices->push_back(dac);
-                this->_open_dev_lock.unlock();
+                {
+                    std::lock_guard<std::mutex> lock(_open_devices_lock);
+                    this->_open_devices->push_back(dac);
+                }
+                
+
             }
         }
         this->_is_scanning = false;
@@ -74,39 +80,50 @@ namespace jam::helios {
     DeviceState Connector::attachDevice(int device_index, uint instance_id) {
         // check if device withn index exists
         bool device_exists = false;
-        for( auto it = this->_open_devices->begin(); it != this->_open_devices->end(); ++it) {
-            if (it->index == device_index) {
-                device_exists = true;
-                break;
+        {
+            std::lock_guard<std::mutex> lock(_open_devices_lock);
+            for( auto it = this->_open_devices->begin(); it != this->_open_devices->end(); ++it) {
+                if (it->index == device_index) {
+                    device_exists = true;
+                    break;
+                }
             }
         }
+        
         if(!device_exists) {
             return DeviceState::NOTFOUND;
         }
         
-        auto it = this->_attached_devices.find(device_index);
-        if(it != this->_attached_devices.end()) {
-            // device is already attached to this instace. Return success
-            if(it->second == instance_id) {
-                return DeviceState::ATTACH_SUCCESS ;
-            } else {
-                return DeviceState::ATTACH_ERROR_ALREADY_ATTACHED;
+        {
+            std::lock_guard<std::mutex> lock(_attached_devices_lock);
+            auto it = this->_attached_devices.find(device_index);
+            if(it != this->_attached_devices.end()) {
+                    // device is already attached to this instace. Return success
+                if(it->second == instance_id) {
+                    return DeviceState::ATTACH_SUCCESS ;
+                } else {
+                    return DeviceState::ATTACH_ERROR_ALREADY_ATTACHED;
+                }
             }
         }
         
         // device exist and is not yet attached: let's attach it
-        this->_open_dev_lock.lock();
-        this->_attached_devices.insert({device_index, instance_id});
-        this->_open_dev_lock.unlock();
+        {
+            std::lock_guard<std::mutex> lock(_attached_devices_lock);
+            this->_attached_devices.insert({device_index, instance_id});
+        }
         return DeviceState::ATTACH_SUCCESS ;
     };
     
     void Connector::detachDevice(uint instance_id) {
-        for (const auto& pair : this->_attached_devices) {
-            if(pair.second == instance_id) {
-                this->_attached_devices.erase(pair.first);
-                break;
-                
+        {
+            std::lock_guard<std::mutex> lock(_attached_devices_lock);
+            for (const auto& pair : this->_attached_devices) {
+                if(pair.second == instance_id) {
+                    this->_attached_devices.erase(pair.first);
+                    break;
+                    
+                }
             }
         }
     };

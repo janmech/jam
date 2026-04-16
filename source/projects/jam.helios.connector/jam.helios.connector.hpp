@@ -67,7 +67,8 @@ namespace jam::helios {
         
         HeliosDac _helios_dac;
         
-        std::mutex _open_dev_lock;
+        std::mutex _open_devices_lock;
+        std::mutex _attached_devices_lock;
         
         std::vector<device_info_t> *_open_devices;
         

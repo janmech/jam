@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libusbi.h"
+#include "../libusbi.h"
 
 static int
 null_get_device_list(struct libusb_context * ctx,

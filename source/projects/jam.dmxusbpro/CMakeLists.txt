@@ -30,6 +30,22 @@ add_library(
 	${SOURCE_FILES}
 )
 
+# --- Link macOS Frameworks ---
+
+find_library(CORE_FOUNDATION CoreFoundation REQUIRED)
+find_library(IO_KIT IOKit REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    ${CORE_FOUNDATION} 
+    ${IO_KIT} 
+)
+
+# This forces the frameworks into the 'Link Binary With Libraries' UI section
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+    XCODE_LINK_BUILD_PHASE_MODE KNOWN_LOCATION
+)
+
+
 
 include(${C74_MIN_API_DIR}/script/min-posttarget.cmake)
 

@@ -22,6 +22,14 @@
 <p>
     You can find detailed information about the technical standards on the ILDA website: <a href="https://www.ilda.com/technical.htm">https://www.ilda.com/technical.htm</a>
 </p>
+<p>
+  <h2>Legal Note</h2>
+  <p>
+    The acronym ILDA in the context of this packages (e.g as part of object names) refers to the ILDA file format and is used as an abbreviation for the term ILDA File.
+  </p>
+  <p><b>It does not imply that this package is approved or released by the International Laser Display Association, neither were they part in anyway in the creation or evaluation of this package.</b>
+  </p>
+</p>
 <h2>The ILDA interface</h2>
 <p>
   An ILDA interface uses a DB-25 connector. It is an analog interface where different pins control different aspects of the the laser projector (for example color values or X/Y position of the beam) by varying the voltage on the related pins. 
@@ -104,14 +112,6 @@ It consists of a sequences of so-called frames or sections. One frame can either
   <p>
     will always create ILDA files using <b>FORMAT 5</b> frames (2D Coordinates with True Color).<br/>
   Frames imported from an ILDA file will be converted to FORMAT 5 (flattened to 2D and indexed colors will be converted to true colors using the ILDA standard pallet).
-</p>
-<p>
-  <h2>Legal Notes</h2>
-  <p>
-    The acronym ILDA in the context of this packages (e.g as part of object names) refers to the ILDA file format and is used as an abbreviation for the term ILDA File.
-  </p>
-  <p><b>It does not imply that this package is approved or released by the International Laser Display Association, neither were they part in anyway in the creation or evaluation of this package.</b>
-  </p>
 </p>
   <seealsolist>
     <seealso name="04_jam_color_palette" module="guides" type="vignette" />

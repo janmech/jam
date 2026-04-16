@@ -29,6 +29,10 @@
 #include "libusbi.h"
 #include "windows_common.h"
 
+#if defined(LIBUSB_WINDOWS_HOTPLUG)
+#include "windows_hotplug.h"
+#endif
+
 #define EPOCH_TIME	UINT64_C(116444736000000000)	// 1970.01.01 00:00:000 in MS Filetime
 
 #define STATUS_SUCCESS	((ULONG_PTR)0UL)
@@ -565,6 +569,18 @@ static int windows_init(struct libusb_context *ctx)
 
 	r = LIBUSB_SUCCESS;
 
+#if defined(LIBUSB_WINDOWS_HOTPLUG)
+	if (init_count == 1) {
+		r = windows_start_event_monitor(); // Start-up hotplug event handler
+		if (r != LIBUSB_SUCCESS) {
+			usbi_err(ctx, "error starting hotplug event monitor");
+			goto init_exit;
+		}
+	}
+
+	windows_initial_scan_devices(ctx);
+#endif
+
 init_exit: // Holds semaphore here
 	if ((init_count == 1) && (r != LIBUSB_SUCCESS)) { // First init failed?
 		if (usbdk_available) {
@@ -596,6 +612,9 @@ static void windows_exit(struct libusb_context *ctx)
 
 	// Only works if exits and inits are balanced exactly
 	if (--init_count == 0) { // Last exit
+#if defined(LIBUSB_WINDOWS_HOTPLUG)
+		windows_stop_event_monitor();
+#endif
 		if (usbdk_available) {
 			usbdk_backend.exit(ctx);
 			usbdk_available = false;
@@ -624,10 +643,22 @@ static int windows_set_option(struct libusb_context *ctx, enum libusb_option opt
 	return LIBUSB_ERROR_NOT_SUPPORTED;
 }
 
+#if !defined(LIBUSB_WINDOWS_HOTPLUG)
 static int windows_get_device_list(struct libusb_context *ctx, struct discovered_devs **discdevs)
 {
 	struct windows_context_priv *priv = usbi_get_context_priv(ctx);
 	return priv->backend->get_device_list(ctx, discdevs);
+}
+#endif
+
+static int windows_get_device_string(libusb_device *dev,
+	enum libusb_device_string_type string_type, char *data, int length)
+{
+	struct windows_context_priv* priv = usbi_get_context_priv(DEVICE_CTX(dev));
+	if (NULL != priv->backend->get_device_string) {
+		return priv->backend->get_device_string(dev, string_type, data, length);
+	}
+	return LIBUSB_ERROR_NOT_SUPPORTED;
 }
 
 static int windows_open(struct libusb_device_handle *dev_handle)
@@ -715,6 +746,37 @@ static void windows_destroy_device(struct libusb_device *dev)
 {
 	struct windows_context_priv *priv = usbi_get_context_priv(DEVICE_CTX(dev));
 	priv->backend->destroy_device(dev);
+}
+
+static int windows_endpoint_supports_raw_io(libusb_device_handle* dev_handle,
+	uint8_t endpoint)
+{
+	struct windows_context_priv *priv = usbi_get_context_priv(HANDLE_CTX(dev_handle));
+	if (priv->backend->endpoint_supports_raw_io)
+		return priv->backend->endpoint_supports_raw_io(dev_handle, endpoint);
+	return LIBUSB_ERROR_NOT_SUPPORTED;
+}
+
+static int windows_endpoint_set_raw_io(libusb_device_handle* dev_handle,
+	uint8_t endpoint, int enable)
+{
+	struct windows_context_priv *priv = usbi_get_context_priv(HANDLE_CTX(dev_handle));
+
+	if (priv->backend->endpoint_supports_raw_io == NULL
+		|| priv->backend->endpoint_supports_raw_io(dev_handle, endpoint) != 1
+		|| priv->backend->endpoint_set_raw_io == NULL)
+		return LIBUSB_ERROR_NOT_SUPPORTED;
+
+	return priv->backend->endpoint_set_raw_io(dev_handle, endpoint, enable);
+}
+
+static int windows_get_max_raw_io_transfer_size(struct libusb_device_handle *dev_handle,
+	uint8_t endpoint)
+{
+	struct windows_context_priv *priv = usbi_get_context_priv(HANDLE_CTX(dev_handle));
+	if (priv->backend->get_max_raw_io_transfer_size)
+		return priv->backend->get_max_raw_io_transfer_size(dev_handle, endpoint);
+	return LIBUSB_ERROR_NOT_SUPPORTED;
 }
 
 static int windows_submit_transfer(struct usbi_transfer *itransfer)
@@ -888,7 +950,12 @@ const struct usbi_os_backend usbi_backend = {
 	windows_init,
 	windows_exit,
 	windows_set_option,
+#if defined(LIBUSB_WINDOWS_HOTPLUG)
+	NULL, /* get_device_list */
+#else
 	windows_get_device_list,
+#endif
+	windows_get_device_string,
 	NULL,	/* hotplug_poll */
 	NULL,	/* wrap_sys_device */
 	windows_open,
@@ -910,6 +977,9 @@ const struct usbi_os_backend usbi_backend = {
 	NULL,	/* kernel_driver_active */
 	NULL,	/* detach_kernel_driver */
 	NULL,	/* attach_kernel_driver */
+	windows_endpoint_supports_raw_io,
+	windows_endpoint_set_raw_io,
+	windows_get_max_raw_io_transfer_size,
 	windows_destroy_device,
 	windows_submit_transfer,
 	windows_cancel_transfer,

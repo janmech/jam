@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 #############################################################
-# Build jam.ilda.manager as extension (not as external)
+# Build jam.helios.manager as extension (not as external)
 #############################################################
 set(C74_BUILD_MAX_EXTENSION 1)
 
@@ -24,20 +24,11 @@ include_directories(
 
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
-    ../jam.helios.connector/libusb/sync.c
-    ../jam.helios.connector/libusb/io.c
-    ../jam.helios.connector/libusb/strerror.c
-    ../jam.helios.connector/libusb/descriptor.c
-    ../jam.helios.connector/libusb/os/darwin_usb.c
-    ../jam.helios.connector/libusb/hotplug.c
     ../jam.helios.connector/helios-sdk/cpp/idn/idn.cpp
     ../jam.helios.connector/helios-sdk/cpp/HeliosDac.cpp
     ../jam.helios.connector/helios-sdk/cpp/shared_library/HeliosDacAPI.cpp
-    ../jam.helios.connector/libusb/os/threads_posix.c
-    ../jam.helios.connector/libusb/os/events_posix.c
-    ../jam.helios.connector/libusb/core.c
     ../jam.helios.connector/helios-sdk/cpp/idn/idnServerList.cpp
-    ../jam.helios.connector/helios-sdk/cpp/idn/plt-posix.cpp
+    ../jam.helios.connector/helios-sdk/cpp/idn/plt-posix.c
     ../jam.helios.connector/jam.helios.connector.cpp
 )
 
@@ -46,6 +37,46 @@ add_library(
 	${PROJECT_NAME} 
 	MODULE
 	${SOURCE_FILES}
+)
+
+# --- Link macOS Frameworks ---
+
+find_library(CORE_FOUNDATION CoreFoundation REQUIRED)
+find_library(IO_KIT IOKit REQUIRED)
+find_library(SECURITY_FRAMEWORK Security REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    ${CORE_FOUNDATION} 
+    ${IO_KIT} 
+    ${SECURITY_FRAMEWORK}
+)
+
+
+# 1. Locate the dylib using the correct relative path
+find_library(LIBUSB_BIN 
+    NAMES libusb-1.0.0.dylib 
+    PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/helios-sdk/cpp/libusb_bin/macOS"
+    NO_DEFAULT_PATH
+)
+
+# 2. Check if it was actually found to prevent the "NOTFOUND" error
+if(NOT LIBUSB_BIN)
+    message(FATAL_ERROR "Could not find libusb-1.0.0.dylib! Checked in: ${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/helios-sdk/cpp/libusb_bin/macOS")
+endif()
+
+# 3. Link it
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBUSB_BIN})
+
+# 4. Bundle it
+set_source_files_properties(${LIBUSB_BIN} PROPERTIES 
+    MACOSX_PACKAGE_LOCATION Frameworks
+)
+target_sources(${PROJECT_NAME} PRIVATE ${LIBUSB_BIN})
+
+# 5. Set RPATH
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH "@loader_path/../Frameworks"
 )
 
 

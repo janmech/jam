@@ -1,6 +1,11 @@
 /* config.h.  Manually generated for Xcode.  */
 
+
 #include <AvailabilityMacros.h>
+
+#ifndef OS_DARWIN
+#define OS_DARWIN 1
+#endif
 
 /* Define to the attribute for default visibility. */
 #define DEFAULT_VISIBILITY __attribute__ ((visibility ("default")))

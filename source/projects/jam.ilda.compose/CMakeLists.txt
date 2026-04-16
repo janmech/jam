@@ -37,6 +37,43 @@ add_library(
 	MODULE
 	${SOURCE_FILES}
 )
+# --- Link macOS Frameworks ---
+
+find_library(CORE_FOUNDATION CoreFoundation REQUIRED)
+find_library(CORE_TEXT CoreText REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    ${CORE_FOUNDATION} 
+    ${CORE_TEXT} 
+)
+
+
+# 1. Locate the dylib using the correct relative path
+find_library(LIBUSB_BIN 
+    NAMES libusb-1.0.0.dylib 
+    PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/helios-sdk/cpp/libusb_bin/macOS"
+    NO_DEFAULT_PATH
+)
+
+# 2. Check if it was actually found to prevent the "NOTFOUND" error
+if(NOT LIBUSB_BIN)
+    message(FATAL_ERROR "Could not find libusb-1.0.0.dylib! Checked in: ${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/helios-sdk/cpp/libusb_bin/macOS")
+endif()
+
+# 3. Link it
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBUSB_BIN})
+
+# 4. Bundle it
+set_source_files_properties(${LIBUSB_BIN} PROPERTIES 
+    MACOSX_PACKAGE_LOCATION Frameworks
+)
+target_sources(${PROJECT_NAME} PRIVATE ${LIBUSB_BIN})
+
+# 5. Set RPATH
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    BUILD_WITH_INSTALL_RPATH TRUE
+    INSTALL_RPATH "@loader_path/../Frameworks"
+)
 
 
 include(${C74_MIN_API_DIR}/script/min-posttarget.cmake)
@@ -47,3 +84,9 @@ include(${C74_MIN_API_DIR}/script/min-posttarget.cmake)
 #############################################################
 
 include(${C74_MIN_API_DIR}/test/min-object-unittest.cmake)
+
+
+
+
+
+

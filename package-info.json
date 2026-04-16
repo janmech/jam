@@ -1,7 +1,7 @@
 {
 	"name" : "jam",
 	"displayname" : "Jam",
-	"version" : "2.0-alpha",
+	"version" : "2.0-dev",
 	"author" : "Jan Mech",
 	"authors" : [],
 	"description" : "A collection of oblects to control DMX and ILDA capable devices",

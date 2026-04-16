@@ -53,10 +53,14 @@ class helios : public object<helios>
     
 protected:
     
-    HeliosPointHighRes* _frame_1 = nullptr;
-    HeliosPointHighRes* _frame_2 = nullptr;
+    HeliosPointHighRes* _frame_1    = nullptr;
+    HeliosPointHighRes* _frame_2    = nullptr;
     HeliosPointHighRes* _play_frame = nullptr;
     HeliosPointHighRes* _edit_frame = nullptr;
+    
+    std::vector<jam::ilda::IldaFrame>                _ilda_frames;
+//    std::vector<std::unique_ptr<HeliosPointHighRes[]>> _laser_frames;
+    std::vector<std::vector<HeliosPointHighRes>> _laser_frames;
     
     lpvec _frame_points;
     
@@ -102,8 +106,6 @@ protected:
     c74::max::t_object *_ilda_manager;              // Pointer to global jam.ilda.manager object
                                                     // (stores data to be accasibele by other jam.ilda.* object)
     t_jam_im * _ilda_manager_struct_ptr = NULL;     // Pointer to max-object struct of the jam.ilda.manager object
-    
-    std::vector<jam::ilda::IldaFrame> _ilda_frames;
     
     t_jam_im * _getIldaManagerStructPointer() {
         if(this->_ilda_manager_struct_ptr == NULL) {
@@ -235,8 +237,12 @@ protected:
         lock.unlock();
     }
     
-    number _map(number x, number in_min, number in_max, number out_min, number out_max) {
-      return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+//    number _map(number x, number in_min, number in_max, number out_min, number out_max) {
+//      return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+//    }
+    
+    template <typename T> T _map(T x, T in_min, T in_max, T out_min, T out_max) {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
     
     number _toPrecision(number value, uint precision = 3) {
@@ -345,8 +351,58 @@ protected:
         return points;
     }
     
+    void _parseFrames2DToTrueColor(std::vector<jam::ilda::IldaFrame> &frames) {
+        jam::ilda::Colors *col = new jam::ilda::Colors();
+        
+        for(size_t i = 0; i < frames.size(); i++) {
+            jam::ilda::IldaHeader h = frames[i].getHeader();
+            jam::ilda::RecordFormat rec_format = h.getFormatCode();
+            
+            if(rec_format == jam::ilda::RecordFormat::FORMAT_2) { // we ignore color palette frames
+                continue;
+            }
+            h.setFormatCode(jam::ilda::RecordFormat::FORMAT_5); // 2D True Color
+            frames[i].setHeader(h);
+            std::vector<jam::ilda::IldaDataRecord> dr = frames[i].getDataRecords();
+            for(size_t j = 0; j < dr.size(); j++) {
+                uint8_t color_index = dr[j].getColorIndex();
+                std::vector<number> col_vals = col->getFloatColorByIndex((size_t)color_index);
+                dr[j].setRed((uint8_t)(col_vals[0] * 255.));
+                dr[j].setGreen((uint8_t)(col_vals[1] * 255.));
+                dr[j].setBlue((uint8_t)(col_vals[2] * 255.));
+                dr[j].setPosZ(0);
+            }
+            frames[i].setDataRecords(dr);
+            
+        }
+        delete col;
+    }
+    
     void _ildaToLaserFrames() {
-        // TODO: we need to parse the ilda frames to a vector of HeliosPointHighRes* arrays
+        this->_laser_frames.clear();
+        for(auto ilda_frame: this->_ilda_frames) {
+            int frame_record_count = ilda_frame.getDataRecordCount();
+                // Make new laser frame
+//            auto l_frame = std::make_unique<HeliosPointHighRes[]>(frame_record_count);
+            auto data_record = ilda_frame.getDataRecords();
+            std::vector<HeliosPointHighRes> l_frame;
+            for(int i = 0; i < frame_record_count; i++) {
+                auto l_point = new HeliosPointHighRes;
+                auto dr = data_record[i];
+                l_point->x = dr.getPosX();
+                l_point->y = dr.getPosY();
+                l_point->r = dr.getRed();
+                auto red = dr.getBlanking() ? 0 : this->_map((uint16_t)dr.getRed(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
+                auto green = dr.getBlanking() ? 0 : this->_map((uint16_t)dr.getGreen(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
+                auto blue = dr.getBlanking() ? 0 : this->_map((uint16_t)dr.getBlue(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
+                l_point->r = red;
+                l_point->g = green;
+                l_point->b = blue;
+                l_frame.push_back(std::move(*l_point));
+                
+            }
+            this->_laser_frames.push_back(std::move(l_frame));
+        }
     }
  
     
@@ -493,6 +549,25 @@ public:
         description {"Rotate the output"},
     };
     
+    attribute<symbol> drawmode {
+        this, "drawmode", "direct",
+        range {"direct", "ilda"},
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<std::string>(args, &cleaned_args, 1, "direct");
+                std::string value = cleaned_args[0];
+                if(value != "direct" && value != "ilda") {
+                    cleaned_args[0] = "direct";
+                }
+                return cleaned_args;
+            }
+        },
+        title { "Daw Mode" },
+        description { "Select between direct drawing mode and ilda file rendering." },
+    };
+    
+    
     message<> open {
         this, "open", "Open connetion to a Helios DAC",
         MIN_FUNCTION{
@@ -630,8 +705,9 @@ public:
 
             std::string ilda_file_refence = args[0];
             std::vector<jam::ilda::IldaFrame> frames = this->_getIldaManagerStructPointer()->getFrames(ilda_file_refence);
+            this->_parseFrames2DToTrueColor(frames);
             this->_ilda_frames = frames;
-        
+            this->_ildaToLaserFrames();
             return {};
             
         }
@@ -657,14 +733,31 @@ public:
             this->_projector_thread = std::thread([this]() {
                 HeliosDac * helios = this->_getConnector()->getDac();
                 while (this->_projector_in_running) {
-                    int status = helios->GetStatus(this->_attached_device);
-                    if (status == 1) {
-                        int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, this->_play_frame, POINTS_PER_FRAME);
-                        if(result != HELIOS_SUCCESS) {
-                            cerr << this->heliosErrorToString(result) << endl;
+                    if(this->drawmode == symbol("direct")) {
+                        int status = helios->GetStatus(this->_attached_device);
+                        if (status == 1) {
+                            int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, this->_play_frame, POINTS_PER_FRAME);
+                            if(result != HELIOS_SUCCESS) {
+                                cerr << this->heliosErrorToString(result) << endl;
+                            }
+                            std::this_thread::sleep_for (std::chrono::milliseconds(1000 / (int)fps));
                         }
-                        std::this_thread::sleep_for (std::chrono::milliseconds(1000 / (int)fps));
+                    } else {
+                        for(int i = 0; i < this->_laser_frames.size(); i++) {
+                            int status = helios->GetStatus(this->_attached_device);
+                            if (status == 1) {
+                                unsigned int frame_size = (unsigned int)this->_laser_frames[i].size();
+                                std::this_thread::sleep_for (std::chrono::milliseconds(500));
+                                cout << "frame: " << i << " " << frame_size << endl;
+                                int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, &this->_laser_frames[i][0], POINTS_PER_FRAME);
+                                if(result != HELIOS_SUCCESS) {
+                                    cerr << this->heliosErrorToString(result) << endl;
+                                }
+//                                std::this_thread::sleep_for (std::chrono::milliseconds(1000 / (int)fps));
+                            }
+                        }
                     }
+                    
                 }
             });
             this->_projector_thread.detach();

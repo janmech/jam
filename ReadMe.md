@@ -46,7 +46,9 @@ Windows: unsupported
 
 **3.**  `` cd build`` and run ``cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G Xcode ..`` 
 
-## Manual steps to configure the build targets:
+
+##Manual steps are DEPRECATED. CmakeLists.txt handle this now
+Manual steps to configure the build targets:
 
 > I haven't figuered out yet how to automize these steps with cmake. For now there steps have to be done manually:
 
