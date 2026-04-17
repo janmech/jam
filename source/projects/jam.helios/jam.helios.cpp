@@ -56,15 +56,9 @@ class helios : public object<helios>, public InterfaceHeliosListener
     
 protected:
     
-    HeliosPointHighRes* _frame_1    = nullptr;
-    HeliosPointHighRes* _frame_2    = nullptr;
-    HeliosPointHighRes* _play_frame = nullptr;
-    HeliosPointHighRes* _edit_frame = nullptr;
-    
-    std::vector<HeliosPointHighRes> _test_play_frame;
-    
-    std::mutex _frame_1_lock;
-    std::mutex _frame_2_lock;
+    std::vector<HeliosPointHighRes> _play_frame;
+    std::vector<HeliosPointHighRes> _edit_frame;
+        
     std::mutex _play_frame_lock;
     std::mutex _edit_frame_lock;
     
@@ -108,7 +102,7 @@ protected:
     
     std::thread _projector_thread;
     
-    bool _projector_in_running = false;
+    std::atomic<bool> _projector_in_running = false;
     
     fifo<queued_message_t> _to_max_queue_2{ 1000 };
     
@@ -224,30 +218,35 @@ protected:
         return rotated;
     }
     
-    void _fillFrame(HeliosPointHighRes * frame, lpvec lps) {
-        lpvec processed = this->_rotateAndScale(lps);
-       
-        for (int i = 0; i < POINTS_PER_DIRECT_DRAW_FRAME; i++) {
-            frame[i].x = processed[i].x;
-            frame[i].y = processed[i].y;
-            frame[i].r = processed[i].blanking ? 0 : this->_color[0];
-            frame[i].g = processed[i].blanking ? 0 : this->_color[1];
-            frame[i].b = processed[i].blanking ? 0 : this->_color[2];
+    void _processFramePointsAndFillFrame(std::vector<HeliosPointHighRes> &frame) {
+        lpvec processed = this->_rotateAndScale(this->_getFramePoints());
+        frame.clear();
+        for (int i = 0; i < processed.size(); i++) {
+            HeliosPointHighRes hires_point;
+            hires_point.x = processed[i].x;
+            hires_point.y = processed[i].y;
+            hires_point.r = processed[i].blanking ? 0 : this->_color[0];
+            hires_point.g = processed[i].blanking ? 0 : this->_color[1];
+            hires_point.b = processed[i].blanking ? 0 : this->_color[2];
+            frame.push_back(hires_point);
         }
     }
     
     void _drawFrame() {
         std::scoped_lock lock(_play_frame_lock, _edit_frame_lock);
-        HeliosPointHighRes* old_frame_play = this->_play_frame;
-        this->_play_frame = this->_edit_frame;
-        this->_edit_frame = old_frame_play;
-        
+        this->_play_frame.swap(this->_edit_frame);
     }
     
     void _setFramePoints(lpvec frame_points) {
         std::lock_guard lock(_frame_points_lock);
         this->_frame_points = frame_points;
     }
+    
+    lpvec _getFramePoints() {
+        std::lock_guard lock(_frame_points_lock);
+        return this->_frame_points;;
+    }
+
     
     template <typename T> T _map(T x, T in_min, T in_max, T out_min, T out_max) {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -431,41 +430,15 @@ public:
             
             laser_point_t lp{0, 0};
             lpvec empty_frame{POINTS_PER_DIRECT_DRAW_FRAME, lp};
-            lpvec test_frame_points = this->_makeEllipsePoints({0., 0.}, {.5, .5});
-            _test_play_frame.clear();
-            for(size_t i = 0; i< test_frame_points.size(); i++) {
-                HeliosPointHighRes hires_point;
-                
-                hires_point.x = test_frame_points[i].x;
-                hires_point.y = test_frame_points[i].y;
-                hires_point.r = this->_color[0];
-                hires_point.g = this->_color[1];
-                hires_point.b = this->_color[2];
-                _test_play_frame.push_back(hires_point);
-                
-            }
-            
             this->_setFramePoints(empty_frame);
-
             
-            {
-                std::lock_guard lock(_frame_1_lock);
-                this->_frame_1 =  new HeliosPointHighRes[POINTS_PER_DIRECT_DRAW_FRAME];
-                this->_fillFrame(this->_frame_1, empty_frame);
-            }
-            
-            {
-                std::lock_guard lock(_frame_2_lock);
-                this->_frame_2 =  new HeliosPointHighRes[POINTS_PER_DIRECT_DRAW_FRAME];
-                this->_fillFrame(this->_frame_2, empty_frame);
-            }
             {
                 std::lock_guard lock(_play_frame_lock);
-                this->_play_frame = this->_frame_1;
+                this->_processFramePointsAndFillFrame(this->_play_frame);
             }
             {
                 std::lock_guard lock(_edit_frame_lock);
-                this->_edit_frame = this->_frame_2;
+                this->_processFramePointsAndFillFrame(this->_edit_frame);
             }
            
         }
@@ -475,13 +448,9 @@ public:
         if (!dummy() && this->initialized()) {
             close();
             this->_getConnector()->unRegisterJamHeliosInstance(this);
-            if(this->_frame_1) {
-                std::lock_guard lock(_frame_1_lock);
-                delete [] this->_frame_1;
-            }
-            if(this->_frame_2) {
-                std::lock_guard lock(_frame_2_lock);
-                delete [] this->_frame_2;
+            
+            if(this->_projector_thread.joinable()) {
+                this->_projector_thread.join();
             }
         }
     }
@@ -548,7 +517,7 @@ public:
             if(this->initialized()) {
                 {
                     std::lock_guard lock(_edit_frame_lock);
-                    this->_fillFrame(this->_edit_frame, this->_frame_points);
+                    this->_processFramePointsAndFillFrame(this->_edit_frame);
                 }
                
                 this->_drawFrame();
@@ -574,7 +543,7 @@ public:
                 if(this->initialized()) {
                     {
                         std::lock_guard lock(_edit_frame_lock);
-                        this->_fillFrame(this->_edit_frame, this->_frame_points);
+                        this->_processFramePointsAndFillFrame(this->_edit_frame);
                     }
                    
                     this->_drawFrame();
@@ -601,7 +570,7 @@ public:
                 if(this->initialized()) {
                     {
                         std::lock_guard lock(_edit_frame_lock);
-                        this->_fillFrame(this->_edit_frame, this->_frame_points);
+                        this->_processFramePointsAndFillFrame(this->_edit_frame);
                     }
                     this->_drawFrame();
                 }
@@ -681,6 +650,7 @@ public:
             if(this->_attached_device > -1) {
                 this->_getConnector()->detachDacDevice(this->getInstanceId());
                 this->_attached_device = -1;
+                this->_projector_in_running = false;
                 queued_message_t msg;
                 atoms msg_atoms;
                 msg_atoms.push_back(0);
@@ -699,11 +669,11 @@ public:
             }
             number x = std::clamp((number)args[0], -1., 1.);
             number y = std::clamp((number)args[1], -1., 1.) * -1.;
-            
             this->_setFramePoints(this->_makeDotPoints(x, y));
+            
             {
                 std::lock_guard lock(_edit_frame_lock);
-                this->_fillFrame(this->_edit_frame, this->_frame_points);
+                this->_processFramePointsAndFillFrame(this->_edit_frame);
             }
            
             this->_drawFrame();
@@ -725,12 +695,11 @@ public:
             number y = std::clamp((number)args[1], -1., 1.) * -1.;
             coord_point_t center = {x, y};
             coord_point_t  radius = {r, r};
-            
             this->_setFramePoints(this->_makeEllipsePoints(center, radius));
             
             {
                 std::lock_guard lock(_edit_frame_lock);
-                this->_fillFrame(this->_edit_frame, this->_frame_points);
+                this->_processFramePointsAndFillFrame(this->_edit_frame);
             }
            
             this->_drawFrame();
@@ -755,9 +724,10 @@ public:
             };
             
             this->_setFramePoints(this->_makeLinePoints(start, end));
+            
             {
                 std::lock_guard lock(_edit_frame_lock);
-                this->_fillFrame(this->_edit_frame, this->_frame_points);
+                this->_processFramePointsAndFillFrame(this->_edit_frame);
             }
            
             this->_drawFrame();
@@ -806,6 +776,9 @@ public:
             }
             this->_projector_in_running = true;
             
+            if(this->_projector_thread.joinable()) {
+                this->_projector_thread.join();
+            }
             this->_projector_thread = std::thread([this]() {
                 HeliosDac * helios = this->_getConnector()->getDac();
                 while (this->_projector_in_running) {
@@ -814,22 +787,15 @@ public:
                         if (status == 1) {
                             int result;
                             {
-                            std::lock_guard lock(_play_frame_lock);
-                            unsigned int test_frame_size = (unsigned int) this->_test_play_frame.size();
-                            result = helios->WriteFrameHighResolution(
-                                      this->_attached_device,
-                                      (int)samplerate,
-                                      HELIOS_FLAGS_DEFAULT,
-                                      this->_test_play_frame.data(),
-                                      test_frame_size
-                                     );
-//                            result = helios->WriteFrameHighResolution(
-//                                      this->_attached_device,
-//                                      (int)samplerate,
-//                                      HELIOS_FLAGS_DEFAULT,
-//                                      this->_play_frame,
-//                                      POINTS_PER_DIRECT_DRAW_FRAME
-//                                     );
+                                std::lock_guard lock(_play_frame_lock);
+                                unsigned int frame_size = (unsigned int) this->_play_frame.size();
+                                result = helios->WriteFrameHighResolution(
+                                          this->_attached_device,
+                                          (int)samplerate,
+                                          HELIOS_FLAGS_DEFAULT,
+                                          this->_play_frame.data(),
+                                          frame_size
+                                         );
                             }
                             
 
@@ -857,7 +823,7 @@ public:
                     
                 }
             });
-            this->_projector_thread.detach();
+            
             return {};
         }
     };
