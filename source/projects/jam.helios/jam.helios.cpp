@@ -26,7 +26,7 @@
 #include "../jam.ilda_common/ilda_colors.hpp"
 #include "InterfaceHeliosListener.hpp"
 
-#define POINTS_PER_FRAME 1000
+#define POINTS_PER_DIRECT_DRAW_FRAME 1000
 #define X_Y_MAX 65500
 #define X_Y_MIN 35
 
@@ -227,7 +227,7 @@ protected:
     void _fillFrame(HeliosPointHighRes * frame, lpvec lps) {
         lpvec processed = this->_rotateAndScale(lps);
        
-        for (int i = 0; i < POINTS_PER_FRAME; i++) {
+        for (int i = 0; i < POINTS_PER_DIRECT_DRAW_FRAME; i++) {
             frame[i].x = processed[i].x;
             frame[i].y = processed[i].y;
             frame[i].r = processed[i].blanking ? 0 : this->_color[0];
@@ -248,10 +248,6 @@ protected:
         std::lock_guard lock(_frame_points_lock);
         this->_frame_points = frame_points;
     }
-    
-//    number _map(number x, number in_min, number in_max, number out_min, number out_max) {
-//      return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-//    }
     
     template <typename T> T _map(T x, T in_min, T in_max, T out_min, T out_max) {
         return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -325,10 +321,10 @@ protected:
     lpvec _makeDotPoints(number x, number y) {
         lpvec points;
         number x_coord_prev = 0.;
-        for(int i = 0; i < POINTS_PER_FRAME; i++) {
+        for(int i = 0; i < POINTS_PER_DIRECT_DRAW_FRAME; i++) {
             coord_point_t cp;
             cp.y = y;
-            number offset = (2. / (number)(POINTS_PER_FRAME) * (number)i);
+            number offset = (2. / (number)(POINTS_PER_DIRECT_DRAW_FRAME) * (number)i);
             number x_coord = -1. + offset;
             cp.x = x_coord;
             bool blanking = !(x >= x_coord_prev && x <= x_coord);
@@ -347,8 +343,8 @@ protected:
         lpvec points;
         number delta_x = p2.x - p1.x;
         number delta_y = p2.y - p1.y;
-        for (int i = 0; i < POINTS_PER_FRAME; ++i) {
-            number t = static_cast<number>(i) / POINTS_PER_FRAME;
+        for (int i = 0; i < POINTS_PER_DIRECT_DRAW_FRAME; ++i) {
+            number t = static_cast<number>(i) / POINTS_PER_DIRECT_DRAW_FRAME;
             number x = p1.x + t * delta_x;
             number y = p1.y + t * delta_y;
             coord_point_t cp{std::clamp(x, -1., 1.), std::clamp(y, -1., 1.)};
@@ -356,8 +352,8 @@ protected:
             points.push_back(lp);
         }
         for(int i = 1; i < 10; i++) {
-            points[POINTS_PER_FRAME - i] = points[0];
-            points[POINTS_PER_FRAME - i].blanking = true;
+            points[POINTS_PER_DIRECT_DRAW_FRAME - i] = points[0];
+            points[POINTS_PER_DIRECT_DRAW_FRAME - i].blanking = true;
         }
         
         return points;
@@ -434,19 +430,19 @@ public:
             this->_connector->registerJamHeliosInstance(this);
             
             laser_point_t lp{0, 0};
-            lpvec empty_frame{POINTS_PER_FRAME, lp};
-            lpvec test_frame_point = this->_makeEllipsePoints({0., 0.}, {.5, .5});
-            for(size_t j = 0; j< test_frame_point.size(); j++) {
-                for (int i = 0; i < POINTS_PER_FRAME; i++) {
-                    HeliosPointHighRes hires_point;
-                    
-                    hires_point.x = test_frame_point[i].x;
-                    hires_point.y = test_frame_point[i].y;
-                    hires_point.r = this->_color[0];
-                    hires_point.g = this->_color[1];
-                    hires_point.b = this->_color[2];
-                    _test_play_frame.push_back(hires_point);
-                }
+            lpvec empty_frame{POINTS_PER_DIRECT_DRAW_FRAME, lp};
+            lpvec test_frame_points = this->_makeEllipsePoints({0., 0.}, {.5, .5});
+            _test_play_frame.clear();
+            for(size_t i = 0; i< test_frame_points.size(); i++) {
+                HeliosPointHighRes hires_point;
+                
+                hires_point.x = test_frame_points[i].x;
+                hires_point.y = test_frame_points[i].y;
+                hires_point.r = this->_color[0];
+                hires_point.g = this->_color[1];
+                hires_point.b = this->_color[2];
+                _test_play_frame.push_back(hires_point);
+                
             }
             
             this->_setFramePoints(empty_frame);
@@ -454,13 +450,13 @@ public:
             
             {
                 std::lock_guard lock(_frame_1_lock);
-                this->_frame_1 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+                this->_frame_1 =  new HeliosPointHighRes[POINTS_PER_DIRECT_DRAW_FRAME];
                 this->_fillFrame(this->_frame_1, empty_frame);
             }
             
             {
                 std::lock_guard lock(_frame_2_lock);
-                this->_frame_2 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+                this->_frame_2 =  new HeliosPointHighRes[POINTS_PER_DIRECT_DRAW_FRAME];
                 this->_fillFrame(this->_frame_2, empty_frame);
             }
             {
@@ -832,7 +828,7 @@ public:
 //                                      (int)samplerate,
 //                                      HELIOS_FLAGS_DEFAULT,
 //                                      this->_play_frame,
-//                                      POINTS_PER_FRAME
+//                                      POINTS_PER_DIRECT_DRAW_FRAME
 //                                     );
                             }
                             
@@ -850,7 +846,7 @@ public:
                                 unsigned int frame_size = (unsigned int)this->_laser_frames[i].size();
                                 std::this_thread::sleep_for (std::chrono::milliseconds(500));
                                 cout << "frame: " << i << " " << frame_size << endl;
-                                int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, &this->_laser_frames[i][0], POINTS_PER_FRAME);
+                                int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, &this->_laser_frames[i][0], POINTS_PER_DIRECT_DRAW_FRAME);
                                 if(result != HELIOS_SUCCESS) {
                                     cerr << this->heliosErrorToString(result) << endl;
                                 }
