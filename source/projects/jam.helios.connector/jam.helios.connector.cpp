@@ -2,6 +2,10 @@
 
 namespace jam::helios {
     
+    void Connector::subscribeListener(InterfaceHeliosListener * ptr_jam_helio_instance) {
+        
+    };
+    
     bool Connector::isScanning() {
         return this->_is_scanning;
     }

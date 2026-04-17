@@ -39,6 +39,8 @@ add_library(
 	${SOURCE_FILES}
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/shared")
+
 # 1. Locate the dylib using the correct relative path
 find_library(LIBUSB_BIN 
     NAMES libusb-1.0.0.dylib 

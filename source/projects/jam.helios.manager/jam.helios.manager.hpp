@@ -5,6 +5,7 @@
 #include <string>
 #include <mutex>
 #include "../jam.helios.connector/jam.helios.connector.hpp"
+#include "InterfaceHeliosListener.hpp"
 
 
 

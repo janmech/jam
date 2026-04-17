@@ -39,6 +39,9 @@ add_library(
 	${SOURCE_FILES}
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../jam.helios.connector/shared")
+
+
 # --- Link macOS Frameworks ---
 
 find_library(CORE_FOUNDATION CoreFoundation REQUIRED)

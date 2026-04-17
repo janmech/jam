@@ -195,8 +195,6 @@ protected:
         }
         _messages_to_device_queue_cv.notify_all();
         
-        char                       msg_buffer[msg_bytes.size()];
-        
         std::size_t success = write(
             this->_getConnector()->getFd(this->_getOpenDeviceName()),
             msg_bytes.data(),

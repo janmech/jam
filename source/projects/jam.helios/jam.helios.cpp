@@ -23,6 +23,7 @@
 #include "../jam.ilda_common/ilda_header.hpp"
 #include "../jam.ilda_common/ilda_data_record.hpp"
 #include "../jam.ilda_common/ilda_colors.hpp"
+#include "InterfaceHeliosListener.hpp"
 
 #define POINTS_PER_FRAME 1000
 #define X_Y_MAX 65500
@@ -30,6 +31,7 @@
 
 
 using namespace c74::min;
+using namespace jam::helios;
 using HeliosConnector = jam::helios::Connector;
 using fvec = std::vector<number>;
 
@@ -48,7 +50,7 @@ typedef struct CoordPoint {
 using lpvec = std::vector<laser_point_t>;
 
 
-class helios : public object<helios>
+class helios : public object<helios>, public InterfaceHeliosListener
 {
     
 protected:
@@ -58,11 +60,17 @@ protected:
     HeliosPointHighRes* _play_frame = nullptr;
     HeliosPointHighRes* _edit_frame = nullptr;
     
+    std::mutex _frame_1_lock;
+    std::mutex _frame_2_lock;
+    std::mutex _play_frame_lock;
+    std::mutex _edit_frame_lock;
+    
     std::vector<jam::ilda::IldaFrame>                _ilda_frames;
 //    std::vector<std::unique_ptr<HeliosPointHighRes[]>> _laser_frames;
     std::vector<std::vector<HeliosPointHighRes>> _laser_frames;
     
     lpvec _frame_points;
+    std::mutex _frame_points_lock;
     
     coord_point_t _scaling {1., 1.};
     
@@ -215,26 +223,27 @@ protected:
     
     void _fillFrame(HeliosPointHighRes * frame, lpvec lps) {
         lpvec processed = this->_rotateAndScale(lps);
-        std::mutex lock;
-        lock.lock();
+       
         for (int i = 0; i < POINTS_PER_FRAME; i++) {
             frame[i].x = processed[i].x;
             frame[i].y = processed[i].y;
             frame[i].r = processed[i].blanking ? 0 : this->_color[0];
             frame[i].g = processed[i].blanking ? 0 : this->_color[1];
             frame[i].b = processed[i].blanking ? 0 : this->_color[2];
-            
         }
-        lock.unlock();
     }
     
     void _drawFrame() {
-        std::mutex lock;
-        lock.lock();
+        std::scoped_lock lock(_play_frame_lock, _edit_frame_lock);
         HeliosPointHighRes* old_frame_play = this->_play_frame;
         this->_play_frame = this->_edit_frame;
         this->_edit_frame = old_frame_play;
-        lock.unlock();
+        
+    }
+    
+    void _setFramePoints(lpvec frame_points) {
+        std::lock_guard lock(_frame_points_lock);
+        this->_frame_points = frame_points;
     }
     
 //    number _map(number x, number in_min, number in_max, number out_min, number out_max) {
@@ -419,25 +428,44 @@ public:
             srand((unsigned int)ts.tv_nsec);
             this->_instance_id = rand();
             
-            this->_frame_1 =  new HeliosPointHighRes[POINTS_PER_FRAME];
-            this->_frame_2 =  new HeliosPointHighRes[POINTS_PER_FRAME];
             laser_point_t lp{0, 0};
             lpvec empty_frame{POINTS_PER_FRAME, lp};
-            this->_frame_points = empty_frame;
-            this->_fillFrame(this->_frame_1, empty_frame);
-            this->_fillFrame(this->_frame_2, empty_frame);
-            this->_play_frame = this->_frame_1;
-            this->_edit_frame = this->_frame_2;
+            
+            this->_setFramePoints(empty_frame);
+
+            
+            {
+                std::lock_guard lock(_frame_1_lock);
+                this->_frame_1 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+                this->_fillFrame(this->_frame_1, empty_frame);
+            }
+            
+            {
+                std::lock_guard lock(_frame_2_lock);
+                this->_frame_2 =  new HeliosPointHighRes[POINTS_PER_FRAME];
+                this->_fillFrame(this->_frame_2, empty_frame);
+            }
+            {
+                std::lock_guard lock(_play_frame_lock);
+                this->_play_frame = this->_frame_1;
+            }
+            {
+                std::lock_guard lock(_edit_frame_lock);
+                this->_edit_frame = this->_frame_2;
+            }
+           
         }
     }
     
     ~helios() {
         if (!dummy()) {
             close();
-            if(this->_frame_1 != nullptr) {
+            if(this->_frame_1) {
+                std::lock_guard lock(_frame_1_lock);
                 delete [] this->_frame_1;
             }
-            if(this->_frame_2 != nullptr) {
+            if(this->_frame_2) {
+                std::lock_guard lock(_frame_2_lock);
                 delete [] this->_frame_2;
             }
         }
@@ -453,6 +481,10 @@ public:
     outlet<> outlet_menu{ this, "(anything) Connect to umenu", "message" };
     outlet<> outlet_connected{ this, "(int) State of Connection", "int" };
     outlet<> outlet_dumpout{ this, "dumpout" };
+    
+    void onConnectionReset() {
+        cwarn << "callback called" << endl;
+    }
 
     attribute<int, threadsafe::no, limit::clamp> samplerate {
         this,
@@ -494,7 +526,11 @@ public:
             this->_color[1] = static_cast<uint16_t>((number)cleaned_args[1] * (number)0xFFFF);
             this->_color[2] = static_cast<uint16_t>((number)cleaned_args[2] * (number)0xFFFF);
             if(this->initialized()) {
-                this->_fillFrame(this->_edit_frame, this->_frame_points);
+                {
+                    std::lock_guard lock(_edit_frame_lock);
+                    this->_fillFrame(this->_edit_frame, this->_frame_points);
+                }
+               
                 this->_drawFrame();
             }
             return cleaned_args;
@@ -516,7 +552,11 @@ public:
                 
                 this->_scaling = {cleaned_args[0], cleaned_args[1]};
                 if(this->initialized()) {
-                    this->_fillFrame(this->_edit_frame, this->_frame_points);
+                    {
+                        std::lock_guard lock(_edit_frame_lock);
+                        this->_fillFrame(this->_edit_frame, this->_frame_points);
+                    }
+                   
                     this->_drawFrame();
                 }
                 return cleaned_args;
@@ -539,7 +579,10 @@ public:
                 this->_rotation_center.x = (number)cleaned_args[1];
                 this->_rotation_center.y = (number)cleaned_args[2];
                 if(this->initialized()) {
-                    this->_fillFrame(this->_edit_frame, this->_frame_points);
+                    {
+                        std::lock_guard lock(_edit_frame_lock);
+                        this->_fillFrame(this->_edit_frame, this->_frame_points);
+                    }
                     this->_drawFrame();
                 }
                 return cleaned_args;
@@ -636,8 +679,13 @@ public:
             }
             number x = std::clamp((number)args[0], -1., 1.);
             number y = std::clamp((number)args[1], -1., 1.) * -1.;
-            this->_frame_points = this->_makeDotPoints(x, y);
-            this->_fillFrame(this->_edit_frame, this->_frame_points);
+            
+            this->_setFramePoints(this->_makeDotPoints(x, y));
+            {
+                std::lock_guard lock(_edit_frame_lock);
+                this->_fillFrame(this->_edit_frame, this->_frame_points);
+            }
+           
             this->_drawFrame();
             return {};
         }
@@ -658,32 +706,40 @@ public:
             coord_point_t center = {x, y};
             coord_point_t  radius = {r, r};
             
-            this->_frame_points = this->_makeEllipsePoints(center, radius);
-            this->_fillFrame(this->_edit_frame, this->_frame_points);
+            this->_setFramePoints(this->_makeEllipsePoints(center, radius));
+            
+            {
+                std::lock_guard lock(_edit_frame_lock);
+                this->_fillFrame(this->_edit_frame, this->_frame_points);
+            }
+           
             this->_drawFrame();
             return {};
         }
     };
     
     message<threadsafe::no> line {
-        this, "line", "Project a line with x/y in the center, width and angle",
+        this, "line", "Project a line with from x1/y1 to x2/y2",
         MIN_FUNCTION {
             if(args.size() < 4) {
                 return {};
             }
             coord_point_t start = {
-                std::clamp((number)args[0], -1., 1.),
-                std::clamp((number)args[1], -1., 1.) * -1.
+                std::clamp((number)args[0], -1., 1.) * -1.,
+                std::clamp((number)args[1], -1., 1.) // * -1.
             };
             
             coord_point_t end = {
-                std::clamp((number)args[2], -1., 1.),
-                std::clamp((number)args[3], -1., 1.) * -1.
+                std::clamp((number)args[2], -1., 1.) * -1.,
+                std::clamp((number)args[3], -1., 1.) //* -1.
             };
             
-        
-            this->_frame_points = this->_makeLinePoints(start, end);
-            this->_fillFrame(this->_edit_frame, this->_frame_points);
+            this->_setFramePoints(this->_makeLinePoints(start, end));
+            {
+                std::lock_guard lock(_edit_frame_lock);
+                this->_fillFrame(this->_edit_frame, this->_frame_points);
+            }
+           
             this->_drawFrame();
             
             
@@ -736,7 +792,16 @@ public:
                     if(this->drawmode == symbol("direct")) {
                         int status = helios->GetStatus(this->_attached_device);
                         if (status == 1) {
-                            int result = helios->WriteFrameHighResolution(this->_attached_device, (int)samplerate, HELIOS_FLAGS_DEFAULT, this->_play_frame, POINTS_PER_FRAME);
+                            int result;
+                            {
+                            std::lock_guard lock(_play_frame_lock);
+                            result = helios->WriteFrameHighResolution(
+                                      this->_attached_device,
+                                      (int)samplerate, HELIOS_FLAGS_DEFAULT,
+                                      this->_play_frame, POINTS_PER_FRAME
+                                     );
+                            }
+                            
                             if(result != HELIOS_SUCCESS) {
                                 cerr << this->heliosErrorToString(result) << endl;
                             }

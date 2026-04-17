@@ -4,6 +4,7 @@
 #include "helios-sdk/cpp/HeliosDac.h"
 #include "helios-sdk/cpp/libusb.h"
 #include "c74_min_api.h"
+#include "shared/InterfaceHeliosListener.hpp"
 
 using number = c74::min::number;
 
@@ -58,6 +59,8 @@ namespace jam::helios {
         void detachDevice(uint instance_id);
         
         HeliosDac * getDac();
+        
+        void subscribeListener(InterfaceHeliosListener * ptr_jam_helio_instance);
         
         
         

@@ -73,7 +73,7 @@
                             },
                             {
                                 "box": {
-                                    "attr": "notifyothers",
+                                    "attr": "drawmode",
                                     "id": "obj-23",
                                     "maxclass": "attrui",
                                     "numinlets": 1,
