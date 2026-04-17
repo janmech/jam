@@ -13,6 +13,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <iterator>
 #include "c74_min.h"
 #include "../jam.helper/attribute_args_helper.hpp"
 #include "../jam.helios.connector/jam.helios.connector.hpp"
@@ -59,6 +60,8 @@ protected:
     HeliosPointHighRes* _frame_2    = nullptr;
     HeliosPointHighRes* _play_frame = nullptr;
     HeliosPointHighRes* _edit_frame = nullptr;
+    
+    std::vector<HeliosPointHighRes> _test_play_frame;
     
     std::mutex _frame_1_lock;
     std::mutex _frame_2_lock;
@@ -432,6 +435,19 @@ public:
             
             laser_point_t lp{0, 0};
             lpvec empty_frame{POINTS_PER_FRAME, lp};
+            lpvec test_frame_point = this->_makeEllipsePoints({0., 0.}, {.5, .5});
+            for(size_t j = 0; j< test_frame_point.size(); j++) {
+                for (int i = 0; i < POINTS_PER_FRAME; i++) {
+                    HeliosPointHighRes hires_point;
+                    
+                    hires_point.x = test_frame_point[i].x;
+                    hires_point.y = test_frame_point[i].y;
+                    hires_point.r = this->_color[0];
+                    hires_point.g = this->_color[1];
+                    hires_point.b = this->_color[2];
+                    _test_play_frame.push_back(hires_point);
+                }
+            }
             
             this->_setFramePoints(empty_frame);
 
@@ -474,6 +490,15 @@ public:
         }
     }
     
+    void onConnectionReset() {
+        this->_attached_device = -1;
+        queued_message_t msg;
+        atoms msg_atoms;
+        msg_atoms.push_back(0);
+        msg.set(&outlet_connected, msg_atoms);
+        msg.send(this);
+    }
+    
     MIN_DESCRIPTION { "Connect to a Helios ILDA DAC" };
     MIN_TAGS { "laser control" };
     MIN_AUTHOR{ "Jan Mech" };
@@ -485,15 +510,6 @@ public:
     outlet<> outlet_connected{ this, "(int) State of Connection", "int" };
     outlet<> outlet_dumpout{ this, "dumpout" };
     
-    void onConnectionReset() {
-        this->_attached_device = -1;
-        queued_message_t msg;
-        atoms msg_atoms;
-        msg_atoms.push_back(0);
-        msg.set(&outlet_connected, msg_atoms);
-        msg.send(this);
-    }
-
     attribute<int, threadsafe::no, limit::clamp> samplerate {
         this,
         "samplerate",
@@ -803,12 +819,24 @@ public:
                             int result;
                             {
                             std::lock_guard lock(_play_frame_lock);
+                            unsigned int test_frame_size = (unsigned int) this->_test_play_frame.size();
                             result = helios->WriteFrameHighResolution(
                                       this->_attached_device,
-                                      (int)samplerate, HELIOS_FLAGS_DEFAULT,
-                                      this->_play_frame, POINTS_PER_FRAME
+                                      (int)samplerate,
+                                      HELIOS_FLAGS_DEFAULT,
+                                      this->_test_play_frame.data(),
+                                      test_frame_size
                                      );
+//                            result = helios->WriteFrameHighResolution(
+//                                      this->_attached_device,
+//                                      (int)samplerate,
+//                                      HELIOS_FLAGS_DEFAULT,
+//                                      this->_play_frame,
+//                                      POINTS_PER_FRAME
+//                                     );
                             }
+                            
+
                             
                             if(result != HELIOS_SUCCESS) {
                                 cerr << this->heliosErrorToString(result) << endl;
