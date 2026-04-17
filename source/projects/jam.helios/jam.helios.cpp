@@ -101,7 +101,7 @@ protected:
         }
     } queued_message_t;
     
-    int _attached_device = -1;
+    std::atomic<int> _attached_device = -1;
     
     std::thread _projector_thread;
     
@@ -127,7 +127,7 @@ protected:
     HeliosConnector * _connector = nullptr;
     
     HeliosConnector * _getConnector() {
-        if(this->_connector == nullptr) {
+        if(!this->_connector) {
             this->_connector = (HeliosConnector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
         }
         return this->_connector;
@@ -422,11 +422,13 @@ public:
             this->_ilda_manager_struct_ptr = (t_jam_im *)typedmess(this->_ilda_manager,symbol("get_struct"),0,0L);
             
             this->_manager = (c74::max::t_object*)c74::max::object_new_typed(c74::max::CLASS_NOBOX, symbol("jam.helios.manager"), 0, NULL);
-            this->_connector = (HeliosConnector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
+            
+            this->_connector = this->_connector = (HeliosConnector *)typedmess(this->_manager,symbol("get_connector"),0,0L);
             struct timespec ts;
             clock_gettime(CLOCK_REALTIME, &ts);
             srand((unsigned int)ts.tv_nsec);
             this->_instance_id = rand();
+            this->_connector->registerJamHeliosInstance(this);
             
             laser_point_t lp{0, 0};
             lpvec empty_frame{POINTS_PER_FRAME, lp};
@@ -458,8 +460,9 @@ public:
     }
     
     ~helios() {
-        if (!dummy()) {
+        if (!dummy() && this->initialized()) {
             close();
+            this->_getConnector()->unRegisterJamHeliosInstance(this);
             if(this->_frame_1) {
                 std::lock_guard lock(_frame_1_lock);
                 delete [] this->_frame_1;
@@ -483,7 +486,12 @@ public:
     outlet<> outlet_dumpout{ this, "dumpout" };
     
     void onConnectionReset() {
-        cwarn << "callback called" << endl;
+        this->_attached_device = -1;
+        queued_message_t msg;
+        atoms msg_atoms;
+        msg_atoms.push_back(0);
+        msg.set(&outlet_connected, msg_atoms);
+        msg.send(this);
     }
 
     attribute<int, threadsafe::no, limit::clamp> samplerate {
@@ -627,7 +635,7 @@ public:
             
             device_index--;
             
-            auto result = this->_getConnector()->attachDevice(device_index, this->getInstanceId());
+            auto result = this->_getConnector()->attachDacDevice(device_index, this->getInstanceId());
             
             bool connection_state = false;
             switch(result) {
@@ -659,7 +667,7 @@ public:
         this, "close", "Close connetion to Helios DAC",
         MIN_FUNCTION {
             if(this->_attached_device > -1) {
-                this->_getConnector()->detachDevice(this->getInstanceId());
+                this->_getConnector()->detachDacDevice(this->getInstanceId());
                 this->_attached_device = -1;
                 queued_message_t msg;
                 atoms msg_atoms;

@@ -128,29 +128,33 @@ public:
                 cwarn << "scan already in progress" << endl;
                 return {};
             }
-            
-            auto connector = this->_getConnector();
-            int numDevs = connector->deviceScan();
-            cout << "numDevs:" << numDevs << endl;
-            
-//            this->_device_scan_thread = std::thread([this]() {
-//                auto b = this->box();
-//                number current_progress{ -1. };
-//                b("startprogress", &current_progress);
-//                auto connector = this->_getConnector();
-//                int numDevs = connector->deviceScan();
+            if(this->_device_scan_thread.joinable()) {
+                this->_device_scan_thread.join();
+            }
 
-////                atoms scan_result;
-////                scan_result.clear();
-////                scan_result.push_back(atom("devicescan"));
-////                scan_result.push_back(atom(numDevs));
-////                queued_message_t msg;
-////                msg.set(&outlet_dumpout, scan_result);
-////                msg.send(this);
-//                b("stopprogress");
-////                this->_makeMenu();
-//            });
-//            _device_scan_thread.detach();
+            
+            this->_device_scan_thread = std::thread([this]() {
+                auto b = this->box();
+                number current_progress{ -1. };
+                b("startprogress", &current_progress);
+                auto connector = this->_getConnector();
+                int numDevs = connector->deviceScan();
+                if(numDevs == -1) {
+                    cwarn << "scan already in progress" << endl;
+                    b("stopprogress");
+                    return; // device scanning already in progress due to race condition
+                }
+
+                atoms scan_result;
+                scan_result.clear();
+                scan_result.push_back(atom("devicescan"));
+                scan_result.push_back(atom(numDevs));
+                queued_message_t msg;
+                msg.set(&outlet_dumpout, scan_result);
+                msg.send(this);
+                b("stopprogress");
+                this->_makeMenu();
+            });
         
             return {};
         }

@@ -36,7 +36,7 @@ namespace jam::helios {
         Connector(const Connector&) = delete;
         
         ~Connector() {
-            delete _open_devices;
+            delete _opened_dac_devices;
         }
         
         static Connector & get() {
@@ -48,38 +48,44 @@ namespace jam::helios {
         
         bool isScanning();
         
+        void registerJamHeliosInstance(InterfaceHeliosListener * ptr_jam_helio_instance);
+        void unRegisterJamHeliosInstance(InterfaceHeliosListener * ptr_jam_helio_instance);
+        void _callListeners();
+        
+        
         std::vector<device_info_t> * getOpenDevices();
         
         std::string getTypeName(DacType type);
         
-        bool getDeviceByIndex(int index, device_info_t * device_info);
+        bool getDacDeviceByIndex(int index, device_info_t * device_info);
         
-        DeviceState attachDevice(int device_index, uint instance_id);
+        DeviceState attachDacDevice(int device_index, uint instance_id);
         
-        void detachDevice(uint instance_id);
+        void detachDacDevice(uint instance_id);
         
         HeliosDac * getDac();
         
-        void subscribeListener(InterfaceHeliosListener * ptr_jam_helio_instance);
-        
-        
-        
-        
+          
     protected:
-        bool _is_scanning = false;
+        std::atomic<bool> _is_scanning = false;
         
         HeliosDac _helios_dac;
         
-        std::mutex _open_devices_lock;
-        std::mutex _attached_devices_lock;
         
-        std::vector<device_info_t> *_open_devices;
+        std::mutex _opened_dac_devices_lock;
+        std::vector<device_info_t> *_opened_dac_devices;
         
-        std::map<int, uint> _attached_devices = {};
+        std::mutex _attached_dac_devices_lock;
+        std::map<int, uint> _attached_dac_devices = {};
+        
+        std::vector<InterfaceHeliosListener*> _jam_helios_instances;
+        std::mutex _jam_helios_instances_lock;
+        
+        
         
     private:
         Connector() {
-            _open_devices = new std::vector<device_info_t>();
+            _opened_dac_devices = new std::vector<device_info_t>();
         };
     };
 }

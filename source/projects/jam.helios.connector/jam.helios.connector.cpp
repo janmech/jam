@@ -2,17 +2,37 @@
 
 namespace jam::helios {
     
-    void Connector::subscribeListener(InterfaceHeliosListener * ptr_jam_helio_instance) {
-        
+    void Connector::registerJamHeliosInstance(InterfaceHeliosListener * ptr_jam_helio_instance) {
+        std::lock_guard lock(this->_jam_helios_instances_lock);
+        this->_jam_helios_instances.push_back(ptr_jam_helio_instance);
     };
+    
+    void Connector::unRegisterJamHeliosInstance(InterfaceHeliosListener * ptr_jam_helio_instance) {
+        std::lock_guard lock(this->_jam_helios_instances_lock);
+        this->_jam_helios_instances.erase(
+               std::remove(
+                           _jam_helios_instances.begin(),
+                           _jam_helios_instances.end(),
+                           ptr_jam_helio_instance),
+               _jam_helios_instances.end()
+        );
+        
+     }
+    
+    void Connector::_callListeners() {
+        std::lock_guard lock(this->_jam_helios_instances_lock);
+        for (const auto& item : _jam_helios_instances) {
+            item->onConnectionReset();
+        }
+    }
     
     bool Connector::isScanning() {
         return this->_is_scanning;
     }
     
     std::vector<device_info_t> *Connector::getOpenDevices() {
-        std::lock_guard<std::mutex> lock(_open_devices_lock);
-        std::vector<device_info_t> *open_devs = this->_open_devices;
+        std::lock_guard<std::mutex> lock(_opened_dac_devices_lock);
+        std::vector<device_info_t> *open_devs = this->_opened_dac_devices;
         return open_devs;
     };
     
@@ -29,16 +49,20 @@ namespace jam::helios {
     };
     
     int Connector::deviceScan() {
-        this->_is_scanning = true;
+        if (_is_scanning.exchange(true)) {
+            return -1; // Abort!
+        }
+        this->_callListeners();
+
         this->_helios_dac.CloseDevices();
         
         {
-            std::lock_guard<std::mutex> lock(_open_devices_lock);
-            this->_open_devices->clear();
+            std::lock_guard<std::mutex> lock(_opened_dac_devices_lock);
+            this->_opened_dac_devices->clear();
         }
         {
-            std::lock_guard<std::mutex> lock(_attached_devices_lock);
-            this->_attached_devices.clear();
+            std::lock_guard<std::mutex> lock(_attached_dac_devices_lock);
+            this->_attached_dac_devices.clear();
         }
         
         int numDevs = this->_helios_dac.OpenDevices();
@@ -70,8 +94,8 @@ namespace jam::helios {
                 dac.index = i;
                 
                 {
-                    std::lock_guard<std::mutex> lock(_open_devices_lock);
-                    this->_open_devices->push_back(dac);
+                    std::lock_guard<std::mutex> lock(_opened_dac_devices_lock);
+                    this->_opened_dac_devices->push_back(dac);
                 }
                 
 
@@ -81,12 +105,12 @@ namespace jam::helios {
         return numDevs;
     }
     
-    DeviceState Connector::attachDevice(int device_index, uint instance_id) {
+    DeviceState Connector::attachDacDevice(int device_index, uint instance_id) {
         // check if device withn index exists
         bool device_exists = false;
         {
-            std::lock_guard<std::mutex> lock(_open_devices_lock);
-            for( auto it = this->_open_devices->begin(); it != this->_open_devices->end(); ++it) {
+            std::lock_guard<std::mutex> lock(_opened_dac_devices_lock);
+            for( auto it = this->_opened_dac_devices->begin(); it != this->_opened_dac_devices->end(); ++it) {
                 if (it->index == device_index) {
                     device_exists = true;
                     break;
@@ -99,9 +123,9 @@ namespace jam::helios {
         }
         
         {
-            std::lock_guard<std::mutex> lock(_attached_devices_lock);
-            auto it = this->_attached_devices.find(device_index);
-            if(it != this->_attached_devices.end()) {
+            std::lock_guard<std::mutex> lock(_attached_dac_devices_lock);
+            auto it = this->_attached_dac_devices.find(device_index);
+            if(it != this->_attached_dac_devices.end()) {
                     // device is already attached to this instace. Return success
                 if(it->second == instance_id) {
                     return DeviceState::ATTACH_SUCCESS ;
@@ -113,18 +137,18 @@ namespace jam::helios {
         
         // device exist and is not yet attached: let's attach it
         {
-            std::lock_guard<std::mutex> lock(_attached_devices_lock);
-            this->_attached_devices.insert({device_index, instance_id});
+            std::lock_guard<std::mutex> lock(_attached_dac_devices_lock);
+            this->_attached_dac_devices.insert({device_index, instance_id});
         }
         return DeviceState::ATTACH_SUCCESS ;
     };
     
-    void Connector::detachDevice(uint instance_id) {
+    void Connector::detachDacDevice(uint instance_id) {
         {
-            std::lock_guard<std::mutex> lock(_attached_devices_lock);
-            for (const auto& pair : this->_attached_devices) {
+            std::lock_guard<std::mutex> lock(_attached_dac_devices_lock);
+            for (const auto& pair : this->_attached_dac_devices) {
                 if(pair.second == instance_id) {
-                    this->_attached_devices.erase(pair.first);
+                    this->_attached_dac_devices.erase(pair.first);
                     break;
                     
                 }
