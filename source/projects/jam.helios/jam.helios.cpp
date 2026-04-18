@@ -38,17 +38,6 @@ using HeliosConnector = jam::helios::Connector;
 using fvec = std::vector<number>;
 
 
-//typedef struct LaserPoint {
-//    uint16_t x = 32767; // 65535 (0xFFFF)  / 2
-//    uint16_t y = 32767; // 65535 (0xFFFF)  / 2
-//    bool blanking = false;
-//} laser_point_t;
-//
-//typedef struct CoordPoint {
-//    number x = 0.;
-//    number y = 0.;
-//} coord_point_t;
-
 using lpvec = std::vector<laser_point_t>;
 
 
@@ -192,7 +181,7 @@ protected:
         number cos_a      = std::cos(this->_rotation_angle);
         number sin_a      = std::sin(this->_rotation_angle);
         for(auto lp: lps) {
-            coord_point_t coord_point = this->_toCoordPoint(lp);
+            coord_point_t coord_point = this->_frame_maker.toCoordPoint(lp);
             
                 // apply rotation
                 // calculate delta x/y - ajust for rotation anchor
@@ -208,9 +197,9 @@ protected:
             coord_point.x = std::clamp(coord_point.x, -1., 1.);
             coord_point.y = std::clamp(coord_point.y, -1., 1.);
             
-            laser_point_t rp = this->_toLaserPoint(coord_point);
+            laser_point_t rp = this->_frame_maker.toLaserPoint(coord_point);
             rp.blanking = lp.blanking;
-            if(!this->_laserPointVisible(rp)) {
+            if(!this->_frame_maker.laserPointVisible(rp)) {
                 rp.blanking = true;
             }
             rotated.push_back(rp);
@@ -246,60 +235,6 @@ protected:
         std::lock_guard lock(_frame_points_lock);
         return this->_frame_points;;
     }
-
-    
-    template <typename T> T _map(T x, T in_min, T in_max, T out_min, T out_max) {
-        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-    }
-    
-    number _toPrecision(number value, uint precision = 3) {
-        value = (int)(value * (10 * precision));
-        return (number)value / (10 * precision);
-    }
-    
-    bool _laserPointVisible(laser_point_t &lp) {
-        
-        return lp.x >= X_Y_MIN && lp.x <= X_Y_MAX && lp.y >= X_Y_MIN && lp.y <= X_Y_MAX;
-    }
-    
-    laser_point_t _toLaserPoint(coord_point_t p, bool set_blanking = true) {
-        laser_point_t lp;
-        // from -1/1 to 0/0xFFFF (65535)
-        number x_mapped = this->_map(p.x, -1., 1., 0., 65535.);
-        number y_mapped = this->_map(p.y, -1., 1.,  0., 65535.);
-        lp.x = (uint16_t)x_mapped;
-        lp.y = (uint16_t)y_mapped;
-        if(set_blanking) {
-            lp.blanking = !this->_laserPointVisible(lp);
-        }
-        return lp;
-    };
-    
-    coord_point_t _toCoordPoint(const laser_point_t &lp) {
-        coord_point_t cp;
-    
-        cp.x = this->_map((number)lp.x, 0., 65535., -1., 1.);
-        cp.y = this->_map((number)lp.y, 0., 65535., -1., 1.);
-        return cp;;
-    }
-    
-    lpvec _makeDotPoints(number x, number y) {
-        lpvec points;
-        number x_coord_prev = 0.;
-        for(int i = 0; i < POINTS_PER_DIRECT_DRAW_FRAME; i++) {
-            coord_point_t cp;
-            cp.y = y;
-            number offset = (2. / (number)(POINTS_PER_DIRECT_DRAW_FRAME) * (number)i);
-            number x_coord = -1. + offset;
-            cp.x = x_coord;
-            bool blanking = !(x >= x_coord_prev && x <= x_coord);
-            laser_point_t lp = this->_toLaserPoint(cp, false);
-            lp.blanking = blanking;
-            x_coord_prev = x_coord;
-            points.push_back(lp);
-        }
-        return points;
-    }
     
     void _parseFrames2DToTrueColor(std::vector<jam::ilda::IldaFrame> &frames) {
         jam::ilda::Colors *col = new jam::ilda::Colors();
@@ -332,8 +267,6 @@ protected:
         this->_laser_frames.clear();
         for(auto ilda_frame: this->_ilda_frames) {
             int frame_record_count = ilda_frame.getDataRecordCount();
-                // Make new laser frame
-//            auto l_frame = std::make_unique<HeliosPointHighRes[]>(frame_record_count);
             auto data_record = ilda_frame.getDataRecords();
             std::vector<HeliosPointHighRes> l_frame;
             for(int i = 0; i < frame_record_count; i++) {
@@ -342,9 +275,9 @@ protected:
                 l_point->x = dr.getPosX();
                 l_point->y = dr.getPosY();
                 l_point->r = dr.getRed();
-                auto red = dr.getBlanking() ? 0 : this->_map((uint16_t)dr.getRed(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
-                auto green = dr.getBlanking() ? 0 : this->_map((uint16_t)dr.getGreen(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
-                auto blue = dr.getBlanking() ? 0 : this->_map((uint16_t)dr.getBlue(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
+                auto red = dr.getBlanking() ? 0 : this->_frame_maker.map((uint16_t)dr.getRed(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
+                auto green = dr.getBlanking() ? 0 : this->_frame_maker.map((uint16_t)dr.getGreen(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
+                auto blue = dr.getBlanking() ? 0 : this->_frame_maker.map((uint16_t)dr.getBlue(), (uint16_t)0x0, (uint16_t)0xff, (uint16_t)0x0, (uint16_t)0xFFFF);
                 l_point->r = red;
                 l_point->g = green;
                 l_point->b = blue;
@@ -419,6 +352,25 @@ public:
     outlet<> outlet_menu{ this, "(anything) Connect to umenu", "message" };
     outlet<> outlet_connected{ this, "(int) State of Connection", "int" };
     outlet<> outlet_dumpout{ this, "dumpout" };
+    
+    attribute<number, threadsafe::no> segments_size {
+        this,
+        "segments_size",
+        0.005,
+        title{ "Segment Size" },
+        description{ "Normalized sized of each line segment in the generasted laser frame" },
+        setter {
+            MIN_FUNCTION {
+                atoms cleaned_args;
+                jam::checkAndFillAttrArgs<number>(args, &cleaned_args, 1, 0.005);
+                cleaned_args[0] = std::clamp((number)cleaned_args[0], .005, 0.1);
+                if(this->initialized()) {
+                    this->_frame_maker.setSegmentSize((number)cleaned_args[0]);
+                }
+                return cleaned_args;
+            }
+        }
+    };
     
     attribute<int, threadsafe::no, limit::clamp> samplerate {
         this,
@@ -614,7 +566,7 @@ public:
             }
             number x = std::clamp((number)args[0], -1., 1.);
             number y = std::clamp((number)args[1], -1., 1.) * -1.;
-            this->_setFramePoints(this->_makeDotPoints(x, y));
+            this->_setFramePoints(this->_frame_maker.makeDotPoints(x, y));
             
             {
                 std::lock_guard lock(_edit_frame_lock);

@@ -36,20 +36,33 @@ namespace jam::helios {
                                  coord_point_t r,
                                  const number theta_start = 0,
                                  const number theta_end = 360,
-                                 int segments = 1000
+                                 const int segments = POINTS_PER_DIRECT_DRAW_FRAME
                                  );
         lpvec makeLinePoints(
                               const coord_point_t& p1,
-                              const coord_point_t& p2
+                              const coord_point_t& p2,
+                              const int segments = POINTS_PER_DIRECT_DRAW_FRAME
                              );
+        lpvec makeDotPoints(number x, number y);
         
-        laser_point_t _toLaserPoint(coord_point_t p, bool set_blanking = true);
+        laser_point_t toLaserPoint(coord_point_t p, bool set_blanking = true);
+        coord_point_t toCoordPoint(const laser_point_t &lp);
+        
+        template <typename T> T map(T x, T in_min, T in_max, T out_min, T out_max) {
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        }
+        
+        bool laserPointVisible(laser_point_t &lp, unsigned int xy_min = X_Y_MIN, unsigned int xy_max = X_Y_MAX);
+        
+        lpvec interpolatePoints(lpvec &in_laser_points);
+        
+        void setSegmentSize(number segment_size);
+        
         
     protected:
-        template <typename T> T _map(T x, T in_min, T in_max, T out_min, T out_max);
-        bool _laserPointVisible(laser_point_t &lp);
-        
+        number _segment_size = 0.05f;
     };
+    
 }
 
 
