@@ -19,16 +19,25 @@ include_directories(
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
     ./jam.shape.cpp
+    ./jam.shape.hpp
     ./jam_compose_data.cpp
+    ./jam_compose_data.hpp
     ../jam.helper/attribute_args_helper.cpp
+    ../jam.helper/attribute_args_helper.hpp
     ../jam.ilda_common/stb_truetype.h
     ../jam.ilda_common/nanosvg.h
     ../jam.ilda_common/ilda_data_record.cpp
+    ../jam.ilda_common/ilda_data_record.hpp
     ../jam.ilda_common/ilda_file_processor.cpp
+    ../jam.ilda_common/ilda_file_processor.hpp
     ../jam.ilda_common/ilda_frame.cpp
+    ../jam.ilda_common/ilda_frame.hpp
     ../jam.ilda_common/ilda_header.cpp
+    ../jam.ilda_common/ilda_header.hpp
     ../jam.ilda_common/ilda_colors.cpp
+    ../jam.ilda_common/ilda_colors.hpp
     ../jam.ilda_common/ttf_file_processor.cpp
+    ../jam.ilda_common/ttf_file_processor.hpp
 )
 
 

@@ -19,17 +19,25 @@ include_directories(
 
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
+    ./jam.helios.laser_frame_maker.cpp
+    ./jam.helios.laser_frame_maker.hpp
 	../jam.helios.connector/helios-sdk/cpp/HeliosDac.cpp
 	../jam.helios.connector/helios-sdk/cpp/idn/idn.cpp
     ../jam.helios.connector/helios-sdk/cpp/shared_library/HeliosDacAPI.cpp
     ../jam.helios.connector/helios-sdk/cpp/idn/idnServerList.cpp
     ../jam.helios.connector/helios-sdk/cpp/idn/plt-posix.c
     ../jam.helper/attribute_args_helper.cpp
+    ../jam.helper/attribute_args_helper.hpp
     ../jam.helios.connector/jam.helios.connector.cpp
+    ../jam.helios.connector/jam.helios.connector.hpp
     ../jam.ilda_common/ilda_data_record.cpp
+    ../jam.ilda_common/ilda_data_record.hpp
     ../jam.ilda_common/ilda_frame.cpp
+    ../jam.ilda_common/ilda_frame.hpp
     ../jam.ilda_common/ilda_header.cpp
+    ../jam.ilda_common/ilda_header.hpp
     ../jam.ilda_common/ilda_colors.cpp
+    ../jam.ilda_common/ilda_colors.hpp
 )
 
 

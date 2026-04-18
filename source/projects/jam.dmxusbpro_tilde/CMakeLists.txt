@@ -20,7 +20,9 @@ include_directories(
 set( SOURCE_FILES
 	${PROJECT_NAME}.cpp
     ../jam.dmxusbpro.connector/jam.dmxusbpro.connector.cpp
+    ../jam.dmxusbpro.connector/jam.dmxusbpro.connector.hpp
     ../jam.helper/attribute_args_helper.cpp
+    ../jam.helper/attribute_args_helper.hpp
 )
 
 

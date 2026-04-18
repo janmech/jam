@@ -25,10 +25,11 @@
 #include "../jam.ilda_common/ilda_data_record.hpp"
 #include "../jam.ilda_common/ilda_colors.hpp"
 #include "InterfaceHeliosListener.hpp"
+#include "jam.helios.laser_frame_maker.hpp"
 
-#define POINTS_PER_DIRECT_DRAW_FRAME 1000
-#define X_Y_MAX 65500
-#define X_Y_MIN 35
+//#define POINTS_PER_DIRECT_DRAW_FRAME 1000
+//#define X_Y_MAX 65500
+//#define X_Y_MIN 35
 
 
 using namespace c74::min;
@@ -37,16 +38,16 @@ using HeliosConnector = jam::helios::Connector;
 using fvec = std::vector<number>;
 
 
-typedef struct LaserPoint {
-    uint16_t x = 32767; // 65535 (0xFFFF)  / 2
-    uint16_t y = 32767; // 65535 (0xFFFF)  / 2
-    bool blanking = false;
-} laser_point_t;
-
-typedef struct CoordPoint {
-    number x = 0.;
-    number y = 0.;
-} coord_point_t;
+//typedef struct LaserPoint {
+//    uint16_t x = 32767; // 65535 (0xFFFF)  / 2
+//    uint16_t y = 32767; // 65535 (0xFFFF)  / 2
+//    bool blanking = false;
+//} laser_point_t;
+//
+//typedef struct CoordPoint {
+//    number x = 0.;
+//    number y = 0.;
+//} coord_point_t;
 
 using lpvec = std::vector<laser_point_t>;
 
@@ -56,15 +57,14 @@ class helios : public object<helios>, public InterfaceHeliosListener
     
 protected:
     
-    std::vector<HeliosPointHighRes> _play_frame;
-    std::vector<HeliosPointHighRes> _edit_frame;
+    std::vector<HeliosPointHighRes> _play_frame;                // frame rendered to projector
+    std::vector<HeliosPointHighRes> _edit_frame;                // nect frame in preparation to be be rendered to projector
         
     std::mutex _play_frame_lock;
     std::mutex _edit_frame_lock;
     
-    std::vector<jam::ilda::IldaFrame>                _ilda_frames;
-//    std::vector<std::unique_ptr<HeliosPointHighRes[]>> _laser_frames;
-    std::vector<std::vector<HeliosPointHighRes>> _laser_frames;
+    std::vector<jam::ilda::IldaFrame>            _ilda_frames;   // frames from ILDA file
+    std::vector<std::vector<HeliosPointHighRes>> _laser_frames;  // ILDA frames rendered for HeliosDac
     
     lpvec _frame_points;
     std::mutex _frame_points_lock;
@@ -283,40 +283,6 @@ protected:
         return cp;;
     }
     
-    lpvec _makeEllipsePoints(
-        coord_point_t c,
-        coord_point_t r,
-        const number theta_start = 0,
-        const number theta_end = 360,
-        int segments = 1000
-    ) {
-        lpvec points;
-        if(theta_start == theta_end) {
-            return points;
-        }
-        number rad_start = theta_start * (PI / 180.);
-        number rad_end = theta_end * (PI / 180.);
-        number rad_range = rad_end - rad_start;
-        
-        
-        for (int i = 0; i < segments; ++i) {
-            coord_point_t cp;
-           
-            number angle = rad_start + (rad_range * i / segments);
-            // number angle = rad_start + (number)(rad_range * (number)i / (number)segments);
-            cp.x = c.x + r.x * std::cos(angle);
-            cp.y = c.y + r.y * std::sin(angle);
-            
-            cp.x = std::clamp(cp.x, -1., 1.);
-            cp.y = std::clamp(cp.y, -1., 1.);
-            
-            laser_point_t lp = this->_toLaserPoint(cp);
-            points.push_back(lp);
-        }
-        points[segments - 1] = points[0];
-        return points;
-    }
-    
     lpvec _makeDotPoints(number x, number y) {
         lpvec points;
         number x_coord_prev = 0.;
@@ -332,29 +298,6 @@ protected:
             x_coord_prev = x_coord;
             points.push_back(lp);
         }
-        return points;
-    }
-    
-    lpvec _makeLinePoints(
-          const coord_point_t& p1,
-          const coord_point_t& p2
-          ) {
-        lpvec points;
-        number delta_x = p2.x - p1.x;
-        number delta_y = p2.y - p1.y;
-        for (int i = 0; i < POINTS_PER_DIRECT_DRAW_FRAME; ++i) {
-            number t = static_cast<number>(i) / POINTS_PER_DIRECT_DRAW_FRAME;
-            number x = p1.x + t * delta_x;
-            number y = p1.y + t * delta_y;
-            coord_point_t cp{std::clamp(x, -1., 1.), std::clamp(y, -1., 1.)};
-            laser_point_t lp = this->_toLaserPoint(cp);
-            points.push_back(lp);
-        }
-        for(int i = 1; i < 10; i++) {
-            points[POINTS_PER_DIRECT_DRAW_FRAME - i] = points[0];
-            points[POINTS_PER_DIRECT_DRAW_FRAME - i].blanking = true;
-        }
-        
         return points;
     }
     
@@ -411,6 +354,8 @@ protected:
             this->_laser_frames.push_back(std::move(l_frame));
         }
     }
+    
+    FrameMaker _frame_maker{};
  
     
 public:
@@ -695,7 +640,7 @@ public:
             number y = std::clamp((number)args[1], -1., 1.) * -1.;
             coord_point_t center = {x, y};
             coord_point_t  radius = {r, r};
-            this->_setFramePoints(this->_makeEllipsePoints(center, radius));
+            this->_setFramePoints(this->_frame_maker.makeEllipsePoints(center, radius));
             
             {
                 std::lock_guard lock(_edit_frame_lock);
@@ -723,7 +668,7 @@ public:
                 std::clamp((number)args[3], -1., 1.) //* -1.
             };
             
-            this->_setFramePoints(this->_makeLinePoints(start, end));
+            this->_setFramePoints(this->_frame_maker.makeLinePoints(start, end));
             
             {
                 std::lock_guard lock(_edit_frame_lock);

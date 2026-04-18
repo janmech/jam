@@ -30,6 +30,8 @@ set( SOURCE_FILES
     ../jam.helios.connector/helios-sdk/cpp/idn/idnServerList.cpp
     ../jam.helios.connector/helios-sdk/cpp/idn/plt-posix.c
     ../jam.helios.connector/jam.helios.connector.cpp
+    ../jam.helios.connector/jam.helios.connector.hpp
+    ./jam.helios.manager.hpp
 )
 
 

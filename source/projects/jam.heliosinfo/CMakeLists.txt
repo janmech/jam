@@ -25,7 +25,9 @@ set( SOURCE_FILES
     ../jam.helios.connector/helios-sdk/cpp/idn/idnServerList.cpp
     ../jam.helios.connector/helios-sdk/cpp/idn/plt-posix.c
     ../jam.helper/attribute_args_helper.cpp
+    ../jam.helper/attribute_args_helper.hpp
     ../jam.helios.connector/jam.helios.connector.cpp
+    ../jam.helios.connector/jam.helios.connector.hpp
 )
 
 
